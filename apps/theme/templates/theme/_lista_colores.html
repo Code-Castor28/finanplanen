@@ -1,0 +1,41 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Color</th>
+      <th>Nombre</th>
+      <th>Slug</th>
+      <th>Hex</th>
+      <th>Activo</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for color in colores %}
+    <tr id="color-{{ color.pk }}">
+      <td><span class="color-swatch" style="background: {{ color.hex }}"></span></td>
+      <td>{{ color.nombre }}</td>
+      <td><code>--clr-{{ color.slug }}</code></td>
+      <td><code>{{ color.hex }}</code></td>
+      <td>{% if color.activo %}<i class="fas fa-check" style="color: var(--inc)"></i>{% else %}<i class="fas fa-times" style="color: var(--exp)"></i>{% endif %}</td>
+      <td class="actions">
+        <button class="btn-sm"
+                hx-get="{% url 'theme:colores_editar' color.pk %}"
+                hx-target="#modal-content"
+                _="on htmx:afterOnLoad wait 10ms then add @open to #form-modal">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-sm btn-danger"
+                hx-get="{% url 'theme:colores_eliminar' color.pk %}"
+                hx-target="#modal-content"
+                _="on htmx:afterOnLoad wait 10ms then add @open to #form-modal">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6" class="text-center">No hay colores registrados.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

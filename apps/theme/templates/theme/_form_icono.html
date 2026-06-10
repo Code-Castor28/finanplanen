@@ -1,0 +1,35 @@
+<form method="post"
+      hx-post="{% if object %}{% url 'theme:iconos_editar' object.pk %}{% else %}{% url 'theme:iconos_crear' %}{% endif %}"
+      hx-target="this"
+      hx-swap="outerHTML"
+      _="on htmx:beforeSend remove @open from #form-modal">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+    {{ form.nombre }}
+    {% for error in form.nombre.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div class="form-group">
+    <label for="{{ form.slug.id_for_label }}">{{ form.slug.label }}</label>
+    {{ form.slug }}
+    {% for error in form.slug.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div class="form-group">
+    <label for="{{ form.clase_css.id_for_label }}">{{ form.clase_css.label }}</label>
+    {{ form.clase_css }}
+    {% for error in form.clase_css.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div class="form-group">
+    <label class="checkbox-label">
+      {{ form.activo }} {{ form.activo.label }}
+    </label>
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn-primary">
+      <i class="fas fa-save"></i> {% if object %}Guardar{% else %}Crear{% endif %}
+    </button>
+    <button type="button" class="btn-secondary" _="on click remove @open from #form-modal">
+      Cancelar
+    </button>
+  </div>
+</form>

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Colores — FinanPlanen{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Colores</h1>
+    <p class="sub">Gestiona los colores de tu tema visual</p>
+  </div>
+  <div class="head-buttons">
+    <button class="btn btn-primary"
+            hx-get="{% url 'theme:colores_crear' %}"
+            hx-target="#modal-content"
+            hx-trigger="click"
+            _="on htmx:afterOnLoad wait 10ms then add @open to #form-modal">
+      <i class="fas fa-plus"></i> Nuevo Color
+    </button>
+  </div>
+</div>
+
+<div id="color-list" hx-get="{% url 'theme:colores_lista' %}" hx-trigger="load" hx-swap="innerHTML">
+  <div class="loading">Cargando...</div>
+</div>
+
+<div id="form-modal" class="modal-overlay">
+  <div class="modal" id="modal-content"></div>
+</div>
+{% endblock %}

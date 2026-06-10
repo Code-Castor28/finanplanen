@@ -1,0 +1,39 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Icono</th>
+      <th>Nombre</th>
+      <th>Slug</th>
+      <th>Clase CSS</th>
+      <th>Activo</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for icono in iconos %}
+    <tr id="icono-{{ icono.pk }}">
+      <td><i class="{{ icono.clase_css }}"></i></td>
+      <td>{{ icono.nombre }}</td>
+      <td><code>{{ icono.slug }}</code></td>
+      <td><code>{{ icono.clase_css }}</code></td>
+      <td>{% if icono.activo %}<i class="fas fa-check" style="color: var(--inc)"></i>{% else %}<i class="fas fa-times" style="color: var(--exp)"></i>{% endif %}</td>
+      <td class="actions">
+        <button class="btn-sm"
+                hx-get="{% url 'theme:iconos_editar' icono.pk %}"
+                hx-target="#modal-content"
+                _="on htmx:afterOnLoad wait 10ms then add @open to #form-modal">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-sm btn-danger"
+                hx-get="{% url 'theme:iconos_eliminar' icono.pk %}"
+                hx-target="#modal-content"
+                _="on htmx:afterOnLoad wait 10ms then add @open to #form-modal">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6" class="text-center">No hay iconos registrados.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
