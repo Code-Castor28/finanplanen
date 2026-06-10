@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>derejfinance — Iniciar Sesión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --p:#000666;--pc:#1a237e;--op:#ffffff;--opc:#8690ee;
+  --sl:#ffffff;--slw:#f2f4f7;--sc:#eceef1;
+  --os:#191c1e;--ov:#454652;
+  --ol:#767683;--olv:#c6c5d4;
+  --st:#4c56af;
+  --inc:#2E7D32;--incb:rgba(46,125,50,.1);
+  --exp:#C62828;--expb:rgba(198,40,40,.1);
+  --s2:0 12px 32px rgba(26,35,126,.12);
+  --r:.5rem;--rm:.75rem;--rl:1rem;--rxl:1.5rem;--rf:9999px;
+}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+  font-family:'Inter',sans-serif;
+  color:var(--os);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;min-height:100dvh;
+  overflow-x:hidden;
+}
+
+/* ===== SPLIT LAYOUT ===== */
+.login-page{
+  display:flex;min-height:100vh;min-height:100dvh;
+}
+
+/* LEFT: HERO IMAGE SIDE */
+.login-hero{
+  flex:1.2;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:#0d1042;
+}
+.login-hero .bg-img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:.35;filter:brightness(.6) saturate(1.1);
+  transition:opacity .5s;
+}
+.login-hero::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,6,102,.75) 0%,rgba(26,35,126,.60) 50%,rgba(13,16,66,.80) 100%);
+  pointer-events:none;
+}
+.hero-content{
+  position:relative;z-index:1;padding:60px 48px;max-width:520px;color:#fff;
+}
+.hero-content .hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;border-radius:var(--rf);
+  background:rgba(255,255,255,.12);backdrop-filter:blur(8px);
+  font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  margin-bottom:24px;color:#fff;
+}
+.hero-content .hero-badge i{font-size:11px}
+.hero-content h1{
+  font-size:42px;font-weight:800;line-height:1.15;letter-spacing:-.03em;
+  margin-bottom:20px;text-shadow:0 4px 12px rgba(0,0,0,.2);
+}
+.hero-content h1 .accent{color:#bdc2ff}
+.hero-content p{
+  font-size:16px;line-height:1.7;color:rgba(255,255,255,.75);
+  margin-bottom:32px;
+}
+.hero-features{display:flex;flex-direction:column;gap:16px}
+.hero-features .hf{
+  display:flex;align-items:center;gap:14px;
+  font-size:14px;color:rgba(255,255,255,.85);font-weight:500;
+}
+.hero-features .hf .hf-icon{
+  width:40px;height:40px;border-radius:var(--r);flex-shrink:0;
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  color:#bdc2ff;
+}
+.hero-features .hf strong{color:#fff}
+
+.hero-deco{
+  position:absolute;bottom:-60px;right:-60px;
+  width:240px;height:240px;border-radius:50%;
+  background:rgba(255,255,255,.03);pointer-events:none;z-index:0;
+}
+.hero-deco2{
+  position:absolute;top:-40px;left:-40px;
+  width:180px;height:180px;border-radius:50%;
+  background:rgba(255,255,255,.02);pointer-events:none;z-index:0;
+}
+
+/* RIGHT: FORM SIDE */
+.login-form-side{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  background:var(--slw);padding:40px;
+  position:relative;overflow:hidden;
+}
+.login-form-side::before{
+  content:'';position:absolute;top:-100px;right:-100px;
+  width:300px;height:300px;border-radius:50%;
+  background:rgba(26,35,126,.03);pointer-events:none;
+}
+.login-form-side::after{
+  content:'';position:absolute;bottom:-80px;left:-80px;
+  width:250px;height:250px;border-radius:50%;
+  background:rgba(76,86,175,.03);pointer-events:none;
+}
+
+.login-card{
+  width:100%;max-width:420px;position:relative;z-index:1;
+}
+.login-card .logo{
+  display:flex;align-items:center;gap:12px;margin-bottom:36px;
+}
+.login-card .logo .logo-icon{
+  width:48px;height:48px;border-radius:var(--rm);
+  background:linear-gradient(135deg,var(--pc),#283593);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:20px;box-shadow:0 4px 16px rgba(26,35,126,.25);
+}
+.login-card .logo .logo-text{
+  font-size:24px;font-weight:800;color:var(--p);letter-spacing:-.02em;
+}
+.login-card .logo .logo-sub{
+  display:block;font-size:11px;font-weight:500;color:var(--ol);
+  letter-spacing:.06em;text-transform:uppercase;margin-top:1px;
+}
+
+.login-card h2{
+  font-size:28px;font-weight:800;color:var(--os);margin-bottom:6px;letter-spacing:-.02em;
+}
+.login-card .subtitle{
+  font-size:14px;color:var(--ov);margin-bottom:32px;line-height:1.6;
+}
+.login-card .subtitle a{
+  color:var(--pc);font-weight:600;text-decoration:none;
+}
+.login-card .subtitle a:hover{text-decoration:underline}
+
+/* FORM */
+.form-group{margin-bottom:20px;position:relative}
+.form-group label{
+  display:block;font-size:11px;font-weight:600;color:var(--ov);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;
+}
+.input-wrap{
+  position:relative;display:flex;align-items:center;
+}
+.input-wrap .input-icon{
+  position:absolute;left:14px;font-size:16px;color:var(--ol);
+  pointer-events:none;transition:color .2s;
+}
+.input-wrap input{
+  width:100%;padding:14px 14px 14px 44px;
+  border:1.5px solid var(--olv);border-radius:var(--rm);
+  font-family:inherit;font-size:15px;color:var(--os);
+  background:var(--sl);outline:none;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.input-wrap input::placeholder{color:var(--ol)}
+.input-wrap input:focus{
+  border-color:var(--pc);background:#fff;
+  box-shadow:0 0 0 4px rgba(26,35,126,.08);
+}
+.input-wrap input:focus~.input-icon{color:var(--pc)}
+.input-wrap input.error{
+  border-color:var(--exp);background:#fff;
+  box-shadow:0 0 0 4px rgba(198,40,40,.06);
+}
+.input-wrap input.error~.input-icon{color:var(--exp)}
+.input-wrap .toggle-pw{
+  position:absolute;right:14px;background:none;border:none;
+  cursor:pointer;color:var(--ol);font-size:16px;padding:4px;
+  transition:color .2s;
+}
+.input-wrap .toggle-pw:hover{color:var(--os)}
+.error-msg{
+  font-size:12px;color:var(--exp);font-weight:500;
+  margin-top:6px;display:none;align-items:center;gap:5px;
+}
+.error-msg.show{display:flex}
+.error-msg i{font-size:11px}
+
+.form-options{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;
+}
+.checkbox-wrap{
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+}
+.checkbox-wrap input[type="checkbox"]{
+  width:18px;height:18px;accent-color:var(--pc);cursor:pointer;
+  border-radius:4px;
+}
+.checkbox-wrap span{font-size:13px;color:var(--ov);font-weight:500}
+.forgot-link{
+  font-size:13px;color:var(--pc);font-weight:600;text-decoration:none;
+}
+.forgot-link:hover{text-decoration:underline}
+
+.submit-btn{
+  width:100%;padding:15px;border:none;border-radius:var(--rm);
+  background:linear-gradient(135deg,var(--pc),#283593);
+  color:#fff;font-family:inherit;font-size:15px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  gap:10px;transition:all .2s;position:relative;overflow:hidden;
+}
+.submit-btn:hover{
+  filter:brightness(1.08);
+  box-shadow:0 8px 24px rgba(26,35,126,.30);
+  transform:translateY(-1px);
+}
+.submit-btn:active{transform:translateY(0);filter:brightness(.98)}
+.submit-btn .spinner{
+  display:none;width:20px;height:20px;
+  border:2.5px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .6s linear infinite;
+}
+.submit-btn.loading .btn-text{display:none}
+.submit-btn.loading .spinner{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.divider{
+  display:flex;align-items:center;gap:16px;margin:28px 0;
+}
+.divider::before,.divider::after{
+  content:'';flex:1;height:1px;background:var(--olv);
+}
+.divider span{font-size:12px;color:var(--ol);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+
+.social-buttons{display:flex;gap:12px}
+.social-btn{
+  flex:1;padding:12px;border:1.5px solid var(--olv);border-radius:var(--rm);
+  background:var(--sl);font-family:inherit;font-size:14px;font-weight:600;
+  color:var(--os);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  gap:10px;transition:all .2s;
+}
+.social-btn:hover{
+  border-color:var(--pc);background:rgba(26,35,126,.03);
+  box-shadow:0 4px 12px rgba(26,35,126,.06);
+}
+.social-btn i{font-size:18px}
+.social-btn.google i{color:#ea4335}
+.social-btn.apple i{color:#000}
+
+.footer-text{
+  margin-top:32px;text-align:center;
+  font-size:12px;color:var(--ol);line-height:1.6;
+}
+.footer-text a{color:var(--ov);text-decoration:none;font-weight:500}
+.footer-text a:hover{text-decoration:underline}
+
+/* SUCCESS STATE */
+.success-overlay{
+  position:fixed;inset:0;background:rgba(0,6,102,.30);
+  backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;
+  z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.success-overlay.show{opacity:1;pointer-events:all}
+.success-card{
+  background:var(--sl);border-radius:var(--rxl);padding:48px 40px;
+  text-align:center;max-width:380px;width:90%;
+  box-shadow:0 24px 64px rgba(0,0,0,.2);
+  transform:scale(.9);transition:transform .3s cubic-bezier(.22,1,.36,1);
+}
+.success-overlay.show .success-card{transform:scale(1)}
+.success-icon{
+  width:80px;height:80px;border-radius:50%;margin:0 auto 20px;
+  background:var(--incb);color:var(--inc);
+  display:flex;align-items:center;justify-content:center;font-size:32px;
+  animation:popIn .5s cubic-bezier(.22,1,.36,1) .2s both;
+}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success-card h3{font-size:22px;font-weight:700;color:var(--os);margin-bottom:8px}
+.success-card p{font-size:14px;color:var(--ov);margin-bottom:24px;line-height:1.6}
+.success-card .btn-ok{
+  padding:12px 32px;border:none;border-radius:var(--rm);
+  background:var(--pc);color:#fff;font-family:inherit;font-size:14px;
+  font-weight:600;cursor:pointer;transition:all .2s;
+}
+.success-card .btn-ok:hover{filter:brightness(1.1)}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--is);color:var(--io);
+  padding:12px 22px;border-radius:var(--rm);
+  font-size:13px;font-weight:500;box-shadow:var(--s2);z-index:2000;
+  transition:all .3s;display:flex;align-items:center;gap:8px;white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast i{font-size:14px}
+.toast.su i{color:#66bb6a}
+.toast.er i{color:#ef5350}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.login-card{animation:fadeUp .6s ease forwards}
+.login-card .logo{animation:fadeUp .6s ease .1s both}
+.login-card h2,.login-card .subtitle{animation:fadeUp .6s ease .15s both}
+.form-group:nth-child(1){animation:fadeUp .6s ease .2s both}
+.form-group:nth-child(2){animation:fadeUp .6s ease .25s both}
+.form-options{animation:fadeUp .6s ease .3s both}
+.submit-btn{animation:fadeUp .6s ease .35s both}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  .login-page{flex-direction:column}
+  .login-hero{
+    min-height:280px;max-height:340px;flex:none;
+  }
+  .hero-content{padding:36px 28px;max-width:100%}
+  .hero-content h1{font-size:28px}
+  .hero-features{display:none}
+  .login-form-side{padding:32px 24px}
+  .login-card h2{font-size:24px}
+}
+@media(max-width:480px){
+  .login-hero{min-height:220px;max-height:260px}
+  .hero-content{padding:24px 20px}
+  .hero-content h1{font-size:22px}
+  .hero-content p{font-size:14px}
+  .login-form-side{padding:24px 18px}
+  .login-card h2{font-size:22px}
+  .social-buttons{flex-direction:column}
+  .form-options{flex-direction:column;gap:12px;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div class="login-page">
+  <!-- LEFT: HERO -->
+  <div class="login-hero">
+    <div class="hero-deco"></div>
+    <div class="hero-deco2"></div>
+    <img class="bg-img" src="https://www.argentinaproduct.com/ckfinder/userfiles/files/blog/finanoct.jpg" alt="Finanzas personales" loading="eager">
+    <div class="hero-content">
+      <span class="hero-badge"><i class="fas fa-shield-halved"></i> Plataforma Segura</span>
+      <h1>Tus finanzas bajo <span class="accent">control total</span></h1>
+      <p>Administra tus cuentas, presupuestos y metas de ahorro con precisión fiscal. Todo en un solo lugar, de forma simple y segura.</p>
+      <div class="hero-features">
+        <div class="hf">
+          <div class="hf-icon"><i class="fas fa-chart-line"></i></div>
+          <span>Seguimiento en <strong>tiempo real</strong> de todas tus cuentas</span>
+        </div>
+        <div class="hf">
+          <div class="hf-icon"><i class="fas fa-piggy-bank"></i></div>
+          <span>Metas de ahorro con <strong>proyecciones inteligentes</strong></span>
+        </div>
+        <div class="hf">
+          <div class="hf-icon"><i class="fas fa-lock"></i></div>
+          <span>Encriptación de <strong>grado bancario</strong> en tus datos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: FORM -->
+  <div class="login-form-side">
+    <div class="login-card">
+      <div class="logo">
+        <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
+        <div>
+          <span class="logo-text">derejfinance</span>
+          <span class="logo-sub">Fiscal Precision</span>
+        </div>
+      </div>
+
+      <h2>Bienvenido de vuelta</h2>
+      <p class="subtitle">Ingresa tus credenciales para acceder a tu panel financiero. <br>¿No tienes cuenta? <a href="#" id="toggleMode">Crear cuenta</a></p>
+
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="email">Correo Electrónico</label>
+          <div class="input-wrap">
+            <input type="email" id="email" placeholder="tu@email.com" autocomplete="email">
+            <i class="fas fa-envelope input-icon"></i>
+          </div>
+          <div class="error-msg" id="emailError"><i class="fas fa-exclamation-circle"></i><span></span></div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <div class="input-wrap">
+            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+            <i class="fas fa-lock input-icon"></i>
+            <button type="button" class="toggle-pw" id="togglePw" aria-label="Mostrar contraseña"><i class="far fa-eye"></i></button>
+          </div>
+          <div class="error-msg" id="pwError"><i class="fas fa-exclamation-circle"></i><span></span></div>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-wrap">
+            <input type="checkbox" id="remember">
+            <span>Recordarme</span>
+          </label>
+          <a href="#" class="forgot-link" id="forgotLink">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span class="btn-text"><i class="fas fa-right-to-bracket"></i> Iniciar Sesión</span>
+          <div class="spinner"></div>
+        </button>
+      </form>
+
+      <div class="divider"><span>o continúa con</span></div>
+
+      <div class="social-buttons">
+        <button class="social-btn google" id="googleBtn">
+          <i class="fab fa-google"></i> Google
+        </button>
+        <button class="social-btn apple" id="appleBtn">
+          <i class="fab fa-apple"></i> Apple
+        </button>
+      </div>
+
+      <div class="footer-text">
+        Al continuar, aceptas nuestros <a href="#">Términos de Servicio</a> y <a href="#">Política de Privacidad</a>.
+        <br>&copy; 2024 derejfinance. Todos los derechos reservados.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-card">
+    <div class="success-icon"><i class="fas fa-check"></i></div>
+    <h3>¡Bienvenido, Alex!</h3>
+    <p>Sesión iniciada correctamente. Serás redirigido a tu panel financiero.</p>
+    <button class="btn-ok" id="btnOk"><i class="fas fa-gauge-high"></i> Ir al Dashboard</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fas fa-circle-check"></i><span id="tm"></span></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var $form = document.getElementById('loginForm');
+  var $email = document.getElementById('email');
+  var $pw = document.getElementById('password');
+  var $emailErr = document.getElementById('emailError');
+  var $pwErr = document.getElementById('pwError');
+  var $submit = document.getElementById('submitBtn');
+  var $togglePw = document.getElementById('togglePw');
+  var $overlay = document.getElementById('successOverlay');
+  var $forgot = document.getElementById('forgotLink');
+  var $toggleMode = document.getElementById('toggleMode');
+
+  var isLogin = true;
+
+  // Toggle password visibility
+  $togglePw.addEventListener('click', function(){
+    var inp = $pw;
+    var icon = $togglePw.querySelector('i');
+    if(inp.type === 'password'){
+      inp.type = 'text';
+      icon.className = 'far fa-eye-slash';
+    } else {
+      inp.type = 'password';
+      icon.className = 'far fa-eye';
+    }
+  });
+
+  // Validation
+  function validateEmail(val){
+    if(!val.trim()) return 'El correo es obligatorio';
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return 'Ingresa un correo válido';
+    return '';
+  }
+  function validatePw(val){
+    if(!val) return 'La contraseña es obligatoria';
+    if(val.length < 6) return 'Mínimo 6 caracteres';
+    return '';
+  }
+
+  function showError(el, msg){
+    el.querySelector('span').textContent = msg;
+    el.classList.add('show');
+    el.previousElementSibling.querySelector('input').classList.add('error');
+  }
+  function clearError(el){
+    el.classList.remove('show');
+    el.previousElementSibling.querySelector('input').classList.remove('error');
+  }
+
+  // Real-time validation
+  $email.addEventListener('input', function(){
+    var err = validateEmail($email.value);
+    if(err) showError($emailErr, err);
+    else clearError($emailErr);
+  });
+  $pw.addEventListener('input', function(){
+    var err = validatePw($pw.value);
+    if(err) showError($pwErr, err);
+    else clearError($pwErr);
+  });
+
+  // Submit
+  $form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var eErr = validateEmail($email.value);
+    var pErr = validatePw($pw.value);
+
+    if(eErr){showError($emailErr, eErr); $email.focus(); return}
+    else clearError($emailErr);
+
+    if(pErr){showError($pwErr, pErr); $pw.focus(); return}
+    else clearError($pwErr);
+
+    // Simulate login
+    $submit.classList.add('loading');
+    $submit.disabled = true;
+
+    setTimeout(function(){
+      $submit.classList.remove('loading');
+      $submit.disabled = false;
+      $overlay.classList.add('show');
+    }, 1800);
+  });
+
+  // Success close
+  document.getElementById('btnOk').addEventListener('click', function(){
+    $overlay.classList.remove('show');
+    toast('Redirigiendo al dashboard…');
+  });
+
+  // Forgot password
+  $forgot.addEventListener('click', function(e){
+    e.preventDefault();
+    var email = $email.value.trim();
+    if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      showError($emailErr, 'Ingresa tu correo primero para recuperar');
+      $email.focus();
+      return;
+    }
+    toast('Correo de recuperación enviado a ' + email);
+  });
+
+  // Toggle register/login
+  $toggleMode.addEventListener('click', function(e){
+    e.preventDefault();
+    isLogin = !isLogin;
+    var h2 = document.querySelector('.login-card h2');
+    var sub = document.querySelector('.login-card .subtitle');
+    var btnText = document.querySelector('.submit-btn .btn-text');
+    var label = document.querySelectorAll('.form-group label');
+
+    if(isLogin){
+      h2.textContent = 'Bienvenido de vuelta';
+      sub.innerHTML = 'Ingresa tus credenciales para acceder a tu panel financiero.<br>¿No tienes cuenta? <a href="#" id="toggleMode">Crear cuenta</a>';
+      btnText.innerHTML = '<i class="fas fa-right-to-bracket"></i> Iniciar Sesión';
+    } else {
+      h2.textContent = 'Crea tu cuenta';
+      sub.innerHTML = 'Comienza a gestionar tus finanzas con precisión.<br>¿Ya tienes cuenta? <a href="#" id="toggleMode">Iniciar sesión</a>';
+      btnText.innerHTML = '<i class="fas fa-user-plus"></i> Crear Cuenta';
+    }
+
+    // Re-bind toggle
+    document.getElementById('toggleMode').addEventListener('click', arguments.callee);
+    clearError($emailErr);
+    clearError($pwErr);
+  });
+
+  // Social buttons
+  document.getElementById('googleBtn').addEventListener('click', function(){
+    toast('Conectando con Google…');
+  });
+  document.getElementById('appleBtn').addEventListener('click', function(){
+    toast('Conectando con Apple…');
+  });
+
+  // Toast
+  var toastTimer;
+  function toast(msg, type){
+    document.getElementById('tm').textContent = msg;
+    var t = document.getElementById('toast');
+    t.querySelector('i').className = type === 'er' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+    t.querySelector('i').style.color = type === 'er' ? '#ef5350' : '#66bb6a';
+    t.className = 'toast';
+    void t.offsetWidth;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){t.classList.remove('show')}, 3000);
+  }
+  window.toast = toast;
+
+  // Close overlay on Escape / outside click
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') $overlay.classList.remove('open');
+  });
+  $overlay.addEventListener('click', function(e){
+    if(e.target === $overlay) $overlay.classList.remove('show');
+  });
+
+})();
+</script>
+</body>
+</html>
