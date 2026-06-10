@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>FinanPlanen — Iniciar Sesión</title>
+<title>FinanPlanen — Crear Cuenta</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -44,24 +44,19 @@ body{font-family:'Inter',sans-serif;color:var(--os);-webkit-font-smoothing:antia
 .form-group label{display:block;font-size:11px;font-weight:600;color:var(--ov);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
 .input-wrap{position:relative;display:flex;align-items:center}
 .input-wrap .input-icon{position:absolute;left:14px;font-size:16px;color:var(--ol);pointer-events:none}
-.input-wrap input{width:100%;padding:14px 14px 14px 44px;border:1.5px solid var(--olv);border-radius:var(--rm);font-family:inherit;font-size:15px;color:var(--os);background:var(--sl);outline:none;transition:border-color .2s,box-shadow .2s}
+.input-wrap input,.input-wrap select{width:100%;padding:14px 14px 14px 44px;border:1.5px solid var(--olv);border-radius:var(--rm);font-family:inherit;font-size:15px;color:var(--os);background:var(--sl);outline:none;transition:border-color .2s,box-shadow .2s}
 .input-wrap input::placeholder{color:var(--ol)}
-.input-wrap input:focus{border-color:var(--pc);background:#fff;box-shadow:0 0 0 4px rgba(26,35,126,.08)}
-.input-wrap .toggle-pw{position:absolute;right:14px;background:none;border:none;cursor:pointer;color:var(--ol);font-size:16px;padding:4px}
-.input-wrap .toggle-pw:hover{color:var(--os)}
+.input-wrap input:focus,.input-wrap select:focus{border-color:var(--pc);background:#fff;box-shadow:0 0 0 4px rgba(26,35,126,.08)}
+.helptext{display:block;font-size:11px;color:var(--ol);margin-top:4px;line-height:1.4}
 .errorlist{list-style:none;font-size:12px;color:var(--exp);font-weight:500;margin-top:6px;display:flex;align-items:center;gap:5px}
 .errorlist li{margin:0}
-.form-options{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .submit-btn{width:100%;padding:15px;border:none;border-radius:var(--rm);background:linear-gradient(135deg,var(--pc),#283593);color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
 .submit-btn:hover{filter:brightness(1.08);box-shadow:0 8px 24px rgba(26,35,126,.30);transform:translateY(-1px)}
 .submit-btn:active{transform:translateY(0)}
 .footer-text{margin-top:32px;text-align:center;font-size:12px;color:var(--ol);line-height:1.6}
 .footer-text a{color:var(--ov);text-decoration:none;font-weight:500}
 .footer-text a:hover{text-decoration:underline}
-.messages{list-style:none;margin-bottom:20px}
-.messages li{padding:12px 16px;border-radius:var(--rm);font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px}
-.messages .success{background:var(--incb);color:var(--inc)}
-.messages .error{background:var(--expb);color:var(--exp)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .login-card{animation:fadeUp .6s ease forwards}
 @media(max-width:960px){
@@ -72,6 +67,7 @@ body{font-family:'Inter',sans-serif;color:var(--os);-webkit-font-smoothing:antia
   .hero-features{display:none}
   .login-form-side{padding:32px 24px}
   .login-card h2{font-size:24px}
+  .form-row-2{grid-template-columns:1fr}
 }
 @media(max-width:480px){
   .login-hero{min-height:220px;max-height:260px}
@@ -90,12 +86,12 @@ body{font-family:'Inter',sans-serif;color:var(--os);-webkit-font-smoothing:antia
     <img class="bg-img" src="https://www.argentinaproduct.com/ckfinder/userfiles/files/blog/finanoct.jpg" alt="Finanzas personales" loading="eager">
     <div class="hero-content">
       <span class="hero-badge"><i class="fas fa-shield-halved"></i> Plataforma Segura</span>
-      <h1>Tus finanzas bajo <span class="accent">control total</span></h1>
-      <p>Administra tus cuentas, presupuestos y metas de ahorro con precisión fiscal. Todo en un solo lugar, de forma simple y segura.</p>
+      <h1>Empieza a <span class="accent">controlar</span> tus finanzas</h1>
+      <p>Regístrate gratis y lleva el control de tus ingresos, gastos, presupuestos y metas de ahorro en un solo lugar.</p>
       <div class="hero-features">
-        <div class="hf"><div class="hf-icon"><i class="fas fa-chart-line"></i></div><span>Seguimiento en <strong>tiempo real</strong> de todas tus cuentas</span></div>
-        <div class="hf"><div class="hf-icon"><i class="fas fa-piggy-bank"></i></div><span>Metas de ahorro con <strong>proyecciones inteligentes</strong></span></div>
-        <div class="hf"><div class="hf-icon"><i class="fas fa-lock"></i></div><span>Encriptación de <strong>grado bancario</strong> en tus datos</span></div>
+        <div class="hf"><div class="hf-icon"><i class="fas fa-infinity"></i></div><span><strong>Ilimitado</strong> — cuentas, categorías y transacciones</span></div>
+        <div class="hf"><div class="hf-icon"><i class="fas fa-chart-simple"></i></div><span>Dashboard con <strong>gráficos interactivos</strong> y reportes</span></div>
+        <div class="hf"><div class="hf-icon"><i class="fas fa-bell"></i></div><span>Alertas de <strong>presupuestos</strong> y recordatorios de pago</span></div>
       </div>
     </div>
   </div>
@@ -108,33 +104,39 @@ body{font-family:'Inter',sans-serif;color:var(--os);-webkit-font-smoothing:antia
           <span class="logo-sub">Control Financiero</span>
         </div>
       </div>
-      <h2>Bienvenido de vuelta</h2>
-      <p class="subtitle">Ingresa tus credenciales para acceder a tu panel financiero. <br>¿No tienes cuenta? <a href="{% url 'users:registro' %}">Crear cuenta</a></p>
-      {% if messages %}
-      <ul class="messages">
-        {% for message in messages %}
-        <li class="{{ message.tags }}"><i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i> {{ message }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
+      <h2>Crear cuenta</h2>
+      <p class="subtitle">Completa tus datos para empezar. <br>¿Ya tienes cuenta? <a href="{% url 'users:ingresar' %}">Iniciar sesión</a></p>
       <form method="post" novalidate>
         {% csrf_token %}
         {% for field in form %}
+          {% if field.name == 'nombre' or field.name == 'apellido' %}
+            {% if forloop.counter0|divisibleby:2 %}<div class="form-row-2">{% endif %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              <div class="input-wrap">
+                {{ field }}
+                <i class="fas fa-user input-icon"></i>
+              </div>
+              {{ field.help_text|safe }}
+              {% if field.errors %}<ul class="errorlist"><li>{{ field.errors.0 }}</li></ul>{% endif %}
+            </div>
+            {% if forloop.counter|divisibleby:2 or forloop.last %}</div>{% endif %}
+          {% else %}
         <div class="form-group">
           <label for="{{ field.id_for_label }}">{{ field.label }}</label>
           <div class="input-wrap">
             {{ field }}
-            <i class="fas fa-{% if field.name == 'username' %}user{% else %}lock{% endif %} input-icon"></i>
+            <i class="fas fa-{% if field.name == 'nombre_usuario' %}user{% elif field.name == 'correo' %}envelope{% elif 'password' in field.name %}lock{% else %}circle{% endif %} input-icon"></i>
           </div>
-          {% if field.errors %}
-          <ul class="errorlist"><li>{{ field.errors.0 }}</li></ul>
-          {% endif %}
+          {{ field.help_text|safe }}
+          {% if field.errors %}<ul class="errorlist"><li>{{ field.errors.0 }}</li></ul>{% endif %}
         </div>
+          {% endif %}
         {% endfor %}
-        <button type="submit" class="submit-btn"><i class="fas fa-right-to-bracket"></i> Iniciar Sesión</button>
+        <button type="submit" class="submit-btn"><i class="fas fa-user-plus"></i> Crear Cuenta</button>
       </form>
       <div class="footer-text">
-        Al continuar, aceptas nuestros <a href="#">Términos de Servicio</a> y <a href="#">Política de Privacidad</a>.
+        Al registrarte, aceptas nuestros <a href="#">Términos de Servicio</a> y <a href="#">Política de Privacidad</a>.
         <br>&copy; {% now "Y" %} FinanPlanen. Todos los derechos reservados.
       </div>
     </div>
