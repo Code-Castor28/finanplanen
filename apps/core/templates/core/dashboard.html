@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load formatos %}
 
 {% block title %}Panel Principal — FinanPlanen{% endblock %}
 {% block page_title %}Panel Principal{% endblock %}
@@ -22,10 +23,10 @@
       <button class="bh-btn acc" id="addTxBtn"><i class="fas fa-plus"></i> Nueva Transacci&oacute;n</button>
     </div>
   </div>
-  <div class="bh-amount" id="totalBalance">$142,592.84</div>
+  <div class="bh-amount" id="totalBalance">RD$ {{ total_balance|dinero }}</div>
   <div class="bh-meta">
-    <span class="bhm pos"><i class="fas fa-arrow-trend-up"></i> +3.2% este mes</span>
-    <span class="bhm"><i class="fas fa-clock"></i> Actualizado hace 5 min</span>
+    <span class="bhm pos"><i class="fas fa-arrow-trend-up"></i> {% if ahorro_neto >= 0 %}+{% endif %}{{ ahorro_cambio|floatformat:1 }}% este mes</span>
+    <span class="bhm"><i class="fas fa-clock"></i> Actualizado ahora</span>
     <span class="bhm"><i class="fas fa-shield-halved"></i> Datos protegidos</span>
   </div>
 </div>
@@ -34,18 +35,18 @@
 <section class="grid-mid" id="statsRow">
   <div class="stat-mini">
     <div class="sm-top"><div class="sm-icon ic1"><i class="fas fa-arrow-trend-up"></i></div><span class="sm-label">Ingresos del mes</span></div>
-    <div class="sm-value" id="statInc">$5,200.00</div>
-    <div class="sm-change pos"><i class="fas fa-arrow-up"></i> +8.3% vs mes anterior</div>
+    <div class="sm-value" id="statInc">RD$ {{ ingresos_mes|dinero }}</div>
+    <div class="sm-change pos"><i class="fas fa-arrow-up"></i> +{{ ingreso_cambio|floatformat:1 }}% vs mes anterior</div>
   </div>
   <div class="stat-mini">
     <div class="sm-top"><div class="sm-icon ic2"><i class="fas fa-arrow-trend-down"></i></div><span class="sm-label">Gastos del mes</span></div>
-    <div class="sm-value" id="statExp">$3,850.00</div>
-    <div class="sm-change pos"><i class="fas fa-arrow-down"></i> -6.1% vs mes anterior</div>
+    <div class="sm-value" id="statExp">RD$ {{ gastos_mes|dinero }}</div>
+    <div class="sm-change pos"><i class="fas fa-arrow-down"></i> {{ gasto_cambio|floatformat:1 }}% vs mes anterior</div>
   </div>
   <div class="stat-mini">
     <div class="sm-top"><div class="sm-icon ic3"><i class="fas fa-piggy-bank"></i></div><span class="sm-label">Ahorro neto</span></div>
-    <div class="sm-value" id="statSav" style="color:var(--inc)">+$1,350.00</div>
-    <div class="sm-change pos"><i class="fas fa-arrow-up"></i> +92.9% vs mes anterior</div>
+    <div class="sm-value" id="statSav" style="color:{% if ahorro_neto >= 0 %}var(--inc){% else %}var(--exp){% endif %}">{% if ahorro_neto >= 0 %}+{% endif %}RD$ {{ ahorro_neto|dinero }}</div>
+    <div class="sm-change pos"><i class="fas fa-arrow-up"></i> +{{ ahorro_cambio|floatformat:1 }}% vs mes anterior</div>
   </div>
 </section>
 
@@ -70,28 +71,31 @@
       <a class="see-all" href="#">Ver Calendario <i class="fas fa-arrow-right"></i></a>
     </div>
     <div id="paymentsList">
-      <div class="pay-item"><div class="pay-icon i1"><i class="fas fa-house"></i></div><div class="pay-info"><span class="pay-name">Renta Departamento</span><span class="pay-date"><i class="far fa-calendar"></i> 1 Nov, 2023</span></div><span class="pay-amt">-$1,200.00</span></div>
-      <div class="pay-item"><div class="pay-icon i2"><i class="fas fa-bolt"></i></div><div class="pay-info"><span class="pay-name">Servicios (Luz + Agua)</span><span class="pay-date"><i class="far fa-calendar"></i> 5 Nov, 2023</span></div><span class="pay-amt">-$85.00</span></div>
-      <div class="pay-item"><div class="pay-icon i3"><i class="fas fa-wifi"></i></div><div class="pay-info"><span class="pay-name">Internet Fibra &Oacute;ptica</span><span class="pay-date"><i class="far fa-calendar"></i> 8 Nov, 2023</span></div><span class="pay-amt">-$45.00</span></div>
-      <div class="pay-item"><div class="pay-icon i4"><i class="fas fa-dumbbell"></i></div><div class="pay-info"><span class="pay-name">Gimnasio Premium</span><span class="pay-date"><i class="far fa-calendar"></i> 10 Nov, 2023</span></div><span class="pay-amt">-$60.00</span></div>
-      <div class="pay-item"><div class="pay-icon i5"><i class="fas fa-shield-halved"></i></div><div class="pay-info"><span class="pay-name">Seguro Auto</span><span class="pay-date"><i class="far fa-calendar"></i> 15 Nov, 2023</span></div><span class="pay-amt">-$120.00</span></div>
+      <div style="text-align:center;padding:32px;color:var(--ol);font-size:13px">
+        <i class="fas fa-calendar" style="font-size:28px;display:block;margin-bottom:8px;opacity:0.4"></i>
+        Sin pagos pr&oacute;ximos registrados.
+      </div>
     </div>
   </div>
 
   <div class="card card-pad">
     <div class="panel-head">
       <h3><i class="fas fa-clock-rotate-left"></i> Transacciones Recientes</h3>
-      <a class="see-all" href="#">Ver todo <i class="fas fa-arrow-right"></i></a>
+      <a class="see-all" href="{% url 'transactions:lista' %}">Ver todo <i class="fas fa-arrow-right"></i></a>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Comercio</th><th>Categor&iacute;a</th><th style="text-align:right">Monto</th></tr></thead>
         <tbody>
-          <tr><td style="font-weight:600">Amazon Mexico<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">Hoy, 14:32</span></td><td><span class="chip" style="background:#E3F2FD;color:#1565C0"><i class="fas fa-bag-shopping"></i> COMPRAS</span></td><td class="neg" style="text-align:right;font-weight:600">-$1,240.00</td></tr>
-          <tr><td style="font-weight:600">Starbucks Coffee<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">Ayer, 09:15</span></td><td><span class="chip" style="background:#E8F5E9;color:#2E7D32"><i class="fas fa-mug-hot"></i> ALIMENTOS</span></td><td class="neg" style="text-align:right;font-weight:600">-$85.00</td></tr>
-          <tr><td style="font-weight:600">Pago de N&oacute;mina<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">24 Oct, 2023</span></td><td><span class="chip" style="background:var(--incb);color:var(--inc)"><i class="fas fa-building-columns"></i> INGRESO</span></td><td class="pos" style="text-align:right;font-weight:600">+$4,500.00</td></tr>
-          <tr><td style="font-weight:600">Uber Trip<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">23 Oct, 2023</span></td><td><span class="chip" style="background:#FFF3E0;color:#E65100"><i class="fas fa-car"></i> TRANSPORTE</span></td><td class="neg" style="text-align:right;font-weight:600">-$245.50</td></tr>
-          <tr><td style="font-weight:600">Netflix Premium<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">22 Oct, 2023</span></td><td><span class="chip" style="background:#F3E5F5;color:#6A1B9A"><i class="fas fa-tv"></i> OCIO</span></td><td class="neg" style="text-align:right;font-weight:600">-$15.99</td></tr>
+          {% for r in recientes %}
+          <tr>
+            <td style="font-weight:600">{{ r.comercio }}<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">{{ r.fecha|date:"d M Y" }}</span></td>
+            <td><span class="chip" style="background:{{ r.categoria_bg }};color:{{ r.categoria_color }}"><i class="fas {{ r.categoria_icono }}"></i> {{ r.categoria|upper }}</span></td>
+            <td class="{% if r.tipo == 'ingreso' %}pos{% else %}neg{% endif %}" style="text-align:right;font-weight:600">{% if r.tipo == 'ingreso' %}+{% endif %}RD$ {{ r.monto|dinero }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" style="text-align:center;padding:24px;color:var(--ol)">No hay transacciones recientes.</td></tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
@@ -112,11 +116,17 @@
         <table>
           <thead><tr><th>Mes</th><th>Ingresos</th><th>Gastos</th><th>Ahorro</th><th>Estado</th></tr></thead>
           <tbody id="savingsBody">
-            <tr><td>Octubre 2023</td><td>$5,200.00</td><td>$3,850.00</td><td class="pos" style="font-weight:600">+$1,350.00</td><td><span class="chip" style="background:var(--incb);color:var(--inc)"><i class="fas fa-circle-check"></i> SUPER&Aacute;VIT</span></td></tr>
-            <tr><td>Septiembre 2023</td><td>$4,800.00</td><td>$4,100.00</td><td class="pos" style="font-weight:600">+$700.00</td><td><span class="chip" style="background:var(--incb);color:var(--inc)"><i class="fas fa-circle-check"></i> SUPER&Aacute;VIT</span></td></tr>
-            <tr><td>Agosto 2023</td><td>$4,800.00</td><td>$4,950.00</td><td class="neg" style="font-weight:600">-$150.00</td><td><span class="chip" style="background:var(--expb);color:var(--exp)"><i class="fas fa-triangle-exclamation"></i> D&Eacute;FICIT</span></td></tr>
-            <tr><td>Julio 2023</td><td>$5,500.00</td><td>$3,200.00</td><td class="pos" style="font-weight:600">+$2,300.00</td><td><span class="chip" style="background:var(--incb);color:var(--inc)"><i class="fas fa-circle-check"></i> SUPER&Aacute;VIT</span></td></tr>
-            <tr><td>Junio 2023</td><td>$4,800.00</td><td>$4,000.00</td><td class="pos" style="font-weight:600">+$800.00</td><td><span class="chip" style="background:var(--incb);color:var(--inc)"><i class="fas fa-circle-check"></i> SUPER&Aacute;VIT</span></td></tr>
+            {% for s in savings_rows %}
+            <tr>
+              <td>{{ s.mes }}</td>
+              <td>RD$ {{ s.ingresos|dinero }}</td>
+              <td>RD$ {{ s.gastos|dinero }}</td>
+              <td class="{% if s.superavit %}pos{% else %}neg{% endif %}" style="font-weight:600">{% if s.superavit %}+{% endif %}RD$ {{ s.ahorro|dinero }}</td>
+              <td><span class="chip" style="background:{% if s.superavit %}var(--incb){% else %}var(--expb){% endif %};color:{% if s.superavit %}var(--inc){% else %}var(--exp){% endif %}"><i class="fas {% if s.superavit %}fa-circle-check{% else %}fa-triangle-exclamation{% endif %}"></i> {% if s.superavit %}SUPER&Aacute;VIT{% else %}D&Eacute;FICIT{% endif %}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ol)">No hay datos disponibles.</td></tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
@@ -143,17 +153,11 @@
 (function(){
   "use strict";
 
-  var months = ['Jun','Jul','Ago','Sep','Oct','Nov'];
-  var incomeData = [4800, 5500, 4800, 4800, 5200, 5800];
-  var expenseData = [4000, 3200, 4950, 4100, 3850, 3500];
-  var savingsData = incomeData.map(function(v,i){ return v - expenseData[i]; });
-
-  var catData = [
-    { label: 'Vivienda', value: 40, color: '#1a237e' },
-    { label: 'Alimentaci&oacute;n', value: 25, color: '#2E7D32' },
-    { label: 'Transporte', value: 20, color: '#E65100' },
-    { label: 'Ocio', value: 15, color: '#6A1B9A' }
-  ];
+  var months = {{ months_json|safe }};
+  var incomeData = {{ income_json|safe }};
+  var expenseData = {{ expense_json|safe }};
+  var savingsData = {{ savings_json|safe }};
+  var catData = {{ cat_json|safe }};
 
   document.getElementById('refreshBtn').addEventListener('click', function(){
     showToast('Datos actualizados');
@@ -167,13 +171,10 @@
 
   document.getElementById('exportCsv').addEventListener('click', function(){
     var headers = ['Mes','Ingresos','Gastos','Ahorro','Estado'];
-    var rows = [
-      ['Octubre 2023','5200.00','3850.00','1350.00','SUPER&Aacute;VIT'],
-      ['Septiembre 2023','4800.00','4100.00','700.00','SUPER&Aacute;VIT'],
-      ['Agosto 2023','4800.00','4950.00','-150.00','D&Eacute;FICIT'],
-      ['Julio 2023','5500.00','3200.00','2300.00','SUPER&Aacute;VIT'],
-      ['Junio 2023','4800.00','4000.00','800.00','SUPER&Aacute;VIT']
-    ];
+    var rows = [];
+    {% for s in savings_rows %}
+    rows.push(['{{ s.mes }}','{{ s.ingresos }}','{{ s.gastos }}','{{ s.ahorro }}','{% if s.superavit %}SUPERÁVIT{% else %}DÉFICIT{% endif %}']);
+    {% endfor %}
     var csv = '\uFEFF' + headers.join(';') + '\n' + rows.map(function(r){return r.join(';')}).join('\n');
     var a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
@@ -226,13 +227,13 @@
           align: 'top',
           offset: 2,
           font: { size: 10, weight: '700', family: "'Inter', sans-serif" },
-          formatter: function(v){ return '$' + v.toLocaleString('en-US'); },
+          formatter: function(v){ return 'RD$' + v.toLocaleString('en-US'); },
           color: function(ctx){ return ctx.datasetIndex === 0 ? '#2E7D32' : '#C62828'; }
         }
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 12, weight: '600', family: "'Inter', sans-serif" }, color: '#6b7280' } },
-        y: { grid: { color: gridColor }, border: { display: false }, ticks: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#9ca3af', callback: function(v){ return '$' + (v/1000).toFixed(0) + 'k'; } }, beginAtZero: true }
+        y: { grid: { color: gridColor }, border: { display: false }, ticks: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#9ca3af', callback: function(v){ return 'RD$' + (v/1000).toFixed(0) + 'k'; } }, beginAtZero: true }
       }
     }
   });
@@ -307,14 +308,14 @@
           offset: 4,
           font: { size: 11, weight: '700', family: "'Inter', sans-serif" },
           formatter: function(v){
-            return (v >= 0 ? '+$' : '-$') + Math.abs(v).toLocaleString('en-US');
+            return (v >= 0 ? '+RD$' : '-RD$') + Math.abs(v).toLocaleString('en-US');
           },
           color: function(ctx){ return ctx.dataset.data[ctx.dataIndex] >= 0 ? '#2E7D32' : '#C62828'; }
         }
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 12, weight: '600', family: "'Inter', sans-serif" }, color: '#6b7280' } },
-        y: { grid: { color: gridColor }, border: { display: false }, ticks: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#9ca3af', callback: function(v){ return '$' + v.toLocaleString('en-US'); } } }
+        y: { grid: { color: gridColor }, border: { display: false }, ticks: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#9ca3af', callback: function(v){ return 'RD$' + v.toLocaleString('en-US'); } } }
       }
     }
   });
@@ -350,7 +351,7 @@
           align: 'top',
           offset: 2,
           font: { size: 9, weight: '700', family: "'Inter', sans-serif" },
-          formatter: function(v){ return (v >= 0 ? '' : '-') + '$' + Math.abs(v).toLocaleString('en-US'); },
+          formatter: function(v){ return (v >= 0 ? '' : '-') + 'RD$' + Math.abs(v).toLocaleString('en-US'); },
           color: function(ctx){
             if(ctx.datasetIndex === 0) return '#2E7D32';
             if(ctx.datasetIndex === 1) return '#C62828';
@@ -361,7 +362,7 @@
       },
       scales: {
         x: { stacked: true, grid: { display: false }, ticks: { font: { size: 12, weight: '600', family: "'Inter', sans-serif" }, color: '#6b7280' } },
-        y: { stacked: true, grid: { color: gridColor }, border: { display: false }, ticks: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#9ca3af', callback: function(v){ return '$' + (v/1000).toFixed(0) + 'k'; } } }
+        y: { stacked: true, grid: { color: gridColor }, border: { display: false }, ticks: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#9ca3af', callback: function(v){ return 'RD$' + (v/1000).toFixed(0) + 'k'; } } }
       }
     }
   });
