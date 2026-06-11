@@ -110,6 +110,12 @@
       <a href="{% url 'transactions:lista' %}" class="{% if section == 'transactions' %}active{% endif %}">
         <i class="fas fa-receipt"></i>Transacc.
       </a>
+      <a href="{% url 'transactions:ingresos' %}" class="{% if section == 'ingresos' %}active{% endif %}">
+        <i class="fas fa-arrow-trend-up"></i>Ingresos
+      </a>
+      <a href="{% url 'transactions:gastos' %}" class="{% if section == 'gastos' %}active{% endif %}">
+        <i class="fas fa-money-bill-wave"></i>Gastos
+      </a>
       <a href="{% url 'budgets:lista' %}" class="{% if section == 'budgets' %}active{% endif %}">
         <i class="fas fa-chart-pie"></i>Presup.
       </a>

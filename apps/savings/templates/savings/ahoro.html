@@ -252,6 +252,15 @@
           </select>
         </div>
         <div class="field">
+          <label>Cuenta de Origen</label>
+          <select name="cuenta" class="form-control" required>
+            <option value="">Seleccionar...</option>
+            {% for c in cuentas %}
+            <option value="{{ c.pk }}">{{ c.nombre }} ({{ c.get_tipo_display }}) — RD$ {{ c.balance|dinero }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
           <label>Monto a Depositar (RD$)</label>
           <input type="number" name="monto" step="0.01" min="0.01" placeholder="Ej: 500.00" required class="form-control">
         </div>
