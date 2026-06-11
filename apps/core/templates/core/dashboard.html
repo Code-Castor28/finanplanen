@@ -1,442 +1,148 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>FinanceFlow — Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel Principal — FinanPlanen{% endblock %}
+{% block page_title %}Panel Principal{% endblock %}
+
+{% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --surface:#f7f9fc;--sl:#ffffff;--slw:#f2f4f7;--sc:#eceef1;--sch:#e6e8eb;
-  --os:#191c1e;--ov:#454652;--is:#2d3133;--io:#eff1f4;
-  --ol:#767683;--olv:#c6c5d4;--st:#4c56af;
-  --p:#000666;--op:#ffffff;--pc:#1a237e;--opc:#8690ee;
-  --inc:#2E7D32;--incb:rgba(46,125,50,.1);
-  --exp:#C62828;--expb:rgba(198,40,40,.1);
-  --war:#E65100;--warb:rgba(230,81,0,.1);
-  --info:#1565C0;--infob:rgba(21,101,192,.1);
-  --s1:0 4px 12px rgba(26,35,126,.05);
-  --s2:0 12px 32px rgba(26,35,126,.12);
-  --r:.5rem;--rm:.75rem;--rl:1rem;--rxl:1.5rem;--rf:9999px;--cp:24px;
-}
-html{font-size:16px;-webkit-text-size-adjust:100%}
-body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--os);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-.app{display:flex;min-height:100vh;min-height:100dvh}
+{% endblock %}
 
-/* SIDEBAR */
-.sidebar{width:260px;min-height:100vh;background:linear-gradient(180deg,#1a237e,#0d1042);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s}
-.sidebar-logo{padding:28px 24px 24px;border-bottom:1px solid rgba(255,255,255,.08)}
-.sidebar-logo .lr{display:flex;align-items:center;gap:12px}
-.sidebar-logo .li{width:40px;height:40px;background:rgba(255,255,255,.12);border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:#bdc2ff;font-size:18px}
-.sidebar-logo .ln{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.02em}
-.sidebar-logo .ls{display:block;font-size:11px;font-weight:500;color:rgba(255,255,255,.45);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
-.sn{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:4px}
-.ni{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--r);color:rgba(255,255,255,.6);text-decoration:none;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left}
-.ni:hover{color:rgba(255,255,255,.9);background:rgba(255,255,255,.06)}
-.ni.active{color:#fff;background:rgba(255,255,255,.12)}
-.ni i{width:20px;text-align:center;font-size:16px}
-.sb2{padding:12px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:4px}
-.sf2{padding:16px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px}
-.ua{width:36px;height:36px;border-radius:var(--rf);background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600}
-.un{color:#fff;font-size:14px;font-weight:500;display:block}
-.ub{font-size:11px;color:#bdc2ff;font-weight:500}
-.ov-s{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99}
-
-/* MOBILE NAV */
-.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sl);border-top:1px solid var(--olv);z-index:100;padding:6px 0 env(safe-area-inset-bottom,8px)}
-.mob-nav-inner{display:flex;justify-content:space-around}
-.mob-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:var(--ol);font-size:10px;font-weight:600;padding:6px 4px;min-width:54px}
-.mob-nav a i{font-size:18px}
-.mob-nav a.active{color:var(--pc)}
-.mob-nav a.active i{color:var(--pc)}
-
-/* MAIN */
-.main{flex:1;margin-left:260px;max-width:calc(100vw - 260px);padding:28px 36px 48px}
-
-/* TOPBAR */
-.topbar{display:flex;align-items:center;gap:16px;margin-bottom:28px}
-.ham{display:none;width:40px;height:40px;border:none;background:none;font-size:22px;color:var(--os);cursor:pointer;align-items:center;justify-content:center;border-radius:var(--r)}
-.sb-box{position:relative;flex:1;max-width:480px}
-.sb-box>i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ol);font-size:14px}
-.sb-box input{width:100%;padding:10px 16px 10px 40px;border:1px solid var(--olv);border-radius:var(--r);font-family:inherit;font-size:14px;color:var(--os);background:var(--sl);outline:none;transition:border .2s,box-shadow .2s}
-.sb-box input::placeholder{color:var(--ol)}
-.sb-box input:focus{border-color:var(--p);border-width:2px;padding-left:39px;box-shadow:0 0 0 3px rgba(26,35,126,.08)}
-.ta{display:flex;align-items:center;gap:12px;margin-left:auto}
-.ib{background:none;border:none;cursor:pointer;color:var(--ov);width:40px;height:40px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:18px;position:relative;transition:background .15s}
-.ib:hover{background:var(--slw)}
-.ib .dot{position:absolute;top:8px;right:8px;width:8px;height:8px;background:var(--exp);border-radius:50%;border:2px solid var(--surface)}
-.tav{width:36px;height:36px;border-radius:var(--rf);background:var(--pc);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600}
-
-/* PAGE HEAD */
-.ph h1{font-size:26px;font-weight:700;letter-spacing:-.02em}
-.ph .sub{font-size:13px;color:var(--ov);margin-top:4px}
-
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:var(--r);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
-.bp{background:var(--pc);color:var(--op)}.bp:hover{background:var(--p)}
-.bs{background:var(--sl);color:var(--pc);border:1px solid var(--olv)}.bs:hover{border-color:var(--pc)}
-.bg{background:transparent;color:var(--pc)}.bg:hover{background:rgba(26,35,126,.06)}
-
-@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-
-/* BALANCE HERO */
-.balance-hero{
-  background:linear-gradient(135deg,#1a237e 0%,#283593 50%,#3949ab 100%);
-  border-radius:var(--rxl);padding:28px 32px;color:#fff;
-  margin-bottom:24px;position:relative;overflow:hidden;
-  opacity:0;animation:fu .5s ease forwards;
-}
-.balance-hero::before{content:'';position:absolute;top:-40%;right:-8%;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none}
-.balance-hero::after{content:'';position:absolute;bottom:-30%;left:20%;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.03);pointer-events:none}
-.bh-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;position:relative;z-index:1;gap:12px;flex-wrap:wrap}
-.bh-label{font-size:11px;font-weight:600;letter-spacing:1.5px;color:rgba(255,255,255,.5);text-transform:uppercase}
-.bh-actions{display:flex;gap:8px}
-.bh-btn{padding:7px 14px;border-radius:var(--r);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;display:inline-flex;align-items:center;gap:6px;transition:background .15s}
-.bh-btn:hover{background:rgba(255,255,255,.2)}
-.bh-btn.acc{background:#fff;color:var(--pc);border-color:#fff}
-.bh-amount{font-size:44px;font-weight:800;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;position:relative;z-index:1}
-.bh-meta{display:flex;align-items:center;gap:20px;margin-top:12px;position:relative;z-index:1;flex-wrap:wrap}
-.bh-meta .bhm{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:rgba(255,255,255,.75)}
-.bh-meta .bhm.pos{color:#7ef0a8}
-.bh-meta .bhm i{font-size:12px}
-.bh-deco{position:absolute;right:32px;bottom:16px;font-size:100px;color:rgba(255,255,255,.04);z-index:0;pointer-events:none}
-
-/* CARDS */
-.card{background:var(--sl);border-radius:var(--rl);box-shadow:var(--s1);overflow:hidden}
-
-/* GRID */
-.grid-top{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;margin-bottom:20px}
-.grid-mid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px}
-.grid-bot{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;margin-bottom:20px}
-.grid-reports{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
-
-.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding:0}
-.panel-head h3{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
-.panel-head h3 i{color:var(--pc);font-size:15px}
-.panel-head .see-all{font-size:12px;color:var(--pc);font-weight:600;text-decoration:none;display:flex;align-items:center;gap:4px;cursor:pointer}
-.panel-head .see-all:hover{text-decoration:underline}
-.panel-head .see-all i{font-size:10px}
-.card-pad{padding:var(--cp)}
-
-/* CHART CONTAINER */
-.chart-wrap{position:relative;width:100%}
-.chart-wrap canvas{width:100%!important;max-height:280px}
-.chart-lg canvas{max-height:320px}
-.chart-sm canvas{max-height:200px}
-
-/* UPCOMING PAYMENTS */
-.pay-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--slw)}
-.pay-item:last-child{border-bottom:none}
-.pay-icon{width:40px;height:40px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.pay-icon.i1{background:var(--infob);color:var(--info)}
-.pay-icon.i2{background:var(--incb);color:var(--inc)}
-.pay-icon.i3{background:var(--warb);color:var(--war)}
-.pay-icon.i4{background:rgba(106,27,154,.08);color:#6A1B9A}
-.pay-icon.i5{background:var(--expb);color:var(--exp)}
-.pay-info{flex:1;min-width:0}
-.pay-info .pay-name{font-size:14px;font-weight:600;display:block}
-.pay-info .pay-date{font-size:11px;color:var(--ol);display:block;margin-top:2px}
-.pay-amt{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0}
-
-/* QUICK STATS */
-.stat-mini{background:var(--sl);border-radius:var(--rl);box-shadow:var(--s1);padding:18px;opacity:0;animation:fu .5s ease forwards}
-.stat-mini:nth-child(1){animation-delay:.05s}
-.stat-mini:nth-child(2){animation-delay:.1s}
-.stat-mini:nth-child(3){animation-delay:.15s}
-.stat-mini .sm-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.stat-mini .sm-icon{width:38px;height:38px;border-radius:var(--rm);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.sm-icon.ic1{background:var(--incb);color:var(--inc)}
-.sm-icon.ic2{background:var(--expb);color:var(--exp)}
-.sm-icon.ic3{background:rgba(26,35,126,.08);color:var(--pc)}
-.stat-mini .sm-label{font-size:10px;font-weight:600;color:var(--ov);letter-spacing:.05em;text-transform:uppercase}
-.stat-mini .sm-value{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
-.stat-mini .sm-change{font-size:11px;font-weight:600;margin-top:2px;display:flex;align-items:center;gap:4px}
-.sm-change.pos{color:var(--inc)}
-.sm-change.neg{color:var(--exp)}
-
-/* TRANSACTIONS TABLE */
-.tx-table{width:100%;border-collapse:collapse}
-.tx-table thead th{padding:12px 16px;font-size:10px;font-weight:600;color:var(--ov);letter-spacing:.06em;text-transform:uppercase;text-align:left;background:var(--slw);border-bottom:1px solid var(--olv);white-space:nowrap}
-.tx-table tbody tr{border-bottom:1px solid var(--slw);transition:background .15s}
-.tx-table tbody tr:last-child{border-bottom:none}
-.tx-table tbody tr:hover{background:var(--slw)}
-.tx-table tbody td{padding:0 16px;height:52px;font-size:13px;vertical-align:middle;white-space:nowrap}
-.tx-table .tda{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
-.tx-table .tda.neg{color:var(--exp)}
-.tx-table .tda.pos{color:var(--inc)}
-.tx-table .td-merchant{font-weight:600;color:var(--os)}
-.tx-table .td-time{font-size:11px;color:var(--ol);display:block;margin-top:1px}
-
-.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--rf);font-size:11px;font-weight:500;white-space:nowrap}
-.chip i{font-size:9px}
-.chip.c1{background:#E3F2FD;color:#1565C0}
-.chip.c2{background:#E8F5E9;color:#2E7D32}
-.chip.c3{background:#FFF3E0;color:#E65100}
-.chip.c4{background:var(--incb);color:var(--inc)}
-.chip.c5{background:#F3E5F5;color:#6A1B9A}
-
-/* SAVINGS TABLE */
-.sv-table{width:100%;border-collapse:collapse}
-.sv-table thead th{padding:12px 16px;font-size:10px;font-weight:600;color:var(--ov);letter-spacing:.06em;text-transform:uppercase;text-align:left;background:var(--slw);border-bottom:1px solid var(--olv);white-space:nowrap}
-.sv-table tbody tr{border-bottom:1px solid var(--slw);transition:background .15s}
-.sv-table tbody tr:last-child{border-bottom:none}
-.sv-table tbody tr:hover{background:var(--slw)}
-.sv-table tbody td{padding:0 16px;height:48px;font-size:13px;vertical-align:middle}
-.sv-table .tda{font-weight:600;font-variant-numeric:tabular-nums}
-.sv-table .tda.pos{color:var(--inc)}
-.sv-table .tda.neg{color:var(--exp)}
-.status-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:var(--rf);font-size:11px;font-weight:700;letter-spacing:.3px}
-.status-chip.sur{background:var(--incb);color:var(--inc)}
-.status-chip.def{background:var(--expb);color:var(--exp)}
-
-/* LEGEND CUSTOM */
-.chart-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;justify-content:center}
-.chart-legend .leg-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ov)}
-.chart-legend .leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.chart-legend .leg-val{font-weight:700;color:var(--os)}
-
-/* Report Section Title */
-.report-section{margin-top:8px;padding-top:20px;border-top:1px solid var(--sc)}
-.report-section .rs-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap}
-.report-section .rs-head h3{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
-.report-section .rs-head h3 i{color:var(--pc);font-size:16px}
-
-/* TOAST */
-.toast{position:fixed;bottom:max(80px,env(safe-area-inset-bottom,80px));left:50%;transform:translateX(-50%) translateY(20px);background:var(--is);color:var(--io);padding:12px 20px;border-radius:var(--r);font-size:13px;font-weight:500;box-shadow:var(--s2);z-index:2000;transition:all .3s;display:flex;align-items:center;gap:8px;white-space:nowrap}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.toast i{font-size:14px}.toast.su i{color:#66bb6a}.toast.er i{color:#ef5350}
-
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--olv);border-radius:3px}
-
-/* RESPONSIVE */
-@media(max-width:1200px){
-  .grid-mid{grid-template-columns:1fr 1fr}
-  .grid-mid .stat-mini:nth-child(3){grid-column:1/-1}
-  .grid-bot{grid-template-columns:1fr}
-  .grid-reports{grid-template-columns:1fr}
-}
-@media(max-width:1000px){
-  .grid-top{grid-template-columns:1fr}
-}
-@media(max-width:900px){
-  .sidebar{transform:translateX(-100%)}
-  .sidebar.open{transform:translateX(0)}
-  .ov-s.show{display:block}
-  .main{margin-left:0;max-width:100vw;padding:16px 16px 100px}
-  .ham{display:flex}
-  .mob-nav{display:block}
-  .ph h1{font-size:22px}
-  .bh-amount{font-size:34px}
-  .grid-mid{grid-template-columns:1fr}
-  .grid-mid .stat-mini:nth-child(3){grid-column:auto}
-  .tx-table{min-width:560px}
-  .sv-table{min-width:480px}
-  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-}
-@media(max-width:480px){
-  .bh-amount{font-size:28px}
-  .balance-hero{padding:20px}
-  .bh-top{flex-direction:column}
-  .bh-actions{width:100%}
-  .bh-actions .bh-btn{flex:1;justify-content:center}
-  .bh-meta{flex-direction:column;gap:8px}
-  .chart-wrap canvas{max-height:220px}
-  .chart-lg canvas{max-height:260px}
-}
-</style>
-</head>
-<body>
-<div class="app">
-  <div class="ov-s" id="ovS"></div>
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo"><div class="lr"><div class="li"><i class="fas fa-chart-line"></i></div><div><span class="ln">FinanceFlow</span><span class="ls">Wealth Management</span></div></div></div>
-    <nav class="sn">
-      <a href="#" class="ni active"><i class="fas fa-gauge-high"></i><span>Dashboard</span></a>
-      <a href="#" class="ni"><i class="fas fa-building-columns"></i><span>Accounts</span></a>
-      <a href="#" class="ni"><i class="fas fa-right-left"></i><span>Transfers</span></a>
-      <a href="#" class="ni"><i class="fas fa-receipt"></i><span>Transactions</span></a>
-      <a href="#" class="ni"><i class="fas fa-money-bill-wave"></i><span>Expenses</span></a>
-      <a href="#" class="ni"><i class="fas fa-chart-pie"></i><span>Budgets</span></a>
-      <a href="#" class="ni"><i class="fas fa-bullseye"></i><span>Savings Goals</span></a>
-      <a href="#" class="ni"><i class="fas fa-file-lines"></i><span>Reports</span></a>
-    </nav>
-    <div class="sb2">
-      <a href="#" class="ni"><i class="fas fa-circle-question"></i><span>Help Center</span></a>
-      <a href="#" class="ni"><i class="fas fa-right-from-bracket"></i><span>Logout</span></a>
+{% block content %}
+<!-- BALANCE HERO -->
+<div class="balance-hero">
+  <i class="fas fa-wallet bh-deco"></i>
+  <div class="bh-top">
+    <div>
+      <div class="bh-label">Balance Total Consolidado</div>
     </div>
-    <div class="sf2"><div class="ua">AT</div><div><span class="un">Alex Thompson</span><span class="ub">Cuenta Premium</span></div></div>
-  </aside>
-
-  <main class="main">
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <button class="ham" id="hamBtn"><i class="fas fa-bars"></i></button>
-      <div class="sb-box"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="Buscar transacciones, cuentas…"></div>
-      <div class="ta">
-        <button class="ib"><i class="far fa-bell"></i><span class="dot"></span></button>
-        <button class="ib"><i class="fas fa-gear"></i></button>
-        <div class="tav">AT</div>
-      </div>
+    <div class="bh-actions">
+      <button class="bh-btn" id="refreshBtn"><i class="fas fa-rotate"></i> Actualizar</button>
+      <button class="bh-btn acc" id="addTxBtn"><i class="fas fa-plus"></i> Nueva Transacci&oacute;n</button>
     </div>
-
-    <!-- BALANCE HERO -->
-    <div class="balance-hero">
-      <i class="fas fa-wallet bh-deco"></i>
-      <div class="bh-top">
-        <div>
-          <div class="bh-label">Balance Total Consolidado</div>
-        </div>
-        <div class="bh-actions">
-          <button class="bh-btn" id="refreshBtn"><i class="fas fa-rotate"></i> Actualizar</button>
-          <button class="bh-btn acc" id="addTxBtn"><i class="fas fa-plus"></i> Nueva Transacción</button>
-        </div>
-      </div>
-      <div class="bh-amount" id="totalBalance">$142,592.84</div>
-      <div class="bh-meta">
-        <span class="bhm pos"><i class="fas fa-arrow-trend-up"></i> +3.2% este mes</span>
-        <span class="bhm"><i class="fas fa-clock"></i> Actualizado hace 5 min</span>
-        <span class="bhm"><i class="fas fa-shield-halved"></i> Datos protegidos</span>
-      </div>
-    </div>
-
-    <!-- QUICK STATS -->
-    <section class="grid-mid" id="statsRow">
-      <div class="stat-mini">
-        <div class="sm-top"><div class="sm-icon ic1"><i class="fas fa-arrow-trend-up"></i></div><span class="sm-label">Ingresos del mes</span></div>
-        <div class="sm-value" id="statInc">$5,200.00</div>
-        <div class="sm-change pos"><i class="fas fa-arrow-up"></i> +8.3% vs mes anterior</div>
-      </div>
-      <div class="stat-mini">
-        <div class="sm-top"><div class="sm-icon ic2"><i class="fas fa-arrow-trend-down"></i></div><span class="sm-label">Gastos del mes</span></div>
-        <div class="sm-value" id="statExp">$3,850.00</div>
-        <div class="sm-change pos"><i class="fas fa-arrow-down"></i> -6.1% vs mes anterior</div>
-      </div>
-      <div class="stat-mini">
-        <div class="sm-top"><div class="sm-icon ic3"><i class="fas fa-piggy-bank"></i></div><span class="sm-label">Ahorro neto</span></div>
-        <div class="sm-value" id="statSav" style="color:var(--inc)">+$1,350.00</div>
-        <div class="sm-change pos"><i class="fas fa-arrow-up"></i> +92.9% vs mes anterior</div>
-      </div>
-    </section>
-
-    <!-- CHARTS TOP -->
-    <section class="grid-top">
-      <div class="card card-pad" style="opacity:0;animation:fu .5s ease .2s forwards">
-        <div class="panel-head"><h3><i class="fas fa-chart-bar"></i> Ingresos vs Gastos</h3><span style="font-size:11px;color:var(--ol);font-weight:500">Últimos 6 meses</span></div>
-        <div class="chart-wrap chart-lg"><canvas id="barChart"></canvas></div>
-      </div>
-      <div class="card card-pad" style="opacity:0;animation:fu .5s ease .25s forwards">
-        <div class="panel-head"><h3><i class="fas fa-chart-pie"></i> Gastos por Categoría</h3></div>
-        <div class="chart-wrap"><canvas id="doughnutChart"></canvas></div>
-        <div class="chart-legend" id="doughnutLegend"></div>
-      </div>
-    </section>
-
-    <!-- BOTTOM GRID -->
-    <section class="grid-bot">
-      <!-- UPCOMING PAYMENTS -->
-      <div class="card card-pad" style="opacity:0;animation:fu .5s ease .3s forwards">
-        <div class="panel-head">
-          <h3><i class="fas fa-calendar-check"></i> Próximos Pagos</h3>
-          <a class="see-all" href="#">Ver Calendario <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div id="paymentsList">
-          <div class="pay-item"><div class="pay-icon i1"><i class="fas fa-house"></i></div><div class="pay-info"><span class="pay-name">Renta Departamento</span><span class="pay-date"><i class="far fa-calendar"></i> 1 Nov, 2023</span></div><span class="pay-amt">-$1,200.00</span></div>
-          <div class="pay-item"><div class="pay-icon i2"><i class="fas fa-bolt"></i></div><div class="pay-info"><span class="pay-name">Servicios (Luz + Agua)</span><span class="pay-date"><i class="far fa-calendar"></i> 5 Nov, 2023</span></div><span class="pay-amt">-$85.00</span></div>
-          <div class="pay-item"><div class="pay-icon i3"><i class="fas fa-wifi"></i></div><div class="pay-info"><span class="pay-name">Internet Fibra Óptica</span><span class="pay-date"><i class="far fa-calendar"></i> 8 Nov, 2023</span></div><span class="pay-amt">-$45.00</span></div>
-          <div class="pay-item"><div class="pay-icon i4"><i class="fas fa-dumbbell"></i></div><div class="pay-info"><span class="pay-name">Gimnasio Premium</span><span class="pay-date"><i class="far fa-calendar"></i> 10 Nov, 2023</span></div><span class="pay-amt">-$60.00</span></div>
-          <div class="pay-item"><div class="pay-icon i5"><i class="fas fa-shield-halved"></i></div><div class="pay-info"><span class="pay-name">Seguro Auto</span><span class="pay-date"><i class="far fa-calendar"></i> 15 Nov, 2023</span></div><span class="pay-amt">-$120.00</span></div>
-        </div>
-      </div>
-
-      <!-- RECENT TRANSACTIONS -->
-      <div class="card card-pad" style="opacity:0;animation:fu .5s ease .35s forwards">
-        <div class="panel-head">
-          <h3><i class="fas fa-clock-rotate-left"></i> Transacciones Recientes</h3>
-          <a class="see-all" href="#">Ver todo <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div class="table-scroll">
-          <table class="tx-table">
-            <thead><tr><th>Comercio</th><th>Categoría</th><th style="text-align:right">Monto</th></tr></thead>
-            <tbody>
-              <tr><td><span class="td-merchant">Amazon Mexico</span><span class="td-time">Hoy, 14:32</span></td><td><span class="chip c1"><i class="fas fa-bag-shopping"></i> COMPRAS</span></td><td class="tda neg">-$1,240.00</td></tr>
-              <tr><td><span class="td-merchant">Starbucks Coffee</span><span class="td-time">Ayer, 09:15</span></td><td><span class="chip c2"><i class="fas fa-mug-hot"></i> ALIMENTOS</span></td><td class="tda neg">-$85.00</td></tr>
-              <tr><td><span class="td-merchant">Pago de Nómina</span><span class="td-time">24 Oct, 2023</span></td><td><span class="chip c4"><i class="fas fa-building-columns"></i> INGRESO</span></td><td class="tda pos">+$4,500.00</td></tr>
-              <tr><td><span class="td-merchant">Uber Trip</span><span class="td-time">23 Oct, 2023</span></td><td><span class="chip c3"><i class="fas fa-car"></i> TRANSPORTE</span></td><td class="tda neg">-$245.50</td></tr>
-              <tr><td><span class="td-merchant">Netflix Premium</span><span class="td-time">22 Oct, 2023</span></td><td><span class="chip c5"><i class="fas fa-tv"></i> OCIO</span></td><td class="tda neg">-$15.99</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- REPORTS SECTION -->
-    <section class="report-section">
-      <div class="rs-head">
-        <h3><i class="fas fa-file-lines"></i> Reportes Avanzados</h3>
-        <button class="btn bs" id="exportCsv"><i class="fas fa-download"></i> Exportar CSV</button>
-      </div>
-
-      <div class="grid-reports">
-        <!-- MONTHLY SAVINGS TABLE -->
-        <div class="card card-pad" style="opacity:0;animation:fu .5s ease .4s forwards">
-          <div class="panel-head"><h3><i class="fas fa-piggy-bank"></i> Ahorro Neto Mensual</h3></div>
-          <div class="table-scroll">
-            <table class="sv-table">
-              <thead><tr><th>Mes</th><th>Ingresos</th><th>Gastos</th><th>Ahorro</th><th>Estado</th></tr></thead>
-              <tbody id="savingsBody">
-                <tr><td>Octubre 2023</td><td>$5,200.00</td><td>$3,850.00</td><td class="tda pos">+$1,350.00</td><td><span class="status-chip sur"><i class="fas fa-circle-check"></i> SUPERÁVIT</span></td></tr>
-                <tr><td>Septiembre 2023</td><td>$4,800.00</td><td>$4,100.00</td><td class="tda pos">+$700.00</td><td><span class="status-chip sur"><i class="fas fa-circle-check"></i> SUPERÁVIT</span></td></tr>
-                <tr><td>Agosto 2023</td><td>$4,800.00</td><td>$4,950.00</td><td class="tda neg">-$150.00</td><td><span class="status-chip def"><i class="fas fa-triangle-exclamation"></i> DÉFICIT</span></td></tr>
-                <tr><td>Julio 2023</td><td>$5,500.00</td><td>$3,200.00</td><td class="tda pos">+$2,300.00</td><td><span class="status-chip sur"><i class="fas fa-circle-check"></i> SUPERÁVIT</span></td></tr>
-                <tr><td>Junio 2023</td><td>$4,800.00</td><td>$4,000.00</td><td class="tda pos">+$800.00</td><td><span class="status-chip sur"><i class="fas fa-circle-check"></i> SUPERÁVIT</span></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div style="margin-top:12px;text-align:center"><button class="btn bg" id="loadMore"><i class="fas fa-arrow-down"></i> Cargar historial completo</button></div>
-        </div>
-
-        <!-- MONTHLY SAVINGS LINE CHART -->
-        <div class="card card-pad" style="opacity:0;animation:fu .5s ease .45s forwards">
-          <div class="panel-head"><h3><i class="fas fa-chart-line"></i> Tendencia de Ahorro</h3></div>
-          <div class="chart-wrap chart-lg"><canvas id="lineChart"></canvas></div>
-          <div class="chart-legend" id="lineLegend"></div>
-        </div>
-      </div>
-
-      <!-- INCOME vs EXPENSE STACKED -->
-      <div class="card card-pad" style="margin-bottom:20px;opacity:0;animation:fu .5s ease .5s forwards">
-        <div class="panel-head"><h3><i class="fas fa-chart-area"></i> Evolución Patrimonial Mensual</h3><span style="font-size:11px;color:var(--ol)">Ingresos vs Gastos vs Ahorro</span></div>
-        <div class="chart-wrap chart-lg"><canvas id="stackedChart"></canvas></div>
-        <div class="chart-legend" id="stackedLegend"></div>
-      </div>
-    </section>
-  </main>
+  </div>
+  <div class="bh-amount" id="totalBalance">$142,592.84</div>
+  <div class="bh-meta">
+    <span class="bhm pos"><i class="fas fa-arrow-trend-up"></i> +3.2% este mes</span>
+    <span class="bhm"><i class="fas fa-clock"></i> Actualizado hace 5 min</span>
+    <span class="bhm"><i class="fas fa-shield-halved"></i> Datos protegidos</span>
+  </div>
 </div>
 
-<!-- MOBILE NAV -->
-<nav class="mob-nav"><div class="mob-nav-inner">
-  <a href="#" class="active"><i class="fas fa-gauge-high"></i>Panel</a>
-  <a href="#"><i class="fas fa-wallet"></i>Cuentas</a>
-  <a href="#"><i class="fas fa-right-left"></i>Transf.</a>
-  <a href="#"><i class="fas fa-receipt"></i>Transac.</a>
-  <a href="#"><i class="fas fa-chart-pie"></i>Reportes</a>
-</div></nav>
+<!-- QUICK STATS -->
+<section class="grid-mid" id="statsRow">
+  <div class="stat-mini">
+    <div class="sm-top"><div class="sm-icon ic1"><i class="fas fa-arrow-trend-up"></i></div><span class="sm-label">Ingresos del mes</span></div>
+    <div class="sm-value" id="statInc">$5,200.00</div>
+    <div class="sm-change pos"><i class="fas fa-arrow-up"></i> +8.3% vs mes anterior</div>
+  </div>
+  <div class="stat-mini">
+    <div class="sm-top"><div class="sm-icon ic2"><i class="fas fa-arrow-trend-down"></i></div><span class="sm-label">Gastos del mes</span></div>
+    <div class="sm-value" id="statExp">$3,850.00</div>
+    <div class="sm-change pos"><i class="fas fa-arrow-down"></i> -6.1% vs mes anterior</div>
+  </div>
+  <div class="stat-mini">
+    <div class="sm-top"><div class="sm-icon ic3"><i class="fas fa-piggy-bank"></i></div><span class="sm-label">Ahorro neto</span></div>
+    <div class="sm-value" id="statSav" style="color:var(--inc)">+$1,350.00</div>
+    <div class="sm-change pos"><i class="fas fa-arrow-up"></i> +92.9% vs mes anterior</div>
+  </div>
+</section>
 
-<div class="toast" id="toast"><i class="fas fa-circle-check"></i><span id="tm"></span></div>
+<!-- CHARTS TOP -->
+<section class="grid-top">
+  <div class="card card-pad">
+    <div class="panel-head"><h3><i class="fas fa-chart-bar"></i> Ingresos vs Gastos</h3><span style="font-size:11px;color:var(--ol);font-weight:500">&Uacute;ltimos 6 meses</span></div>
+    <div class="chart-wrap chart-lg"><canvas id="barChart"></canvas></div>
+  </div>
+  <div class="card card-pad">
+    <div class="panel-head"><h3><i class="fas fa-chart-pie"></i> Gastos por Categor&iacute;a</h3></div>
+    <div class="chart-wrap"><canvas id="doughnutChart"></canvas></div>
+    <div class="chart-legend" id="doughnutLegend"></div>
+  </div>
+</section>
 
+<!-- BOTTOM GRID -->
+<section class="grid-bot">
+  <div class="card card-pad">
+    <div class="panel-head">
+      <h3><i class="fas fa-calendar-check"></i> Pr&oacute;ximos Pagos</h3>
+      <a class="see-all" href="#">Ver Calendario <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div id="paymentsList">
+      <div class="pay-item"><div class="pay-icon i1"><i class="fas fa-house"></i></div><div class="pay-info"><span class="pay-name">Renta Departamento</span><span class="pay-date"><i class="far fa-calendar"></i> 1 Nov, 2023</span></div><span class="pay-amt">-$1,200.00</span></div>
+      <div class="pay-item"><div class="pay-icon i2"><i class="fas fa-bolt"></i></div><div class="pay-info"><span class="pay-name">Servicios (Luz + Agua)</span><span class="pay-date"><i class="far fa-calendar"></i> 5 Nov, 2023</span></div><span class="pay-amt">-$85.00</span></div>
+      <div class="pay-item"><div class="pay-icon i3"><i class="fas fa-wifi"></i></div><div class="pay-info"><span class="pay-name">Internet Fibra &Oacute;ptica</span><span class="pay-date"><i class="far fa-calendar"></i> 8 Nov, 2023</span></div><span class="pay-amt">-$45.00</span></div>
+      <div class="pay-item"><div class="pay-icon i4"><i class="fas fa-dumbbell"></i></div><div class="pay-info"><span class="pay-name">Gimnasio Premium</span><span class="pay-date"><i class="far fa-calendar"></i> 10 Nov, 2023</span></div><span class="pay-amt">-$60.00</span></div>
+      <div class="pay-item"><div class="pay-icon i5"><i class="fas fa-shield-halved"></i></div><div class="pay-info"><span class="pay-name">Seguro Auto</span><span class="pay-date"><i class="far fa-calendar"></i> 15 Nov, 2023</span></div><span class="pay-amt">-$120.00</span></div>
+    </div>
+  </div>
+
+  <div class="card card-pad">
+    <div class="panel-head">
+      <h3><i class="fas fa-clock-rotate-left"></i> Transacciones Recientes</h3>
+      <a class="see-all" href="#">Ver todo <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Comercio</th><th>Categor&iacute;a</th><th style="text-align:right">Monto</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">Amazon Mexico<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">Hoy, 14:32</span></td><td><span class="chip" style="background:#E3F2FD;color:#1565C0"><i class="fas fa-bag-shopping"></i> COMPRAS</span></td><td class="neg" style="text-align:right;font-weight:600">-$1,240.00</td></tr>
+          <tr><td style="font-weight:600">Starbucks Coffee<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">Ayer, 09:15</span></td><td><span class="chip" style="background:#E8F5E9;color:#2E7D32"><i class="fas fa-mug-hot"></i> ALIMENTOS</span></td><td class="neg" style="text-align:right;font-weight:600">-$85.00</td></tr>
+          <tr><td style="font-weight:600">Pago de N&oacute;mina<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">24 Oct, 2023</span></td><td><span class="chip" style="background:var(--incb);color:var(--inc)"><i class="fas fa-building-columns"></i> INGRESO</span></td><td class="pos" style="text-align:right;font-weight:600">+$4,500.00</td></tr>
+          <tr><td style="font-weight:600">Uber Trip<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">23 Oct, 2023</span></td><td><span class="chip" style="background:#FFF3E0;color:#E65100"><i class="fas fa-car"></i> TRANSPORTE</span></td><td class="neg" style="text-align:right;font-weight:600">-$245.50</td></tr>
+          <tr><td style="font-weight:600">Netflix Premium<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">22 Oct, 2023</span></td><td><span class="chip" style="background:#F3E5F5;color:#6A1B9A"><i class="fas fa-tv"></i> OCIO</span></td><td class="neg" style="text-align:right;font-weight:600">-$15.99</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- REPORTS SECTION -->
+<section class="report-section" style="margin-top:8px;padding-top:20px;border-top:1px solid var(--sc)">
+  <div class="panel-head" style="margin-bottom:18px">
+    <h3><i class="fas fa-file-lines"></i> Reportes Avanzados</h3>
+    <button class="btn btn-secondary" id="exportCsv"><i class="fas fa-download"></i> Exportar CSV</button>
+  </div>
+
+  <div class="grid-reports">
+    <div class="card card-pad">
+      <div class="panel-head"><h3><i class="fas fa-piggy-bank"></i> Ahorro Neto Mensual</h3></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Mes</th><th>Ingresos</th><th>Gastos</th><th>Ahorro</th><th>Estado</th></tr></thead>
+          <tbody id="savingsBody">
+            <tr><td>Octubre 2023</td><td>$5,200.00</td><td>$3,850.00</td><td class="pos" style="font-weight:600">+$1,350.00</td><td><span class="chip" style="background:var(--incb);color:var(--inc)"><i class="fas fa-circle-check"></i> SUPER&Aacute;VIT</span></td></tr>
+            <tr><td>Septiembre 2023</td><td>$4,800.00</td><td>$4,100.00</td><td class="pos" style="font-weight:600">+$700.00</td><td><span class="chip" style="background:var(--incb);color:var(--inc)"><i class="fas fa-circle-check"></i> SUPER&Aacute;VIT</span></td></tr>
+            <tr><td>Agosto 2023</td><td>$4,800.00</td><td>$4,950.00</td><td class="neg" style="font-weight:600">-$150.00</td><td><span class="chip" style="background:var(--expb);color:var(--exp)"><i class="fas fa-triangle-exclamation"></i> D&Eacute;FICIT</span></td></tr>
+            <tr><td>Julio 2023</td><td>$5,500.00</td><td>$3,200.00</td><td class="pos" style="font-weight:600">+$2,300.00</td><td><span class="chip" style="background:var(--incb);color:var(--inc)"><i class="fas fa-circle-check"></i> SUPER&Aacute;VIT</span></td></tr>
+            <tr><td>Junio 2023</td><td>$4,800.00</td><td>$4,000.00</td><td class="pos" style="font-weight:600">+$800.00</td><td><span class="chip" style="background:var(--incb);color:var(--inc)"><i class="fas fa-circle-check"></i> SUPER&Aacute;VIT</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;text-align:center"><button class="btn btn-ghost" id="loadMore"><i class="fas fa-arrow-down"></i> Cargar historial completo</button></div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="panel-head"><h3><i class="fas fa-chart-line"></i> Tendencia de Ahorro</h3></div>
+      <div class="chart-wrap chart-lg"><canvas id="lineChart"></canvas></div>
+      <div class="chart-legend" id="lineLegend"></div>
+    </div>
+  </div>
+
+  <div class="card card-pad" style="margin-bottom:20px">
+    <div class="panel-head"><h3><i class="fas fa-chart-area"></i> Evoluci&oacute;n Patrimonial Mensual</h3><span style="font-size:11px;color:var(--ol)">Ingresos vs Gastos vs Ahorro</span></div>
+    <div class="chart-wrap chart-lg"><canvas id="stackedChart"></canvas></div>
+    <div class="chart-legend" id="stackedLegend"></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
 <script>
 (function(){
   "use strict";
 
-  /* ===== DATA ===== */
   var months = ['Jun','Jul','Ago','Sep','Oct','Nov'];
   var incomeData = [4800, 5500, 4800, 4800, 5200, 5800];
   var expenseData = [4000, 3200, 4950, 4100, 3850, 3500];
@@ -444,57 +150,42 @@ body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--os);li
 
   var catData = [
     { label: 'Vivienda', value: 40, color: '#1a237e' },
-    { label: 'Alimentación', value: 25, color: '#2E7D32' },
+    { label: 'Alimentaci&oacute;n', value: 25, color: '#2E7D32' },
     { label: 'Transporte', value: 20, color: '#E65100' },
     { label: 'Ocio', value: 15, color: '#6A1B9A' }
   ];
 
-  /* ===== SIDEBAR TOGGLE ===== */
-  document.getElementById('hamBtn').addEventListener('click', function(){
-    document.getElementById('sidebar').classList.add('open');
-    document.getElementById('ovS').classList.add('show');
-  });
-  document.getElementById('ovS').addEventListener('click', function(){
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('ovS').classList.remove('show');
-  });
-
-  /* ===== REFRESH ===== */
   document.getElementById('refreshBtn').addEventListener('click', function(){
-    toast('Datos actualizados');
+    showToast('Datos actualizados');
   });
   document.getElementById('addTxBtn').addEventListener('click', function(){
-    toast('Abriendo formulario…');
+    showToast('Abriendo formulario…');
   });
   document.getElementById('loadMore').addEventListener('click', function(){
-    toast('Historial completo cargado');
+    showToast('Historial completo cargado');
   });
 
-  /* ===== EXPORT CSV ===== */
   document.getElementById('exportCsv').addEventListener('click', function(){
     var headers = ['Mes','Ingresos','Gastos','Ahorro','Estado'];
     var rows = [
-      ['Octubre 2023','5200.00','3850.00','1350.00','SUPERÁVIT'],
-      ['Septiembre 2023','4800.00','4100.00','700.00','SUPERÁVIT'],
-      ['Agosto 2023','4800.00','4950.00','-150.00','DÉFICIT'],
-      ['Julio 2023','5500.00','3200.00','2300.00','SUPERÁVIT'],
-      ['Junio 2023','4800.00','4000.00','800.00','SUPERÁVIT']
+      ['Octubre 2023','5200.00','3850.00','1350.00','SUPER&Aacute;VIT'],
+      ['Septiembre 2023','4800.00','4100.00','700.00','SUPER&Aacute;VIT'],
+      ['Agosto 2023','4800.00','4950.00','-150.00','D&Eacute;FICIT'],
+      ['Julio 2023','5500.00','3200.00','2300.00','SUPER&Aacute;VIT'],
+      ['Junio 2023','4800.00','4000.00','800.00','SUPER&Aacute;VIT']
     ];
     var csv = '\uFEFF' + headers.join(';') + '\n' + rows.map(function(r){return r.join(';')}).join('\n');
     var a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
     a.download = 'ahorro_neto_mensual.csv';
     a.click();
-    toast('CSV exportado correctamente');
+    showToast('CSV exportado correctamente');
   });
 
-  /* ===== CHART.JS CONFIG ===== */
   Chart.register(ChartDataLabels);
-
   var commonFont = { family: "'Inter', sans-serif" };
   var gridColor = 'rgba(0,0,0,0.04)';
 
-  /* --- BAR CHART: Ingresos vs Gastos --- */
   new Chart(document.getElementById('barChart'), {
     type: 'bar',
     data: {
@@ -540,25 +231,12 @@ body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--os);li
         }
       },
       scales: {
-        x: {
-          grid: { display: false },
-          ticks: { font: { size: 12, weight: '600', family: "'Inter', sans-serif" }, color: '#6b7280' }
-        },
-        y: {
-          grid: { color: gridColor },
-          border: { display: false },
-          ticks: {
-            font: { size: 11, family: "'Inter', sans-serif" },
-            color: '#9ca3af',
-            callback: function(v){ return '$' + (v/1000).toFixed(0) + 'k'; }
-          },
-          beginAtZero: true
-        }
+        x: { grid: { display: false }, ticks: { font: { size: 12, weight: '600', family: "'Inter', sans-serif" }, color: '#6b7280' } },
+        y: { grid: { color: gridColor }, border: { display: false }, ticks: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#9ca3af', callback: function(v){ return '$' + (v/1000).toFixed(0) + 'k'; } }, beginAtZero: true }
       }
     }
   });
 
-  /* --- DOUGHNUT CHART: Gastos por Categoría --- */
   var doughnutChart = new Chart(document.getElementById('doughnutChart'), {
     type: 'doughnut',
     data: {
@@ -593,13 +271,11 @@ body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--os);li
     }
   });
 
-  /* Custom Legend Doughnut */
   var dLegend = document.getElementById('doughnutLegend');
   catData.forEach(function(c){
     dLegend.innerHTML += '<div class="leg-item"><span class="leg-dot" style="background:'+c.color+'"></span>'+c.label+' <span class="leg-val">'+c.value+'%</span></div>';
   });
 
-  /* --- LINE CHART: Tendencia de Ahorro --- */
   new Chart(document.getElementById('lineChart'), {
     type: 'line',
     data: {
@@ -637,59 +313,26 @@ body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--os);li
         }
       },
       scales: {
-        x: {
-          grid: { display: false },
-          ticks: { font: { size: 12, weight: '600', family: "'Inter', sans-serif" }, color: '#6b7280' }
-        },
-        y: {
-          grid: { color: gridColor },
-          border: { display: false },
-          ticks: {
-            font: { size: 11, family: "'Inter', sans-serif" },
-            color: '#9ca3af',
-            callback: function(v){ return '$' + v.toLocaleString('en-US'); }
-          }
-        }
+        x: { grid: { display: false }, ticks: { font: { size: 12, weight: '600', family: "'Inter', sans-serif" }, color: '#6b7280' } },
+        y: { grid: { color: gridColor }, border: { display: false }, ticks: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#9ca3af', callback: function(v){ return '$' + v.toLocaleString('en-US'); } } }
       }
     }
   });
 
-  /* Custom Legend Line */
   var lLegend = document.getElementById('lineLegend');
   savingsData.forEach(function(v,i){
     var color = v >= 0 ? '#2E7D32' : '#C62828';
     lLegend.innerHTML += '<div class="leg-item"><span class="leg-dot" style="background:'+color+'"></span>'+months[i]+' <span class="leg-val" style="color:'+color+'">'+(v>=0?'+':'')+v.toLocaleString('en-US')+'</span></div>';
   });
 
-  /* --- STACKED BAR: Evolución Patrimonial --- */
   new Chart(document.getElementById('stackedChart'), {
     type: 'bar',
     data: {
       labels: months,
       datasets: [
-        {
-          label: 'Ingresos',
-          data: incomeData,
-          backgroundColor: 'rgba(46,125,50,0.80)',
-          borderRadius: 4,
-          borderSkipped: false
-        },
-        {
-          label: 'Gastos',
-          data: expenseData,
-          backgroundColor: 'rgba(198,40,40,0.70)',
-          borderRadius: 4,
-          borderSkipped: false
-        },
-        {
-          label: 'Ahorro',
-          data: savingsData,
-          backgroundColor: function(ctx){
-            return ctx.raw >= 0 ? 'rgba(26,35,126,0.75)' : 'rgba(230,81,0,0.75)';
-          },
-          borderRadius: 4,
-          borderSkipped: false
-        }
+        { label: 'Ingresos', data: incomeData, backgroundColor: 'rgba(46,125,50,0.80)', borderRadius: 4, borderSkipped: false },
+        { label: 'Gastos', data: expenseData, backgroundColor: 'rgba(198,40,40,0.70)', borderRadius: 4, borderSkipped: false },
+        { label: 'Ahorro', data: savingsData, backgroundColor: function(ctx){ return ctx.raw >= 0 ? 'rgba(26,35,126,0.75)' : 'rgba(230,81,0,0.75)'; }, borderRadius: 4, borderSkipped: false }
       ]
     },
     options: {
@@ -707,66 +350,26 @@ body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--os);li
           align: 'top',
           offset: 2,
           font: { size: 9, weight: '700', family: "'Inter', sans-serif" },
-          formatter: function(v){
-            return (v >= 0 ? '' : '-') + '$' + Math.abs(v).toLocaleString('en-US');
-          },
+          formatter: function(v){ return (v >= 0 ? '' : '-') + '$' + Math.abs(v).toLocaleString('en-US'); },
           color: function(ctx){
             if(ctx.datasetIndex === 0) return '#2E7D32';
             if(ctx.datasetIndex === 1) return '#C62828';
             return ctx.raw >= 0 ? '#1a237e' : '#E65100';
           },
-          display: function(ctx){
-            return Math.abs(ctx.dataset.data[ctx.dataIndex]) > 200;
-          }
+          display: function(ctx){ return Math.abs(ctx.dataset.data[ctx.dataIndex]) > 200; }
         }
       },
       scales: {
-        x: {
-          stacked: true,
-          grid: { display: false },
-          ticks: { font: { size: 12, weight: '600', family: "'Inter', sans-serif" }, color: '#6b7280' }
-        },
-        y: {
-          stacked: true,
-          grid: { color: gridColor },
-          border: { display: false },
-          ticks: {
-            font: { size: 11, family: "'Inter', sans-serif" },
-            color: '#9ca3af',
-            callback: function(v){ return '$' + (v/1000).toFixed(0) + 'k'; }
-          }
-        }
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 12, weight: '600', family: "'Inter', sans-serif" }, color: '#6b7280' } },
+        y: { stacked: true, grid: { color: gridColor }, border: { display: false }, ticks: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#9ca3af', callback: function(v){ return '$' + (v/1000).toFixed(0) + 'k'; } } }
       }
     }
   });
 
-  /* Custom Legend Stacked */
   var sLegend = document.getElementById('stackedLegend');
-  [
-    { label: 'Ingresos', color: '#2E7D32' },
-    { label: 'Gastos', color: '#C62828' },
-    { label: 'Ahorro (+)', color: '#1a237e' },
-    { label: 'Déficit (-)', color: '#E65100' }
-  ].forEach(function(item){
+  [{ label: 'Ingresos', color: '#2E7D32' },{ label: 'Gastos', color: '#C62828' },{ label: 'Ahorro (+)', color: '#1a237e' },{ label: 'D&eacute;ficit (-)', color: '#E65100' }].forEach(function(item){
     sLegend.innerHTML += '<div class="leg-item"><span class="leg-dot" style="background:'+item.color+'"></span>'+item.label+'</div>';
   });
-
-  /* ===== TOAST ===== */
-  var toastTimer;
-  function toast(msg, type){
-    document.getElementById('tm').textContent = msg;
-    var t = document.getElementById('toast');
-    t.querySelector('i').className = type === 'er' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
-    t.querySelector('i').style.color = type === 'er' ? '#ef5350' : '#66bb6a';
-    t.className = 'toast';
-    void t.offsetWidth;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2800);
-  }
-  window.toast = toast;
-
 })();
 </script>
-</body>
-</html>
+{% endblock %}
