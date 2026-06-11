@@ -1,8 +1,38 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load formatos %}
 
 {% block title %}Metas de Ahorro — FinanPlanen{% endblock %}
 {% block page_title %}Metas de Ahorro{% endblock %}
+
+{% block extra_head %}
+<style>
+:root {
+  --r: 0.5rem;
+  --r-md: 0.75rem;
+  --r-lg: 1rem;
+  --r-xl: 1.5rem;
+  --r-full: 9999px;
+  --card-pad: 24px;
+  --gutter: 24px;
+  --shadow-1: 0px 4px 12px rgba(26,35,126,0.05);
+  --shadow-2: 0px 12px 32px rgba(26,35,126,0.12);
+}
+.grid-mid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.stat-mini{border:1px solid var(--olv);border-radius:var(--r-lg);padding:20px}
+.sm-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.sm-icon{width:36px;height:36px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:14px}
+.sm-icon.ic1{background:var(--incb);color:var(--inc)}
+.sm-icon.ic2{background:#e0e2f5;color:var(--pc)}
+.sm-icon.ic3{background:var(--warb);color:var(--war)}
+.sm-label{font-size:12px;font-weight:600;color:var(--ol);letter-spacing:.3px;text-transform:uppercase}
+.sm-value{font-size:28px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+
+.goals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-bottom:24px}
+
+.ai-banner{background:linear-gradient(135deg,#1a237e,#283593);color:#fff}
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="page-head">
@@ -15,337 +45,250 @@
   </div>
 </div>
 
-<div id="featuredArea"></div>
+{% if mejor %}
+<div class="card card-pad" style="background:linear-gradient(135deg,#0d1042,#1a237e);color:#fff;margin-bottom:20px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-size:11px;letter-spacing:1.5px;opacity:.7;text-transform:uppercase;font-weight:600">META DESTACADA</div>
+      <div style="font-size:28px;font-weight:800;margin-top:8px;letter-spacing:-.5px">
+        <i class="fas {% if mejor.icono %}{{ mejor.icono.clase_css }}{% else %}fa-piggy-bank{% endif %}"></i>
+        {{ mejor.nombre }}
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;opacity:.7">PROGRESO</div>
+      <div style="font-size:32px;font-weight:800">{{ mejor.progreso_pct|floatformat:0 }}%</div>
+    </div>
+  </div>
+  <div style="height:10px;border-radius:999px;background:rgba(255,255,255,.15);margin:16px 0;overflow:hidden">
+    <div style="height:100%;border-radius:999px;background:linear-gradient(90deg,#34d27e,#7ef0a7);width:{{ mejor.progreso_pct|floatformat:0 }}%"></div>
+  </div>
+  <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:14px">
+    <span><span style="opacity:.7">Meta:</span> <b>RD$ {{ mejor.meta|dinero }}</b></span>
+    <span><span style="opacity:.7">Ahorrado:</span> <b>RD$ {{ mejor.monto_actual|dinero }}</b></span>
+    <span><span style="opacity:.7">Faltante:</span> <b>RD$ {{ faltante_destacada|dinero }}</b></span>
+  </div>
+</div>
+{% endif %}
 
-<section class="grid-mid" id="summaryRow"></section>
+<section class="grid-mid" id="summaryRow">
+  <div class="stat-mini">
+    <div class="sm-top">
+      <div class="sm-icon ic3"><i class="fas fa-flag-checkered"></i></div>
+      <span class="sm-label">Metas Activas</span>
+    </div>
+    <div class="sm-value">{{ total_metas|default:"0" }}</div>
+  </div>
+  <div class="stat-mini">
+    <div class="sm-top">
+      <div class="sm-icon ic1"><i class="fas fa-piggy-bank"></i></div>
+      <span class="sm-label">Total Ahorrado</span>
+    </div>
+    <div class="sm-value">RD$ {{ total_ahorrado|dinero }}</div>
+  </div>
+  <div class="stat-mini">
+    <div class="sm-top">
+      <div class="sm-icon ic2"><i class="fas fa-calendar-plus"></i></div>
+      <span class="sm-label">Ahorro Mensual</span>
+    </div>
+    <div class="sm-value">{{ progreso_promedio|default:"0"|floatformat:0 }}%</div>
+  </div>
+</section>
 
 <div class="section-title">
   <span id="goalsTitle">En progreso</span>
-  <a href="#" class="see-all" id="viewHistory"><i class="fas fa-clock-rotate-left"></i> Ver Historial</a>
 </div>
 
-<section class="goals-grid" id="goalsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-bottom:24px"></section>
+<section class="goals-grid" id="goalsGrid">
+  {% for meta in metas %}
+  {% with pct=meta.progreso_pct color=meta.color.hex|default:"#1a237e" %}
+  <div class="card card-pad" style="border-top:4px solid {{ color }}" id="goal-card-{{ meta.pk }}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div>
+        <span style="font-size:24px"><i class="fas {% if meta.icono %}{{ meta.icono.clase_css }}{% else %}fa-piggy-bank{% endif %}" style="color:{{ color }}"></i></span>
+        <h3 style="font-size:18px;font-weight:700;margin-top:6px">{{ meta.nombre }}</h3>
+        {% if meta.nota %}
+        <p style="font-size:13px;color:var(--ol);margin-top:2px">{{ meta.nota|truncatechars:40 }}</p>
+        {% endif %}
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="btn-icon" onclick="openDeposit({{ meta.pk }})" title="Depositar"><i class="fas fa-plus"></i></button>
+        <button class="btn-icon"
+                hx-get="{% url 'savings:meta_editar' meta.pk %}"
+                hx-target="#modal-content"
+                hx-trigger="click"
+                _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal"
+                title="Editar">
+          <i class="fas fa-pen"></i>
+        </button>
+        <button class="btn-icon"
+                hx-get="{% url 'savings:meta_eliminar' meta.pk %}"
+                hx-target="#modal-content"
+                hx-trigger="click"
+                _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal"
+                title="Eliminar"
+                style="color:var(--exp)">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+    <div style="height:8px;border-radius:999px;background:var(--sc);overflow:hidden;margin:12px 0">
+      <div style="height:100%;border-radius:999px;background:{{ color }};width:{{ pct|floatformat:0 }}%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ov)">
+      <span><b>RD$ {{ meta.monto_actual|dinero }}</b> / RD$ {{ meta.meta|dinero }}</span>
+      <span>{{ pct|floatformat:0 }}%</span>
+    </div>
+    <div style="font-size:12px;color:var(--ol);margin-top:8px">
+      <i class="fas fa-clock"></i>
+      {% if meta.fecha_limite %}
+      {{ meta.fecha_limite|date:"M Y" }}
+      {% else %}
+      Sin fecha l&iacute;mite
+      {% endif %}
+    </div>
+  </div>
+  {% endwith %}
+  {% empty %}
+  <div style="grid-column:1/-1" class="empty-hint">No hay metas de ahorro. Crea la primera.</div>
+  {% endfor %}
+</section>
 
-<div class="card card-pad" id="aiBanner" style="background:linear-gradient(135deg,#1a237e,#283593);color:#fff">
+<div class="card card-pad ai-banner" id="aiBanner" {% if not metas %}style="display:none"{% endif %}>
   <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
     <div style="width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:22px"><i class="fas fa-robot"></i></div>
     <div style="flex:1;min-width:200px">
       <h4 id="aiTitle" style="font-size:18px;font-weight:700">&iexcl;Vas por buen camino!</h4>
-      <p id="aiText" style="font-size:14px;color:rgba(255,255,255,.75);margin-top:4px"></p>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-ghost" id="ignoreAi" style="color:rgba(255,255,255,.7)"><i class="fas fa-xmark"></i> Ignorar</button>
-      <button class="btn" id="adjustPlan" style="background:#fff;color:var(--pc);font-weight:600"><i class="fas fa-sliders"></i> Ajustar Plan</button>
+      <p id="aiText" style="font-size:14px;color:rgba(255,255,255,.75);margin-top:4px">
+        Tus metas est&aacute;n al {{ progreso_promedio|default:"0"|floatformat:0 }}% de progreso.
+        {% if progreso_promedio >= 50 %}Sigue as&iacute;.{% else %}Puedes aumentar tu ahorro mensual para alcanzarlas antes.{% endif %}
+      </p>
     </div>
   </div>
 </div>
 
+{# --- Modal Nueva Meta --- #}
 <div class="modal-overlay" id="newGoalModal">
   <div class="modal">
     <div class="modal-head">
       <h3><i class="fas fa-bullseye" style="color:var(--pc);margin-right:8px"></i>Nueva Meta</h3>
-      <button class="modal-close" onclick="closeModal('newGoalModal')"><i class="fas fa-xmark"></i></button>
+      <button class="modal-close" _="on click remove .open from #newGoalModal"><i class="fas fa-xmark"></i></button>
     </div>
-    <form id="goalForm" style="margin-top:16px">
-      <div class="field">
-        <label>Nombre de la Meta</label>
-        <input type="text" id="gName" placeholder="Ej: Fondo de Emergencia" required>
-      </div>
-      <div class="field">
-        <label>Descripci&oacute;n</label>
-        <input type="text" id="gDesc" placeholder="Ej: Para tranquilidad financiera">
-      </div>
-      <div class="field-row">
+    <form id="goalForm" method="post"
+          hx-post="{% url 'savings:meta_crear' %}"
+          hx-target="this"
+          hx-swap="outerHTML"
+          _="on htmx:beforeSend remove .open from #newGoalModal">
+      {% csrf_token %}
+      <div style="margin-top:16px">
         <div class="field">
-          <label>Meta Total ($)</label>
-          <input type="number" id="gTarget" step="0.01" min="1" placeholder="Ej: 20000.00" required>
+          <label>Nombre de la Meta</label>
+          <input type="text" name="nombre" placeholder="Ej: Fondo de Emergencia" required class="form-control">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Meta Total (RD$)</label>
+            <input type="number" name="meta" step="0.01" min="1" placeholder="Ej: 20000.00" required class="form-control">
+          </div>
+          <div class="field">
+            <label>Fecha L&iacute;mite</label>
+            <input type="date" name="fecha_limite" class="form-control">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Color</label>
+            <select name="color" class="form-control">
+              <option value="">Seleccionar...</option>
+              {% for c in colores %}
+              <option value="{{ c.pk }}">{{ c.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label>Icono</label>
+            <select name="icono" class="form-control">
+              <option value="">Seleccionar...</option>
+              {% for i in iconos %}
+              <option value="{{ i.pk }}">{{ i.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
         <div class="field">
-          <label>Ya Ahorrado ($)</label>
-          <input type="number" id="gSaved" step="0.01" min="0" value="0" placeholder="0.00">
+          <label>Nota</label>
+          <textarea name="nota" rows="3" class="form-control" placeholder="Ej: Para tranquilidad financiera"></textarea>
         </div>
       </div>
-      <div class="field-row">
-        <div class="field">
-          <label>Ahorro Mensual ($)</label>
-          <input type="number" id="gMonthly" step="0.01" min="1" placeholder="Ej: 500.00" required>
-        </div>
-        <div class="field">
-          <label>Prioridad</label>
-          <select id="gPriority">
-            <option value="Cr&iacute;tica">Cr&iacute;tica</option>
-            <option value="Alta">Alta</option>
-            <option value="Media" selected>Media</option>
-            <option value="Baja">Baja</option>
-          </select>
-        </div>
-      </div>
-      <div class="field">
-        <label>Icono</label>
-        <select id="gIcon">
-          <option value="fa-shield-halved">Emergencia</option>
-          <option value="fa-car">Veh&iacute;culo</option>
-          <option value="fa-plane">Viaje</option>
-          <option value="fa-house">Vivienda</option>
-          <option value="fa-graduation-cap">Educaci&oacute;n</option>
-          <option value="fa-ring">Boda</option>
-          <option value="fa-laptop">Tecnolog&iacute;a</option>
-          <option value="fa-piggy-bank">Ahorro General</option>
-          <option value="fa-child">Hijos</option>
-          <option value="fa-heart-pulse">Salud</option>
-        </select>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Crear Meta</button>
+        <button type="button" class="btn btn-secondary" _="on click remove .open from #newGoalModal">Cancelar</button>
       </div>
     </form>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModal('newGoalModal')">Cancelar</button>
-      <button class="btn btn-primary" id="saveGoalBtn"><i class="fas fa-check"></i> Crear Meta</button>
-    </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="editGoalModal">
-  <div class="modal">
-    <div class="modal-head">
-      <h3><i class="fas fa-pen-to-square" style="color:var(--pc);margin-right:8px"></i>Editar Meta</h3>
-      <button class="modal-close" onclick="closeModal('editGoalModal')"><i class="fas fa-xmark"></i></button>
-    </div>
-    <div style="margin-top:16px">
-      <div class="field">
-        <label>Nombre</label>
-        <input type="text" id="egName" readonly style="background:var(--slw);cursor:not-allowed">
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <label>Meta Total ($)</label>
-          <input type="number" id="egTarget" step="0.01" min="1">
-        </div>
-        <div class="field">
-          <label>Ahorro Mensual ($)</label>
-          <input type="number" id="egMonthly" step="0.01" min="1">
-        </div>
-      </div>
-      <div class="field">
-        <label>Prioridad</label>
-        <select id="egPriority">
-          <option value="Cr&iacute;tica">Cr&iacute;tica</option>
-          <option value="Alta">Alta</option>
-          <option value="Media">Media</option>
-          <option value="Baja">Baja</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModal('editGoalModal')">Cancelar</button>
-      <button class="btn btn-primary" id="saveEditBtn"><i class="fas fa-check"></i> Guardar</button>
-    </div>
-  </div>
-</div>
-
+{# --- Modal Depósito --- #}
 <div class="modal-overlay" id="depositModal">
   <div class="modal">
     <div class="modal-head">
       <h3><i class="fas fa-piggy-bank" style="color:var(--inc);margin-right:8px"></i>Depositar Ahorro</h3>
-      <button class="modal-close" onclick="closeModal('depositModal')"><i class="fas fa-xmark"></i></button>
+      <button class="modal-close" _="on click remove .open from #depositModal"><i class="fas fa-xmark"></i></button>
     </div>
-    <div style="margin-top:16px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:16px">
-        <div><div style="font-size:12px;color:var(--ol)">Meta</div><div id="depName" style="font-size:14px;font-weight:600"></div></div>
-        <div style="text-align:right"><div style="font-size:12px;color:var(--ol)">Faltante</div><div id="depRemaining" style="color:var(--pc);font-weight:700"></div></div>
+    <form method="post"
+          hx-post="{% url 'savings:deposito_crear' %}"
+          hx-target="this"
+          hx-swap="outerHTML"
+          _="on htmx:beforeSend remove .open from #depositModal">
+      {% csrf_token %}
+      <div style="margin-top:16px">
+        <div class="field">
+          <label>Meta</label>
+          <select name="meta" class="form-control" required>
+            <option value="">Seleccionar...</option>
+            {% for m in metas %}
+            <option value="{{ m.pk }}">{{ m.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label>Monto a Depositar (RD$)</label>
+          <input type="number" name="monto" step="0.01" min="0.01" placeholder="Ej: 500.00" required class="form-control">
+        </div>
+        <div class="field">
+          <label>Fecha</label>
+          <input type="date" name="fecha" value="{{ hoy }}" class="form-control" required>
+        </div>
+        <div class="field">
+          <label>Nota</label>
+          <textarea name="nota" rows="3" class="form-control" placeholder="Ej: Dep&oacute;sito quincenal"></textarea>
+        </div>
       </div>
-      <div class="field">
-        <label>Monto a Depositar ($)</label>
-        <input type="number" id="depAmount" step="0.01" min="0.01" placeholder="Ej: 500.00">
+      <div class="modal-actions">
+        <button type="submit" class="btn" style="background:var(--inc);color:#fff;font-weight:600"><i class="fas fa-check"></i> Depositar</button>
+        <button type="button" class="btn btn-secondary" _="on click remove .open from #depositModal">Cancelar</button>
       </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModal('depositModal')">Cancelar</button>
-      <button class="btn" id="confirmDeposit" style="background:var(--inc);color:#fff;font-weight:600"><i class="fas fa-check"></i> Depositar</button>
-    </div>
+    </form>
   </div>
+</div>
+
+<div id="form-modal" class="modal-overlay">
+  <div class="modal" id="modal-content"></div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
 (function(){
-  "use strict";
-
-  var STORAGE_KEY = "finanplanen_metas_v1";
-
-  var defaultState = {
-    goals: [
-      { id: 1, name:"Fondo de Emergencia", desc:"6 meses de gastos", icon:"fa-shield-halved", priority:"Cr&iacute;tica", target:15000, saved:4200, monthly:800, created:"2023-05-10" },
-      { id: 2, name:"Viaje a Jap&oacute;n", desc:"Vacaciones 2 semanas", icon:"fa-plane", priority:"Alta", target:8500, saved:2900, monthly:600, created:"2023-06-15" },
-      { id: 3, name:"Curso de Data Science", desc:"Especializaci&oacute;n profesional", icon:"fa-graduation-cap", priority:"Media", target:3200, saved:1500, monthly:350, created:"2023-08-01" }
-    ]
-  };
-
-  var state = load();
-  var editGoalId = null;
-
-  function load() {
-    try { var r = localStorage.getItem(STORAGE_KEY); if(r) return JSON.parse(r); } catch(e){}
-    return JSON.parse(JSON.stringify(defaultState));
-  }
-  function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){} }
-
-  var MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  var COLORS = ['#141d5c','#1a7a3c','#0f766e','#6d28d9','#b45309','#9f1239'];
-
-  function fmt(n) { return "$" + Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); }
-  function pct(a,b) { return b>0 ? Math.min(100,(a/b)*100) : 0; }
-  function esc(s) { var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-
-  function render() {
-    renderFeatured();
-    renderSummary();
-    renderGrid();
-    renderAi();
-  }
-
-  function renderFeatured() {
-    var area = document.getElementById("featuredArea");
-    var top = state.goals.slice().sort(function(a,b){ return b.saved - a.saved; })[0];
-    if(!top) { area.innerHTML=''; return; }
-    var progress = pct(top.saved, top.target);
-    area.innerHTML =
-      '<div class="card card-pad" style="background:linear-gradient(135deg,#0d1042,#1a237e);color:#fff;margin-bottom:20px">' +
-        '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">' +
-          '<div><div style="font-size:11px;letter-spacing:1.5px;opacity:.7;text-transform:uppercase;font-weight:600">META DESTACADA</div>' +
-          '<div style="font-size:28px;font-weight:800;margin-top:8px;letter-spacing:-.5px"><i class="fas '+top.icon+'"></i> '+esc(top.name)+'</div></div>' +
-          '<div style="text-align:right"><div style="font-size:11px;opacity:.7">PROGRESO</div><div style="font-size:32px;font-weight:800">'+Math.round(progress)+'%</div></div>' +
-        '</div>' +
-        '<div style="height:10px;border-radius:999px;background:rgba(255,255,255,.15);margin:16px 0;overflow:hidden">' +
-          '<div style="height:100%;border-radius:999px;background:linear-gradient(90deg,#34d27e,#7ef0a7);width:'+progress+'%"></div>' +
-        '</div>' +
-        '<div style="display:flex;gap:24px;flex-wrap:wrap;font-size:14px">' +
-          '<span><span style="opacity:.7">Meta:</span> <b>'+fmt(top.target)+'</b></span>' +
-          '<span><span style="opacity:.7">Ahorrado:</span> <b>'+fmt(top.saved)+'</b></span>' +
-          '<span><span style="opacity:.7">Faltante:</span> <b>'+fmt(top.target-top.saved)+'</b></span>' +
-        '</div></div>';
-  }
-
-  function renderSummary() {
-    var row = document.getElementById("summaryRow");
-    var active = state.goals.filter(function(g){ return g.saved < g.target; });
-    var totalTarget = state.goals.reduce(function(a,g){ return a+g.target; },0);
-    var totalSaved = state.goals.reduce(function(a,g){ return a+g.saved; },0);
-    var totalMonthly = state.goals.reduce(function(a,g){ return a+g.monthly; },0);
-    row.innerHTML =
-      '<div class="stat-mini"><div class="sm-top"><div class="sm-icon ic3"><i class="fas fa-flag-checkered"></i></div><span class="sm-label">Metas Activas</span></div><div class="sm-value">'+active.length+'</div></div>' +
-      '<div class="stat-mini"><div class="sm-top"><div class="sm-icon ic1"><i class="fas fa-piggy-bank"></i></div><span class="sm-label">Total Ahorrado</span></div><div class="sm-value">'+fmt(totalSaved)+'</div></div>' +
-      '<div class="stat-mini"><div class="sm-top"><div class="sm-icon ic2"><i class="fas fa-calendar-plus"></i></div><span class="sm-label">Ahorro Mensual</span></div><div class="sm-value">'+fmt(totalMonthly)+'</div></div>';
-  }
-
-  function renderGrid() {
-    var grid = document.getElementById("goalsGrid");
-    grid.innerHTML = '';
-    state.goals.forEach(function(g,i){
-      var progress = pct(g.saved, g.target);
-      var remaining = g.target - g.saved;
-      var monthsLeft = g.monthly>0 ? Math.ceil(remaining/g.monthly) : 0;
-      var color = COLORS[i%COLORS.length];
-      grid.innerHTML +=
-        '<div class="card card-pad" style="border-top:4px solid '+color+'">' +
-          '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">' +
-            '<div><span style="font-size:24px"><i class="fas '+g.icon+'" style="color:'+color+'"></i></span>' +
-            '<h3 style="font-size:18px;font-weight:700;margin-top:6px">'+esc(g.name)+'</h3>' +
-            (g.desc?'<p style="font-size:13px;color:var(--ol);margin-top:2px">'+esc(g.desc)+'</p>':'') +
-            '<span class="chip" style="background:'+(g.priority==='Cr&iacute;tica'?'var(--expb)':g.priority==='Alta'?'var(--warb)':'var(--sc)')+';color:'+(g.priority==='Cr&iacute;tica'?'var(--exp)':g.priority==='Alta'?'var(--war)':'var(--ov)')+';margin-top:6px">'+g.priority+'</span></div>' +
-            '<div style="display:flex;gap:4px">' +
-              '<button class="btn-icon" onclick="openDeposit('+g.id+')" title="Depositar"><i class="fas fa-plus"></i></button>' +
-              '<button class="btn-icon" onclick="openEdit('+g.id+')" title="Editar"><i class="fas fa-pen"></i></button>' +
-              '<button class="btn-icon" onclick="deleteGoal('+g.id+')" title="Eliminar" style="color:var(--exp)"><i class="fas fa-trash"></i></button>' +
-            '</div></div>' +
-          '<div style="height:8px;border-radius:999px;background:var(--sc);overflow:hidden;margin:12px 0">' +
-            '<div style="height:100%;border-radius:999px;background:'+color+';width:'+progress+'%"></div></div>' +
-          '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ov)">' +
-            '<span><b>'+fmt(g.saved)+'</b> / '+fmt(g.target)+'</span>' +
-            '<span>'+Math.round(progress)+'%</span></div>' +
-          '<div style="font-size:12px;color:var(--ol);margin-top:8px">' +
-            '<i class="fas fa-clock"></i> '+(monthsLeft>0?monthsLeft+' meses restantes':'Completada') +
-            ' &middot; <i class="fas fa-calendar"></i> '+fmt(g.monthly)+'/mes</div>' +
-        '</div>';
-    });
-    if(!state.goals.length)
-      grid.innerHTML = '<div class="empty-hint" style="grid-column:1/-1">No hay metas de ahorro. Crea la primera.</div>';
-  }
-
-  function renderAi() {
-    var totalSaved = state.goals.reduce(function(a,g){ return a+g.saved; },0);
-    var totalTarget = state.goals.reduce(function(a,g){ return a+g.target; },0);
-    var p = totalTarget>0 ? Math.round(totalSaved/totalTarget*100) : 0;
-    document.getElementById("aiText").textContent = 'Tus metas est&aacute;n al '+p+'% de progreso. '+(p>=50?'Sigue as&iacute;':'Puedes aumentar tu ahorro mensual para alcanzarlas antes.');
-  }
-
-  function openModal(id) { document.getElementById(id).classList.add('open'); }
-  window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
-
-  function openEdit(id) {
-    var g = state.goals.find(function(x){ return x.id===id; });
-    if(!g) return;
-    editGoalId = id;
-    document.getElementById('egName').value = g.name;
-    document.getElementById('egTarget').value = g.target;
-    document.getElementById('egMonthly').value = g.monthly;
-    document.getElementById('egPriority').value = g.priority;
-    openModal('editGoalModal');
-  }
+  var metas = {{ metas_json|safe }};
 
   window.openDeposit = function(id) {
-    var g = state.goals.find(function(x){ return x.id===id; });
-    if(!g) return;
-    document.getElementById('depName').textContent = g.name;
-    document.getElementById('depRemaining').textContent = fmt(g.target - g.saved);
-    document.getElementById('depAmount').value = '';
-    document.getElementById('confirmDeposit').onclick = function() {
-      var amt = parseFloat(document.getElementById('depAmount').value);
-      if(isNaN(amt)||amt<=0){ showToast('Monto inv&aacute;lido'); return; }
-      g.saved += amt;
-      if(g.saved > g.target) g.saved = g.target;
-      save(); render(); closeModal('depositModal');
-      showToast('Dep&oacute;sito registrado');
-    };
-    openModal('depositModal');
-  };
-
-  window.deleteGoal = function(id) {
-    if(!confirm('&iquest;Eliminar esta meta?')) return;
-    state.goals = state.goals.filter(function(g){ return g.id!==id; });
-    save(); render();
-    showToast('Meta eliminada');
+    document.getElementById('depositModal').classList.add('open');
   };
 
   document.getElementById('newGoalBtn').addEventListener('click', function() {
-    document.getElementById('goalForm').reset();
-    document.getElementById('gSaved').value = '0';
-    openModal('newGoalModal');
+    document.getElementById('newGoalModal').classList.add('open');
   });
-
-  document.getElementById('saveGoalBtn').addEventListener('click', function() {
-    var name = document.getElementById('gName').value.trim();
-    var target = parseFloat(document.getElementById('gTarget').value);
-    var saved = parseFloat(document.getElementById('gSaved').value) || 0;
-    var monthly = parseFloat(document.getElementById('gMonthly').value);
-    var priority = document.getElementById('gPriority').value;
-    var icon = document.getElementById('gIcon').value;
-    if(!name||isNaN(target)||target<=0||isNaN(monthly)||monthly<=0){ showToast('Completa todos los campos'); return; }
-    state.goals.push({ id:Date.now(), name:name, desc:document.getElementById('gDesc').value.trim(), icon:icon, priority:priority, target:target, saved:saved, monthly:monthly, created:new Date().toISOString().slice(0,10) });
-    save(); render(); closeModal('newGoalModal');
-    showToast('Meta creada');
-  });
-
-  document.getElementById('saveEditBtn').addEventListener('click', function() {
-    var g = state.goals.find(function(x){ return x.id===editGoalId; });
-    if(!g) return;
-    g.target = parseFloat(document.getElementById('egTarget').value) || g.target;
-    g.monthly = parseFloat(document.getElementById('egMonthly').value) || g.monthly;
-    g.priority = document.getElementById('egPriority').value;
-    save(); render(); closeModal('editGoalModal');
-    showToast('Meta actualizada');
-  });
-
-  render();
 })();
 </script>
 {% endblock %}

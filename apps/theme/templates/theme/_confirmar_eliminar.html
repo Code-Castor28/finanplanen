@@ -1,15 +1,33 @@
-<div class="confirm-delete">
-  <p>¿Eliminar <strong>{{ object }}</strong>?</p>
-  <p class="text-muted" style="font-size:13px;color:var(--ol,#767683);margin-bottom:16px">Esta acción no se puede deshacer.</p>
+<div class="modal-head">
+  <h3><i class="fas fa-exclamation-triangle" style="color:var(--exp,#dc3545);margin-right:8px"></i>Eliminar {{ model_name|default:"registro" }}</h3>
+  <button class="modal-close" _="on click remove .open from #form-modal"><i class="fas fa-xmark"></i></button>
+</div>
+<div style="padding:16px 0">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="width:64px;height:64px;border-radius:50%;background:var(--expb,#fbe9e7);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;color:var(--exp,#dc3545)">
+      <i class="fas fa-trash"></i>
+    </div>
+    <p style="font-size:16px;font-weight:600;margin-bottom:4px">¿Eliminar <strong>{{ object }}</strong>?</p>
+    <p style="font-size:13px;color:var(--ol,#767683);margin:0">Esta acci&oacute;n no se puede deshacer.</p>
+  </div>
   <form method="post"
         hx-post="{{ request.path }}"
         hx-target="this"
         hx-swap="outerHTML"
         _="on htmx:beforeSend remove .open from #form-modal">
     {% csrf_token %}
-    <div class="form-actions">
-      <button type="submit" class="btn-danger"><i class="fas fa-trash"></i> Eliminar</button>
-      <button type="button" class="btn-secondary" _="on click remove .open from #form-modal">Cancelar</button>
+    <div style="display:flex;gap:12px">
+      <button type="submit" style="flex:1;padding:12px;border:2px solid transparent;border-radius:var(--r,8px);background:var(--exp,#dc3545);color:#fff;font-weight:600;font-size:14px;cursor:pointer;transition:.15s"
+              onmouseenter="this.style.borderColor='#fff';this.style.boxShadow='0 0 0 3px var(--exp,#dc3545)'"
+              onmouseleave="this.style.borderColor='transparent';this.style.boxShadow='none'">
+        <i class="fas fa-trash"></i> Eliminar
+      </button>
+      <button type="button" style="flex:1;padding:12px;border:2px solid var(--bo,#e0e0e0);border-radius:var(--r,8px);background:var(--sc,#f5f5f5);color:var(--ot,#333);font-weight:600;font-size:14px;cursor:pointer;transition:.15s"
+              _="on click remove .open from #form-modal"
+              onmouseenter="this.style.borderColor='var(--exp,#dc3545)';this.style.color='var(--exp,#dc3545)'"
+              onmouseleave="this.style.borderColor='var(--bo,#e0e0e0)';this.style.color='var(--ot,#333)'">
+        Cancelar
+      </button>
     </div>
   </form>
 </div>

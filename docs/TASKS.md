@@ -62,9 +62,9 @@
 - [x] 9.4 Templates: `transferencias.html`, `_lista_transferencias.html`, `_form_transferencia.html`
 
 ## Fase 10 — Ahorros
-- [ ] 10.1 Modelo `MetaAhorro` con FK a Color e Icono
-- [ ] 10.2 Modelo `DepositoAhorro`
-- [ ] 10.3 CRUD metas + formulario de depósito
+- [x] 10.1 Modelo `MetaAhorro` con FK a Color e Icono
+- [x] 10.2 Modelo `DepositoAhorro`
+- [x] 10.3 CRUD metas + formulario de depósito
 
 ## Fase 11 — Presupuestos
 - [ ] 11.1 Modelo `Presupuesto`

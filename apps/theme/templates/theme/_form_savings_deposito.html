@@ -1,0 +1,22 @@
+<div class="modal-head">
+  <h3>Nuevo Depósito</h3>
+  <button class="modal-close" _="on click remove .open from #form-modal"><i class="fas fa-xmark"></i></button>
+</div>
+<form method="post"
+      hx-post="{% url 'savings:deposito_crear' %}"
+      hx-target="this"
+      hx-swap="outerHTML"
+      _="on htmx:beforeSend remove .open from #form-modal">
+  {% csrf_token %}
+  {% for field in form %}
+  <div class="form-group">
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  {% endfor %}
+  <div class="modal-actions">
+    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Depositar</button>
+    <button type="button" class="btn btn-secondary" _="on click remove .open from #form-modal">Cancelar</button>
+  </div>
+</form>
