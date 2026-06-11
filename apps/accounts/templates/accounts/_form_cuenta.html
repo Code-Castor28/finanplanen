@@ -1,0 +1,102 @@
+<div class="modal-head">
+  <h3>{% if object %}Editar Cuenta{% else %}Nueva Cuenta{% endif %}</h3>
+  <button class="modal-close" _="on click remove .open from #form-modal"><i class="fas fa-xmark"></i></button>
+</div>
+<p class="sub">Completa los datos de la cuenta.</p>
+<form method="post"
+      hx-post="{% if object %}{% url 'accounts:editar' object.pk %}{% else %}{% url 'accounts:crear' %}{% endif %}"
+      hx-target="this"
+      hx-swap="outerHTML"
+      _="on htmx:beforeSend remove .open from #form-modal">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+    {{ form.nombre }}
+    {% for error in form.nombre.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div class="form-group">
+    <label for="{{ form.tipo.id_for_label }}">{{ form.tipo.label }}</label>
+    {{ form.tipo }}
+    {% for error in form.tipo.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div class="form-group">
+    <label>Balance</label>
+    <div style="display:flex;align-items:center;border:1.5px solid var(--olv);border-radius:8px;overflow:hidden">
+      <span style="padding:10px 12px;background:var(--sc);color:var(--ov);font-weight:700;font-size:14px">RD$</span>
+      {{ form.balance }}
+    </div>
+    {% for error in form.balance.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div id="tarjeta-fields">
+    <div class="field-row">
+      <div class="field">
+        <label for="{{ form.emisor.id_for_label }}">{{ form.emisor.label }}</label>
+        {{ form.emisor }}
+        {% for error in form.emisor.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+      <div class="field">
+        <label for="{{ form.ultimos_digitos.id_for_label }}">{{ form.ultimos_digitos.label }}</label>
+        {{ form.ultimos_digitos }}
+        {% for error in form.ultimos_digitos.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+    </div>
+    <div id="credito-fields" class="field-row">
+      <div class="field">
+        <label for="{{ form.dia_corte.id_for_label }}">{{ form.dia_corte.label }}</label>
+        {{ form.dia_corte }}
+        {% for error in form.dia_corte.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+      <div class="field">
+        <label for="{{ form.dia_pago.id_for_label }}">{{ form.dia_pago.label }}</label>
+        {{ form.dia_pago }}
+        {% for error in form.dia_pago.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+    </div>
+    <div id="vencimiento-field" class="form-group">
+      <label for="{{ form.vencimiento.id_for_label }}">{{ form.vencimiento.label }}</label>
+      {{ form.vencimiento }}
+      {% for error in form.vencimiento.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    </div>
+  </div>
+  <div class="field-row">
+    <div class="field">
+      <label for="{{ form.color.id_for_label }}">{{ form.color.label }}</label>
+      {{ form.color }}
+      {% for error in form.color.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    </div>
+    <div class="field">
+      <label for="{{ form.icono.id_for_label }}">{{ form.icono.label }}</label>
+      {{ form.icono }}
+      {% for error in form.icono.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="checkbox-label">
+      {{ form.activo }} {{ form.activo.label }}
+    </label>
+  </div>
+  <div class="modal-actions">
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-save"></i> {% if object %}Guardar{% else %}Crear{% endif %}
+    </button>
+    <button type="button" class="btn btn-secondary" _="on click remove .open from #form-modal">
+      Cancelar
+    </button>
+  </div>
+</form>
+
+<script>
+(function(){
+  var tipo = document.getElementById('{{ form.tipo.id_for_label }}');
+  var tarjeta = document.getElementById('tarjeta-fields');
+  var credito = document.getElementById('credito-fields');
+  var venc = document.getElementById('vencimiento-field');
+  function toggle(){
+    var v = tipo.value;
+    tarjeta.style.display = v === 'efectivo' ? 'none' : 'block';
+    credito.style.display = v === 'credito' ? 'flex' : 'none';
+    venc.style.display = v === 'debito' ? 'block' : 'none';
+  }
+  if(tipo){ tipo.addEventListener('change', toggle); toggle(); }
+})();
+</script>
