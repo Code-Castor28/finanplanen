@@ -21,6 +21,10 @@
 - Apps dentro de `apps/`: `users`, `accounts`, `transactions`, `categories`, `budgets`, `savings`, `transfers`, `theme`, `core`
 - Settings divididos: `config/settings/base.py`, `dev.py`, `prod.py`
 - Modelos viven en `models.py` de cada app
+- **Settings clave:**
+  - `AUTH_USER_MODEL = 'users.Usuario'`
+  - `LOGIN_URL = '/acceso/ingresar/'`
+  - `LOGIN_REDIRECT_URL = 'core:inicio'`
 
 ### Montos
 - Todos los valores monetarios: `DecimalField(max_digits=12, decimal_places=2)`
@@ -80,6 +84,7 @@
 ## Decisiones Clave (nunca sobreescribir)
 - **Sin DRF** — no REST API, no serializers
 - **Sin npm** — no Node toolchain, no bundlers
+- **Vistas protegidas** — toda vista que renderice contenido del usuario autenticado lleva `@login_required` o hereda de `LoginRequiredMixin`
 - **Tarjetas crédito** = cuentas con tipo=CR, transacciones pendientes vía `pagado=False`
 - **Transferencias** = 1 registro Transferencia + 2 registros Transaccion (débito/crédito)
 - **Etiquetas** = M2M con Categoria (no subcategorías jerárquicas)

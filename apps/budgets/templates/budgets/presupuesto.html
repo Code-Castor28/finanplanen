@@ -1,1236 +1,634 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FinanceFlow — Presupuestos</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+{% extends 'base.html' %}
+{% load static %}
 
-    :root {
-      --surface: #f7f9fc;
-      --surface-dim: #d8dadd;
-      --surface-container-lowest: #ffffff;
-      --surface-container-low: #f2f4f7;
-      --surface-container: #eceef1;
-      --surface-container-high: #e6e8eb;
-      --surface-container-highest: #e0e3e6;
-      --on-surface: #191c1e;
-      --on-surface-variant: #454652;
-      --inverse-surface: #2d3133;
-      --inverse-on-surface: #eff1f4;
-      --outline: #767683;
-      --outline-variant: #c6c5d4;
-      --surface-tint: #4c56af;
-      --primary: #000666;
-      --on-primary: #ffffff;
-      --primary-container: #1a237e;
-      --on-primary-container: #8690ee;
-      --inverse-primary: #bdc2ff;
-      --secondary: #1b6d24;
-      --on-secondary: #ffffff;
-      --secondary-container: #a0f399;
-      --on-secondary-container: #217128;
-      --tertiary: #400003;
-      --on-tertiary: #ffffff;
-      --tertiary-container: #670007;
-      --on-tertiary-container: #ff635a;
-      --error: #ba1a1a;
-      --on-error: #ffffff;
-      --error-container: #ffdad6;
-      --on-error-container: #93000a;
-      --background: #f7f9fc;
-      --on-background: #191c1e;
-      --surface-variant: #e0e3e6;
-      --income: #2E7D32;
-      --income-bg: rgba(46,125,50,0.10);
-      --expense: #C62828;
-      --expense-bg: rgba(198,40,40,0.10);
-      --warning: #E65100;
-      --warning-bg: rgba(230,81,0,0.10);
-      --info: #1565C0;
-      --info-bg: rgba(21,101,192,0.10);
-      --shadow-1: 0px 4px 12px rgba(26,35,126,0.05);
-      --shadow-2: 0px 12px 32px rgba(26,35,126,0.12);
-      --r: 0.5rem;
-      --r-md: 0.75rem;
-      --r-lg: 1rem;
-      --r-xl: 1.5rem;
-      --r-full: 9999px;
-      --card-pad: 24px;
-      --gutter: 24px;
-    }
+{% block title %}Presupuestos — FinanPlanen{% endblock %}
+{% block page_title %}Presupuestos{% endblock %}
 
-    html { font-size: 16px; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--background);
-      color: var(--on-surface);
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-    }
+{% block extra_head %}
+<style>
+:root {
+  --r: 0.5rem;
+  --r-md: 0.75rem;
+  --r-lg: 1rem;
+  --r-xl: 1.5rem;
+  --r-full: 9999px;
+  --card-pad: 24px;
+  --gutter: 24px;
+  --shadow-1: 0px 4px 12px rgba(26,35,126,0.05);
+  --shadow-2: 0px 12px 32px rgba(26,35,126,0.12);
+}
 
-    .app { display: flex; min-height: 100vh; }
+.search-box { position: relative; }
+.search-box i {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--ol); font-size: 14px;
+}
+.search-box input {
+  width: 260px; padding: 10px 16px 10px 40px;
+  border: 1px solid var(--olv); border-radius: var(--r);
+  font-family: inherit; font-size: 14px; color: var(--os);
+  background: var(--sl); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.search-box input::placeholder { color: var(--ol); }
+.search-box input:focus {
+  border-color: var(--pc); border-width: 2px; padding-left: 39px;
+  box-shadow: 0 0 0 3px rgba(26,35,126,0.08);
+}
 
-    /* ===== SIDEBAR ===== */
-    .sidebar {
-      width: 260px;
-      min-height: 100vh;
-      background: linear-gradient(180deg, #1a237e 0%, #0d1042 100%);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
-      z-index: 100;
-    }
-    .sidebar-logo {
-      padding: 28px 24px 24px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .sidebar-logo .logo-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .sidebar-logo .logo-icon {
-      width: 40px; height: 40px;
-      background: rgba(255,255,255,0.12);
-      border-radius: var(--r);
-      display: flex; align-items: center; justify-content: center;
-      color: #bdc2ff;
-      font-size: 18px;
-    }
-    .sidebar-logo .logo-name {
-      font-size: 20px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: -0.02em;
-    }
-    .sidebar-logo .logo-sub {
-      display: block;
-      font-size: 11px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.45);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
+.budget-banner {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 60%, #3949ab 100%);
+  border-radius: var(--r-xl); padding: 32px; color: #fff;
+  margin-bottom: 24px; position: relative; overflow: hidden;
+  animation: fadeUp .5s ease forwards; opacity: 0;
+}
+.budget-banner::before {
+  content: ''; position: absolute; top: -40%; right: -10%;
+  width: 320px; height: 320px; border-radius: 50%;
+  background: rgba(255,255,255,.04); pointer-events: none;
+}
+.budget-banner::after {
+  content: ''; position: absolute; bottom: -30%; left: 20%;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.03); pointer-events: none;
+}
+.banner-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 20px; position: relative; z-index: 1; gap: 12px; flex-wrap: wrap;
+}
+.banner-top h2 { font-size: 20px; font-weight: 600; }
+.banner-top .banner-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-banner {
+  padding: 8px 18px; border-radius: var(--r); font-family: inherit;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  border: 1px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.10); color: #fff;
+  transition: all .2s; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-banner:hover { background: rgba(255,255,255,.20); }
+.btn-banner.accent { background: #fff; color: var(--pc); border-color: #fff; }
+.btn-banner.accent:hover { background: rgba(255,255,255,.90); }
 
-    .sidebar-nav {
-      flex: 1;
-      padding: 16px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border-radius: var(--r);
-      color: rgba(255,255,255,0.60);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-    .nav-item:hover { color: rgba(255,255,255,0.90); background: rgba(255,255,255,0.06); }
-    .nav-item.active { color: #fff; background: rgba(255,255,255,0.12); }
-    .nav-item i { width: 20px; text-align: center; font-size: 16px; }
+.banner-progress { position: relative; z-index: 1; margin-bottom: 8px; }
+.banner-progress .progress-text {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px; gap: 16px; flex-wrap: wrap;
+}
+.banner-progress .progress-text .pct {
+  font-size: 36px; font-weight: 700; letter-spacing: -.02em;
+}
+.banner-progress .progress-text .pct-sub {
+  font-size: 14px; color: rgba(255,255,255,.65);
+}
+.progress-track {
+  height: 10px; background: rgba(255,255,255,.15);
+  border-radius: var(--r-full); overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: var(--r-full);
+  background: linear-gradient(90deg, #66bb6a, #a5d6a7);
+  transition: width 1s cubic-bezier(.22,1,.36,1);
+}
+.progress-fill.warning { background: linear-gradient(90deg, #ff9800, #ffb74d); }
+.progress-fill.danger { background: linear-gradient(90deg, #ef5350, #ef9a9a); }
 
-    .sidebar-bottom {
-      padding: 12px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .sidebar-footer {
-      padding: 16px 24px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .user-avatar {
-      width: 36px; height: 36px;
-      border-radius: var(--r-full);
-      background: rgba(255,255,255,0.15);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .user-name { color: #fff; font-size: 14px; font-weight: 500; display: block; }
-    .user-badge { font-size: 11px; color: #bdc2ff; font-weight: 500; }
+.ai-insight {
+  background: var(--sl); border-radius: var(--r-lg); box-shadow: var(--shadow-1);
+  padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center;
+  gap: 16px; border-left: 4px solid var(--pc);
+  animation: fadeUp .5s ease .1s forwards; opacity: 0;
+}
+.ai-icon {
+  width: 44px; height: 44px; border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; background: rgba(26,35,126,.08);
+  color: var(--pc); flex-shrink: 0;
+}
+.ai-content { flex: 1; }
+.ai-content .ai-label {
+  font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--pc); margin-bottom: 4px;
+}
+.ai-content p { font-size: 14px; color: var(--ov); line-height: 1.6; }
 
-    /* ===== MAIN ===== */
-    .main-content {
-      flex: 1;
-      margin-left: 260px;
-      max-width: calc(100vw - 260px);
-      padding: 32px 40px 48px;
-    }
+.summary-row {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  margin-bottom: 28px;
+}
+.summary-card {
+  background: var(--sl); border-radius: var(--r-lg); padding: 20px;
+  box-shadow: var(--shadow-1); display: flex; align-items: center; gap: 16px;
+  animation: fadeUp .5s ease forwards; opacity: 0;
+}
+.summary-card:nth-child(1) { animation-delay: .15s; }
+.summary-card:nth-child(2) { animation-delay: .20s; }
+.summary-card:nth-child(3) { animation-delay: .25s; }
 
-    /* ===== PAGE HEADER ===== */
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 28px;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-    .page-header h1 {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--on-surface);
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-    }
-    .header-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.sc-icon {
+  width: 44px; height: 44px; border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.sc-icon.income { background: var(--incb); color: var(--inc); }
+.sc-icon.expense { background: var(--expb); color: var(--exp); }
+.sc-icon.available { background: rgba(26,35,126,.08); color: var(--pc); }
 
-    /* ===== SEARCH ===== */
-    .search-box { position: relative; }
-    .search-box i {
-      position: absolute;
-      left: 14px; top: 50%; transform: translateY(-50%);
-      color: var(--outline);
-      font-size: 14px;
-    }
-    .search-box input {
-      width: 260px;
-      padding: 10px 16px 10px 40px;
-      border: 1px solid var(--outline-variant);
-      border-radius: var(--r);
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--on-surface);
-      background: var(--surface-container-lowest);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .search-box input::placeholder { color: var(--outline); }
-    .search-box input:focus {
-      border-color: var(--primary);
-      border-width: 2px;
-      padding-left: 39px;
-      box-shadow: 0 0 0 3px rgba(26,35,126,0.08);
-    }
+.sc-info .sc-label {
+  font-size: 11px; font-weight: 600; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--ov); display: block;
+}
+.sc-info .sc-value {
+  font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums;
+  display: block; margin-top: 2px;
+}
+.sc-value.positive { color: var(--inc); }
+.sc-value.negative { color: var(--exp); }
+.sc-value.neutral { color: var(--os); }
 
-    /* ===== BUTTONS ===== */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      border-radius: var(--r);
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-    .btn-primary { background: var(--primary-container); color: var(--on-primary); }
-    .btn-primary:hover { background: var(--primary); box-shadow: var(--shadow-1); }
-    .btn-secondary {
-      background: var(--surface-container-lowest);
-      color: var(--primary-container);
-      border: 1px solid var(--outline-variant);
-    }
-    .btn-secondary:hover { border-color: var(--primary-container); background: var(--surface-container-low); }
-    .btn-ghost { background: transparent; color: var(--primary-container); border: none; padding: 10px 12px; }
-    .btn-ghost:hover { background: rgba(26,35,126,0.06); }
-    .btn-sm { padding: 8px 14px; font-size: 13px; }
+.budget-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px;
+}
+.budget-card {
+  background: var(--sl); border-radius: var(--r-lg); box-shadow: var(--shadow-1);
+  padding: var(--card-pad); animation: fadeUp .5s ease forwards; opacity: 0;
+  transition: box-shadow .2s;
+}
+.budget-card:hover { box-shadow: var(--shadow-2); }
+.budget-card:nth-child(1) { animation-delay: .30s; }
+.budget-card:nth-child(2) { animation-delay: .35s; }
+.budget-card:nth-child(3) { animation-delay: .40s; }
+.budget-card:nth-child(4) { animation-delay: .45s; }
 
-    /* ===== ANIMATIONS ===== */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+.bc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.bc-header-left { display: flex; align-items: center; gap: 12px; }
+.bc-icon {
+  width: 40px; height: 40px; border-radius: var(--r);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.bc-cat-name { font-size: 15px; font-weight: 600; color: var(--os); }
+.bc-menu-btn {
+  width: 32px; height: 32px; border-radius: var(--r); border: none;
+  background: transparent; cursor: pointer; color: var(--ol);
+  font-size: 14px; display: flex; align-items: center; justify-content: center;
+  transition: background .15s; position: relative;
+}
+.bc-menu-btn:hover { background: var(--sc); }
 
-    /* ===== TOP SUMMARY BANNER ===== */
-    .budget-banner {
-      background: linear-gradient(135deg, #1a237e 0%, #283593 60%, #3949ab 100%);
-      border-radius: var(--r-xl);
-      padding: 32px;
-      color: #fff;
-      margin-bottom: 24px;
-      position: relative;
-      overflow: hidden;
-      animation: fadeUp 0.5s ease forwards;
-      opacity: 0;
-    }
-    .budget-banner::before {
-      content: '';
-      position: absolute;
-      top: -40%; right: -10%;
-      width: 320px; height: 320px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.04);
-      pointer-events: none;
-    }
-    .budget-banner::after {
-      content: '';
-      position: absolute;
-      bottom: -30%; left: 20%;
-      width: 200px; height: 200px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.03);
-      pointer-events: none;
-    }
-    .banner-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
-      position: relative;
-      z-index: 1;
-    }
-    .banner-top h2 {
-      font-size: 20px;
-      font-weight: 600;
-    }
-    .banner-top .banner-actions { display: flex; gap: 10px; }
-    .btn-banner {
-      padding: 8px 18px;
-      border-radius: var(--r);
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid rgba(255,255,255,0.25);
-      background: rgba(255,255,255,0.10);
-      color: #fff;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-banner:hover { background: rgba(255,255,255,0.20); }
-    .btn-banner.accent {
-      background: #fff;
-      color: var(--primary-container);
-      border-color: #fff;
-    }
-    .btn-banner.accent:hover { background: rgba(255,255,255,0.90); }
+.bc-dropdown {
+  position: absolute; top: 100%; right: 0; background: var(--sl);
+  border: 1px solid var(--olv); border-radius: var(--r);
+  box-shadow: var(--shadow-2); z-index: 50; display: none;
+  min-width: 160px; overflow: hidden;
+}
+.bc-dropdown.open { display: block; }
+.bc-dropdown button {
+  width: 100%; padding: 10px 16px; border: none; background: transparent;
+  font-family: inherit; font-size: 13px; color: var(--os);
+  text-align: left; cursor: pointer; display: flex; align-items: center;
+  gap: 10px; transition: background .15s;
+}
+.bc-dropdown button:hover { background: var(--slw); }
+.bc-dropdown button i { width: 14px; color: var(--ol); font-size: 12px; }
+.bc-dropdown button.danger { color: var(--exp); }
+.bc-dropdown button.danger i { color: var(--exp); }
 
-    .banner-progress {
-      position: relative;
-      z-index: 1;
-      margin-bottom: 8px;
-    }
-    .banner-progress .progress-text {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .banner-progress .progress-text .pct {
-      font-size: 36px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    .banner-progress .progress-text .pct-sub {
-      font-size: 14px;
-      color: rgba(255,255,255,0.65);
-    }
-    .progress-track {
-      height: 10px;
-      background: rgba(255,255,255,0.15);
-      border-radius: var(--r-full);
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      border-radius: var(--r-full);
-      background: linear-gradient(90deg, #66bb6a, #a5d6a7);
-      transition: width 1s cubic-bezier(0.22,1,0.36,1);
-    }
-    .progress-fill.warning { background: linear-gradient(90deg, #ff9800, #ffb74d); }
-    .progress-fill.danger { background: linear-gradient(90deg, #ef5350, #ef9a9a); }
+.bc-amounts { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+.bc-spent { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bc-limit { font-size: 14px; color: var(--ov); font-variant-numeric: tabular-nums; }
 
-    /* ===== AI INSIGHT CARD ===== */
-    .ai-insight {
-      background: var(--surface-container-lowest);
-      border-radius: var(--r-lg);
-      box-shadow: var(--shadow-1);
-      padding: 20px 24px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      border-left: 4px solid var(--primary-container);
-      animation: fadeUp 0.5s ease 0.1s forwards;
-      opacity: 0;
-    }
-    .ai-icon {
-      width: 44px; height: 44px;
-      border-radius: var(--r-md);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      background: rgba(26,35,126,0.08);
-      color: var(--primary-container);
-      flex-shrink: 0;
-    }
-    .ai-content { flex: 1; }
-    .ai-content .ai-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--primary-container);
-      margin-bottom: 4px;
-    }
-    .ai-content p {
-      font-size: 14px;
-      color: var(--on-surface-variant);
-      line-height: 1.6;
-    }
+.bc-progress-track {
+  height: 8px; background: var(--sc); border-radius: var(--r-full);
+  overflow: hidden; margin-bottom: 12px;
+}
+.bc-progress-fill {
+  height: 100%; border-radius: var(--r-full);
+  transition: width .8s cubic-bezier(.22,1,.36,1);
+}
+.bc-progress-fill.safe { background: var(--inc); }
+.bc-progress-fill.warning { background: #E65100; }
+.bc-progress-fill.full { background: var(--pc); }
+.bc-progress-fill.over { background: var(--exp); }
 
-    /* ===== FINANCIAL SUMMARY CARDS ===== */
-    .summary-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-    .summary-card {
-      background: var(--surface-container-lowest);
-      border-radius: var(--r-lg);
-      padding: 20px;
-      box-shadow: var(--shadow-1);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      animation: fadeUp 0.5s ease forwards;
-      opacity: 0;
-    }
-    .summary-card:nth-child(1) { animation-delay: 0.15s; }
-    .summary-card:nth-child(2) { animation-delay: 0.20s; }
-    .summary-card:nth-child(3) { animation-delay: 0.25s; }
+.bc-status { display: flex; align-items: center; gap: 8px; }
+.status-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: var(--r-full);
+  font-size: 12px; font-weight: 500;
+}
+.status-chip i { font-size: 11px; }
+.status-chip.safe { background: var(--incb); color: var(--inc); }
+.status-chip.warning { background: rgba(230,81,0,.10); color: #E65100; }
+.status-chip.full { background: rgba(26,35,126,.10); color: var(--pc); }
+.status-chip.over { background: var(--expb); color: var(--exp); }
 
-    .sc-icon {
-      width: 44px; height: 44px;
-      border-radius: var(--r-md);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-    .sc-icon.income { background: var(--income-bg); color: var(--income); }
-    .sc-icon.expense { background: var(--expense-bg); color: var(--expense); }
-    .sc-icon.available { background: rgba(26,35,126,0.08); color: var(--primary-container); }
+.bc-remaining { margin-left: auto; font-size: 12px; font-weight: 500; color: var(--ov); }
 
-    .sc-info .sc-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--on-surface-variant);
-      display: block;
-    }
-    .sc-info .sc-value {
-      font-size: 22px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      display: block;
-      margin-top: 2px;
-    }
-    .sc-value.positive { color: var(--income); }
-    .sc-value.negative { color: var(--expense); }
-    .sc-value.neutral { color: var(--on-surface); }
+.new-cat-card {
+  background: var(--sl); border-radius: var(--r-lg); box-shadow: var(--shadow-1);
+  padding: var(--card-pad); margin-bottom: 28px;
+  animation: fadeUp .5s ease .5s forwards; opacity: 0;
+}
+.new-cat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.new-cat-header h3 { font-size: 16px; font-weight: 600; }
+.new-cat-header .nc-icon {
+  width: 36px; height: 36px; border-radius: var(--r);
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+  background: rgba(26,35,126,.08); color: var(--pc);
+}
+.new-cat-desc { font-size: 13px; color: var(--ov); margin-bottom: 20px; }
 
-    /* ===== BUDGET CATEGORIES ===== */
-    .budget-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-    .budget-card {
-      background: var(--surface-container-lowest);
-      border-radius: var(--r-lg);
-      box-shadow: var(--shadow-1);
-      padding: var(--card-pad);
-      animation: fadeUp 0.5s ease forwards;
-      opacity: 0;
-      transition: box-shadow 0.2s;
-    }
-    .budget-card:hover { box-shadow: var(--shadow-2); }
-    .budget-card:nth-child(1) { animation-delay: 0.30s; }
-    .budget-card:nth-child(2) { animation-delay: 0.35s; }
-    .budget-card:nth-child(3) { animation-delay: 0.40s; }
-    .budget-card:nth-child(4) { animation-delay: 0.45s; }
+.new-cat-form {
+  display: grid; grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 16px; align-items: flex-end;
+}
+.new-cat-form .field { margin-bottom: 0; }
+.new-cat-form select {
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23767683' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 36px;
+}
 
-    .bc-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-    .bc-header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .bc-icon {
-      width: 40px; height: 40px;
-      border-radius: var(--r);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-    .bc-cat-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--on-surface);
-    }
-    .bc-menu-btn {
-      width: 32px; height: 32px;
-      border-radius: var(--r);
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      color: var(--outline);
-      font-size: 14px;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s;
-      position: relative;
-    }
-    .bc-menu-btn:hover { background: var(--surface-container); }
+@media (max-width: 1100px) {
+  .budget-grid { grid-template-columns: 1fr; }
+  .new-cat-form { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .summary-row { grid-template-columns: 1fr; }
+  .new-cat-form { grid-template-columns: 1fr; }
+  .search-box { width: 100%; }
+  .search-box input { width: 100%; }
+}
+</style>
+{% endblock %}
 
-    .bc-dropdown {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background: var(--surface-container-lowest);
-      border: 1px solid var(--outline-variant);
-      border-radius: var(--r);
-      box-shadow: var(--shadow-2);
-      z-index: 50;
-      display: none;
-      min-width: 160px;
-      overflow: hidden;
-    }
-    .bc-dropdown.open { display: block; }
-    .bc-dropdown button {
-      width: 100%;
-      padding: 10px 16px;
-      border: none;
-      background: transparent;
-      font-family: inherit;
-      font-size: 13px;
-      color: var(--on-surface);
-      text-align: left;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: background 0.15s;
-    }
-    .bc-dropdown button:hover { background: var(--surface-container-low); }
-    .bc-dropdown button i { width: 14px; color: var(--outline); font-size: 12px; }
-    .bc-dropdown button.danger { color: var(--error); }
-    .bc-dropdown button.danger i { color: var(--error); }
-
-    .bc-amounts {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 12px;
-    }
-    .bc-spent {
-      font-size: 24px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
-    .bc-limit {
-      font-size: 14px;
-      color: var(--on-surface-variant);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .bc-progress-track {
-      height: 8px;
-      background: var(--surface-container);
-      border-radius: var(--r-full);
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-    .bc-progress-fill {
-      height: 100%;
-      border-radius: var(--r-full);
-      transition: width 0.8s cubic-bezier(0.22,1,0.36,1);
-    }
-    .bc-progress-fill.safe { background: var(--income); }
-    .bc-progress-fill.warning { background: var(--warning); }
-    .bc-progress-fill.full { background: var(--primary-container); }
-    .bc-progress-fill.over { background: var(--error); }
-
-    .bc-status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .status-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      border-radius: var(--r-full);
-      font-size: 12px;
-      font-weight: 500;
-    }
-    .status-chip i { font-size: 11px; }
-    .status-chip.safe { background: var(--income-bg); color: var(--income); }
-    .status-chip.warning { background: var(--warning-bg); color: var(--warning); }
-    .status-chip.full { background: rgba(26,35,126,0.10); color: var(--primary-container); }
-    .status-chip.over { background: var(--expense-bg); color: var(--expense); }
-
-    .bc-remaining {
-      margin-left: auto;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--on-surface-variant);
-    }
-
-    /* ===== NEW CATEGORY CARD ===== */
-    .new-cat-card {
-      background: var(--surface-container-lowest);
-      border-radius: var(--r-lg);
-      box-shadow: var(--shadow-1);
-      padding: var(--card-pad);
-      margin-bottom: 28px;
-      animation: fadeUp 0.5s ease 0.5s forwards;
-      opacity: 0;
-    }
-    .new-cat-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-    .new-cat-header h3 { font-size: 16px; font-weight: 600; }
-    .new-cat-header .nc-icon {
-      width: 36px; height: 36px;
-      border-radius: var(--r);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
-      background: rgba(26,35,126,0.08);
-      color: var(--primary-container);
-    }
-    .new-cat-desc {
-      font-size: 13px;
-      color: var(--on-surface-variant);
-      margin-bottom: 20px;
-    }
-
-    .new-cat-form {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr auto;
-      gap: 16px;
-      align-items: flex-end;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .form-group label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--on-surface-variant);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-    .form-group input, .form-group select {
-      padding: 10px 14px;
-      border: 1px solid var(--outline-variant);
-      border-radius: var(--r);
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--on-surface);
-      background: var(--surface-container-lowest);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .form-group input:focus, .form-group select:focus {
-      border-color: var(--primary);
-      border-width: 2px;
-      padding: 9px 13px;
-      box-shadow: 0 0 0 3px rgba(26,35,126,0.08);
-    }
-    .form-group input.error {
-      border-color: var(--error);
-      border-width: 2px;
-      padding: 9px 13px;
-    }
-    .form-group select {
-      appearance: none;
-      -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23767683' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 36px;
-    }
-
-    /* ===== MODAL ===== */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,6,102,0.25);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal {
-      background: var(--surface-container-lowest);
-      border-radius: var(--r-xl);
-      box-shadow: var(--shadow-2);
-      width: 480px;
-      max-width: 94vw;
-      max-height: 90vh;
-      overflow-y: auto;
-      transform: translateY(24px) scale(0.97);
-      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
-    }
-    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
-    .modal-header {
-      padding: 24px 28px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal-header h2 { font-size: 20px; font-weight: 600; }
-    .modal-close {
-      width: 32px; height: 32px;
-      border-radius: var(--r);
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      font-size: 16px;
-      color: var(--outline);
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s;
-    }
-    .modal-close:hover { background: var(--surface-container); }
-    .modal-body {
-      padding: 24px 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-    .modal-footer {
-      padding: 0 28px 24px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-    }
-
-    /* ===== TOAST ===== */
-    .toast {
-      position: fixed;
-      bottom: 32px; right: 32px;
-      background: var(--inverse-surface);
-      color: var(--inverse-on-surface);
-      padding: 14px 24px;
-      border-radius: var(--r);
-      font-size: 14px;
-      font-weight: 500;
-      box-shadow: var(--shadow-2);
-      z-index: 2000;
-      transform: translateY(20px);
-      opacity: 0;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast i { font-size: 16px; }
-    .toast.success i { color: #66bb6a; }
-    .toast.error i { color: #ef5350; }
-    .toast.info i { color: #42a5f5; }
-
-    /* ===== SCROLLBAR ===== */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--outline-variant); border-radius: 3px; }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 1100px) {
-      .budget-grid { grid-template-columns: 1fr; }
-      .new-cat-form { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 900px) {
-      .sidebar { width: 72px; }
-      .sidebar-logo .logo-name,
-      .sidebar-logo .logo-sub,
-      .nav-item span,
-      .sidebar-footer .user-name,
-      .sidebar-footer .user-badge,
-      .sidebar-bottom .nav-item span { display: none; }
-      .sidebar-logo .logo-icon { margin: 0 auto; }
-      .nav-item { justify-content: center; padding: 12px; }
-      .sidebar-footer { justify-content: center; }
-      .sidebar-bottom .nav-item { justify-content: center; }
-      .main-content { margin-left: 72px; max-width: calc(100vw - 72px); }
-      .summary-row { grid-template-columns: 1fr; }
-      .new-cat-form { grid-template-columns: 1fr; }
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="sidebar-logo">
-        <div class="logo-row">
-          <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
-          <div>
-            <span class="logo-name">FinanceFlow</span>
-            <span class="logo-sub">Wealth Management</span>
-          </div>
-        </div>
-      </div>
-      <nav class="sidebar-nav">
-        <a href="#" class="nav-item"><i class="fas fa-gauge-high"></i> <span>Dashboard</span></a>
-        <a href="#" class="nav-item"><i class="fas fa-wallet"></i> <span>Cuentas</span></a>
-        <a href="#" class="nav-item"><i class="fas fa-right-left"></i> <span>Transferencias</span></a>
-        <a href="#" class="nav-item"><i class="fas fa-receipt"></i> <span>Transacciones</span></a>
-        <a href="#" class="nav-item active"><i class="fas fa-chart-pie"></i> <span>Presupuestos</span></a>
-        <a href="#" class="nav-item"><i class="fas fa-tags"></i> <span>Categorías</span></a>
-      </nav>
-      <div class="sidebar-bottom">
-        <a href="#" class="nav-item"><i class="fas fa-circle-question"></i> <span>Help Center</span></a>
-        <a href="#" class="nav-item"><i class="fas fa-right-from-bracket"></i> <span>Logout</span></a>
-      </div>
-      <div class="sidebar-footer">
-        <div class="user-avatar">AF</div>
-        <div>
-          <span class="user-name">Alex F.</span>
-          <span class="user-badge">Miembro Premium</span>
-        </div>
-      </div>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="main-content">
-      <!-- Header -->
-      <header class="page-header">
-        <h1>Presupuestos</h1>
-        <div class="header-actions">
-          <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Buscar categoría…">
-          </div>
-        </div>
-      </header>
-
-      <!-- Banner -->
-      <div class="budget-banner" id="budgetBanner">
-        <div class="banner-top">
-          <h2>Resumen Mensual</h2>
-          <div class="banner-actions">
-            <button class="btn-banner accent" id="newBudgetBtn"><i class="fas fa-plus"></i> Nuevo Presupuesto</button>
-            <button class="btn-banner" id="aiAnalysisBtn"><i class="fas fa-wand-magic-sparkles"></i> Análisis IA</button>
-          </div>
-        </div>
-        <div class="banner-progress">
-          <div class="progress-text">
-            <span>
-              Has gastado el <span class="pct" id="overallPct">64%</span> de tu presupuesto total.
-            </span>
-            <span class="pct-sub" id="overallDetail">$2,425 de $3,000</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" id="overallFill" style="width:0%"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- AI Insight -->
-      <div class="ai-insight" id="aiInsight">
-        <div class="ai-icon"><i class="fas fa-robot"></i></div>
-        <div class="ai-content">
-          <div class="ai-label">Ahorro Estimado</div>
-          <p id="aiText">Si mantienes este ritmo, podrías ahorrar un <strong>15%</strong> adicional comparado con el mes pasado.</p>
-        </div>
-      </div>
-
-      <!-- Summary Cards -->
-      <section class="summary-row" id="summaryRow"></section>
-
-      <!-- Budget Category Cards -->
-      <section class="budget-grid" id="budgetGrid"></section>
-
-      <!-- New Category -->
-      <div class="new-cat-card">
-        <div class="new-cat-header">
-          <div class="nc-icon"><i class="fas fa-folder-plus"></i></div>
-          <h3>Nueva Categoría</h3>
-        </div>
-        <p class="new-cat-desc">Define un nuevo límite mensual para tus gastos personalizados.</p>
-        <div class="new-cat-form" id="newCatForm">
-          <div class="form-group">
-            <label for="ncName">Nombre de Categoría</label>
-            <input type="text" id="ncName" placeholder="Ej: Mascotas">
-          </div>
-          <div class="form-group">
-            <label for="ncLimit">Límite Mensual ($)</label>
-            <input type="number" id="ncLimit" step="0.01" min="1" placeholder="Ej: 150.00">
-          </div>
-          <div class="form-group">
-            <label for="ncIcon">Icono</label>
-            <select id="ncIcon">
-              <option value="fa-paw">Mascotas</option>
-              <option value="fa-dumbbell">Deporte</option>
-              <option value="fa-book">Educación</option>
-              <option value="fa-plane">Viajes</option>
-              <option value="fa-shirt">Ropa</option>
-              <option value="fa-gift">Regalos</option>
-              <option value="fa-baby">Hijos</option>
-              <option value="fa-car">Auto</option>
-              <option value="fa-palette">Arte</option>
-              <option value="fa-ellipsis">Otro</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" id="addCatBtn"><i class="fas fa-plus"></i> Agregar</button>
-        </div>
-      </div>
-    </main>
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Presupuestos</h1>
   </div>
-
-  <!-- MODAL: Edit Budget -->
-  <div class="modal-overlay" id="editModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h2><i class="fas fa-pen-to-square" style="color:var(--primary-container);margin-right:8px;"></i>Editar Presupuesto</h2>
-        <button class="modal-close" onclick="closeEditModal()"><i class="fas fa-xmark"></i></button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="editName">Nombre de Categoría</label>
-          <input type="text" id="editName" readonly style="background:var(--surface-container-low);cursor:not-allowed;">
-        </div>
-        <div class="form-group">
-          <label for="editSpent">Monto Gastado ($)</label>
-          <input type="number" id="editSpent" step="0.01" min="0" placeholder="0.00">
-        </div>
-        <div class="form-group">
-          <label for="editLimit">Límite Mensual ($)</label>
-          <input type="number" id="editLimit" step="0.01" min="1" placeholder="0.00">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeEditModal()">Cancelar</button>
-        <button class="btn btn-primary" id="saveEditBtn"><i class="fas fa-check"></i> Guardar Cambios</button>
-      </div>
+  <div class="head-buttons">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Buscar categor&iacute;a…">
     </div>
   </div>
+</div>
 
-  <!-- TOAST -->
-  <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+<div class="budget-banner" id="budgetBanner">
+  <div class="banner-top">
+    <h2>Resumen Mensual</h2>
+    <div class="banner-actions">
+      <button class="btn-banner accent" id="newBudgetBtn"><i class="fas fa-plus"></i> Nuevo Presupuesto</button>
+      <button class="btn-banner" id="aiAnalysisBtn"><i class="fas fa-wand-magic-sparkles"></i> An&aacute;lisis IA</button>
+    </div>
+  </div>
+  <div class="banner-progress">
+    <div class="progress-text">
+      <span>
+        Has gastado el <span class="pct" id="overallPct">64%</span> de tu presupuesto total.
+      </span>
+      <span class="pct-sub" id="overallDetail">$2,425 de $3,000</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="overallFill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
 
-  <script>
-    /* ===== DATA ===== */
-    const iconMap = {
-      'Alimentación':    { icon: 'fa-utensils',        color: '#E65100', bg: 'rgba(230,81,0,0.10)' },
-      'Transporte':      { icon: 'fa-car',             color: '#1565C0', bg: 'rgba(21,101,192,0.10)' },
-      'Entretenimiento': { icon: 'fa-gamepad',         color: '#6A1B9A', bg: 'rgba(106,27,154,0.10)' },
-      'Vivienda':        { icon: 'fa-house',           color: '#2E7D32', bg: 'rgba(46,125,50,0.10)' },
-      'Salud':           { icon: 'fa-heart-pulse',     color: '#AD1457', bg: 'rgba(173,20,87,0.10)' },
-      'Educación':       { icon: 'fa-book',            color: '#00695C', bg: 'rgba(0,105,92,0.10)' },
-      'Mascotas':        { icon: 'fa-paw',             color: '#795548', bg: 'rgba(121,85,72,0.10)' },
-      'Viajes':          { icon: 'fa-plane',           color: '#0277BD', bg: 'rgba(2,119,189,0.10)' },
-      'Ropa':            { icon: 'fa-shirt',           color: '#C62828', bg: 'rgba(198,40,40,0.10)' },
-      'Regalos':         { icon: 'fa-gift',            color: '#AD1457', bg: 'rgba(173,20,87,0.10)' },
-    };
+<div class="ai-insight" id="aiInsight">
+  <div class="ai-icon"><i class="fas fa-robot"></i></div>
+  <div class="ai-content">
+    <div class="ai-label">Ahorro Estimado</div>
+    <p id="aiText">Si mantienes este ritmo, podr&iacute;as ahorrar un <strong>15%</strong> adicional comparado con el mes pasado.</p>
+  </div>
+</div>
 
-    const defaultIcon = { icon: 'fa-tag', color: '#455A64', bg: 'rgba(69,90,100,0.10)' };
+<section class="summary-row" id="summaryRow"></section>
 
-    let budgets = [
-      { id: 1, name: 'Alimentación',    spent: 520,  limit: 800,  icon: 'fa-utensils',        color: '#E65100', bg: 'rgba(230,81,0,0.10)' },
-      { id: 2, name: 'Transporte',      spent: 285,  limit: 300,  icon: 'fa-car',             color: '#1565C0', bg: 'rgba(21,101,192,0.10)' },
-      { id: 3, name: 'Entretenimiento', spent: 120,  limit: 400,  icon: 'fa-gamepad',         color: '#6A1B9A', bg: 'rgba(106,27,154,0.10)' },
-      { id: 4, name: 'Vivienda',        spent: 1500, limit: 1500, icon: 'fa-house',           color: '#2E7D32', bg: 'rgba(46,125,50,0.10)' },
+<section class="budget-grid" id="budgetGrid"></section>
+
+<div class="new-cat-card">
+  <div class="new-cat-header">
+    <div class="nc-icon"><i class="fas fa-folder-plus"></i></div>
+    <h3>Nueva Categor&iacute;a</h3>
+  </div>
+  <p class="new-cat-desc">Define un nuevo l&iacute;mite mensual para tus gastos personalizados.</p>
+  <div class="new-cat-form" id="newCatForm">
+    <div class="field">
+      <label for="ncName">Nombre de Categor&iacute;a</label>
+      <input type="text" id="ncName" placeholder="Ej: Mascotas">
+    </div>
+    <div class="field">
+      <label for="ncLimit">L&iacute;mite Mensual ($)</label>
+      <input type="number" id="ncLimit" step="0.01" min="1" placeholder="Ej: 150.00">
+    </div>
+    <div class="field">
+      <label for="ncIcon">Icono</label>
+      <select id="ncIcon">
+        <option value="fa-paw">Mascotas</option>
+        <option value="fa-dumbbell">Deporte</option>
+        <option value="fa-book">Educaci&oacute;n</option>
+        <option value="fa-plane">Viajes</option>
+        <option value="fa-shirt">Ropa</option>
+        <option value="fa-gift">Regalos</option>
+        <option value="fa-baby">Hijos</option>
+        <option value="fa-car">Auto</option>
+        <option value="fa-palette">Arte</option>
+        <option value="fa-ellipsis">Otro</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" id="addCatBtn"><i class="fas fa-plus"></i> Agregar</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3><i class="fas fa-pen-to-square" style="color:var(--pc);margin-right:8px;"></i> Editar Presupuesto</h3>
+      <button class="modal-close" onclick="closeEditModal()"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="field">
+      <label for="editName">Nombre de Categor&iacute;a</label>
+      <input type="text" id="editName" readonly style="background:var(--slw);cursor:not-allowed;">
+    </div>
+    <div class="field">
+      <label for="editSpent">Monto Gastado ($)</label>
+      <input type="number" id="editSpent" step="0.01" min="0" placeholder="0.00">
+    </div>
+    <div class="field">
+      <label for="editLimit">L&iacute;mite Mensual ($)</label>
+      <input type="number" id="editLimit" step="0.01" min="1" placeholder="0.00">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+      <button class="btn btn-primary" id="saveEditBtn"><i class="fas fa-check"></i> Guardar Cambios</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+  'use strict';
+
+  var iconMap = {
+    'Alimentaci\u00f3n':    { icon: 'fa-utensils',        color: '#E65100', bg: 'rgba(230,81,0,0.10)' },
+    'Transporte':      { icon: 'fa-car',             color: '#1565C0', bg: 'rgba(21,101,192,0.10)' },
+    'Entretenimiento': { icon: 'fa-gamepad',         color: '#6A1B9A', bg: 'rgba(106,27,154,0.10)' },
+    'Vivienda':        { icon: 'fa-house',           color: '#2E7D32', bg: 'rgba(46,125,50,0.10)' },
+    'Salud':           { icon: 'fa-heart-pulse',     color: '#AD1457', bg: 'rgba(173,20,87,0.10)' },
+    'Educaci\u00f3n':       { icon: 'fa-book',            color: '#00695C', bg: 'rgba(0,105,92,0.10)' },
+    'Mascotas':        { icon: 'fa-paw',             color: '#795548', bg: 'rgba(121,85,72,0.10)' },
+    'Viajes':          { icon: 'fa-plane',           color: '#0277BD', bg: 'rgba(2,119,189,0.10)' },
+    'Ropa':            { icon: 'fa-shirt',           color: '#C62828', bg: 'rgba(198,40,40,0.10)' },
+    'Regalos':         { icon: 'fa-gift',            color: '#AD1457', bg: 'rgba(173,20,87,0.10)' },
+  };
+
+  var defaultIcon = { icon: 'fa-tag', color: '#455A64', bg: 'rgba(69,90,100,0.10)' };
+
+  var budgets = [
+    { id: 1, name: 'Alimentaci\u00f3n',    spent: 520,  limit: 800,  icon: 'fa-utensils',        color: '#E65100', bg: 'rgba(230,81,0,0.10)' },
+    { id: 2, name: 'Transporte',      spent: 285,  limit: 300,  icon: 'fa-car',             color: '#1565C0', bg: 'rgba(21,101,192,0.10)' },
+    { id: 3, name: 'Entretenimiento', spent: 120,  limit: 400,  icon: 'fa-gamepad',         color: '#6A1B9A', bg: 'rgba(106,27,154,0.10)' },
+    { id: 4, name: 'Vivienda',        spent: 1500, limit: 1500, icon: 'fa-house',           color: '#2E7D32', bg: 'rgba(46,125,50,0.10)' },
+  ];
+
+  var financials = { netIncome: 5800, fixedExpenses: 2100 };
+
+  var editIdx = null;
+
+  function updateOverallProgress() {
+    var totalSpent = budgets.reduce(function(s, b){ return s + b.spent; }, 0);
+    var totalLimit = budgets.reduce(function(s, b){ return s + b.limit; }, 0);
+    var pct = totalLimit > 0 ? Math.round((totalSpent / totalLimit) * 100) : 0;
+
+    document.getElementById('overallPct').textContent = pct + '%';
+    document.getElementById('overallDetail').textContent = fmt(totalSpent) + ' de ' + fmt(totalLimit);
+
+    var fill = document.getElementById('overallFill');
+    fill.style.width = Math.min(pct, 100) + '%';
+    fill.className = 'progress-fill' + (pct >= 100 ? ' danger' : pct >= 80 ? ' warning' : '');
+  }
+
+  function renderSummaryCards() {
+    var totalSpent = budgets.reduce(function(s, b){ return s + b.spent; }, 0);
+    var available = financials.netIncome - financials.fixedExpenses;
+    var cards = [
+      { label: 'Ingresos netos',  value: fmt(financials.netIncome),    cls: 'positive', icon: 'fa-arrow-trend-up',   iconCls: 'income' },
+      { label: 'Gastos fijos',    value: fmt(financials.fixedExpenses), cls: 'negative', icon: 'fa-arrow-trend-down', iconCls: 'expense' },
+      { label: 'Disponible',      value: fmt(available),               cls: 'neutral',  icon: 'fa-wallet',           iconCls: 'available' },
     ];
+    document.getElementById('summaryRow').innerHTML = cards.map(function(c){
+      return '<div class="summary-card">' +
+        '<div class="sc-icon ' + c.iconCls + '"><i class="fas ' + c.icon + '"></i></div>' +
+        '<div class="sc-info"><span class="sc-label">' + c.label + '</span><span class="sc-value ' + c.cls + '">' + c.value + '</span></div>' +
+        '</div>';
+    }).join('');
+  }
 
-    const financials = {
-      netIncome: 5800,
-      fixedExpenses: 2100,
-    };
+  function renderBudgetCards() {
+    var grid = document.getElementById('budgetGrid');
+    if (!budgets.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--ol);font-size:14px;"><i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.4;"></i>No hay presupuestos definidos.</div>';
+      return;
+    }
+    grid.innerHTML = budgets.map(function(b, idx){
+      var pct = b.limit > 0 ? Math.round((b.spent / b.limit) * 100) : 0;
+      var remaining = b.limit - b.spent;
+      var statusCls, statusIcon, statusText;
 
-    let editIdx = null;
+      if (pct >= 100) {
+        statusCls = 'full';
+        statusIcon = 'fa-check-double';
+        statusText = pct > 100 ? 'Presupuesto excedido' : 'Presupuesto completado';
+        if (pct > 100) statusCls = 'over';
+      } else if (pct >= 80) {
+        statusCls = 'warning';
+        statusIcon = 'fa-triangle-exclamation';
+        statusText = 'Cerca del l\u00edmite';
+      } else {
+        statusCls = 'safe';
+        statusIcon = 'fa-circle-check';
+        statusText = pct <= 50 ? 'Buen ritmo de gasto' : 'Dentro del presupuesto';
+      }
 
-    /* ===== INIT ===== */
-    document.addEventListener('DOMContentLoaded', () => {
-      renderAll();
-      bindEvents();
-      // Animate banner fill
-      setTimeout(() => updateOverallProgress(), 300);
+      var fillCls = pct > 100 ? 'over' : pct >= 100 ? 'full' : pct >= 80 ? 'warning' : 'safe';
+      var escName = esc(b.name);
+      var remainingHtml = '';
+      if (pct < 100) remainingHtml = '<span class="bc-remaining">Restante: ' + fmt(remaining) + '</span>';
+      else if (pct > 100) remainingHtml = '<span class="bc-remaining" style="color:var(--exp);">Excedido: ' + fmt(Math.abs(remaining)) + '</span>';
+
+      return '<div class="budget-card" data-name="' + b.name.toLowerCase() + '">' +
+        '<div class="bc-header">' +
+          '<div class="bc-header-left">' +
+            '<div class="bc-icon" style="background:' + b.bg + ';color:' + b.color + ';">' +
+              '<i class="fas ' + b.icon + '"></i>' +
+            '</div>' +
+            '<span class="bc-cat-name">' + escName + '</span>' +
+          '</div>' +
+          '<div style="position:relative;">' +
+            '<button class="bc-menu-btn" onclick="toggleBudgetMenu(event, ' + idx + ')"><i class="fas fa-ellipsis-vertical"></i></button>' +
+            '<div class="bc-dropdown" id="bmenu-' + idx + '">' +
+              '<button onclick="openEditBudget(' + idx + ')"><i class="fas fa-pen"></i> Editar</button>' +
+              '<button class="danger" onclick="deleteBudget(' + idx + ')"><i class="fas fa-trash"></i> Eliminar</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="bc-amounts">' +
+          '<span class="bc-spent" style="color:' + (pct > 100 ? 'var(--exp)' : 'var(--os)') + ';">' + fmt(b.spent) + '</span>' +
+          '<span class="bc-limit">L\u00edmite: ' + fmt(b.limit) + '</span>' +
+        '</div>' +
+        '<div class="bc-progress-track">' +
+          '<div class="bc-progress-fill ' + fillCls + '" style="width:' + Math.min(pct, 100) + '%;"></div>' +
+        '</div>' +
+        '<div class="bc-status">' +
+          '<span class="status-chip ' + statusCls + '"><i class="fas ' + statusIcon + '"></i> ' + statusText + '</span>' +
+          remainingHtml +
+        '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function renderAll() {
+    renderSummaryCards();
+    renderBudgetCards();
+    updateOverallProgress();
+  }
+
+  function fmt(n) {
+    var sign = n < 0 ? '-' : '';
+    var abs = Math.abs(n);
+    var formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return sign + '$' + formatted;
+  }
+
+  function esc(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  window.toggleBudgetMenu = function(e, idx) {
+    e.stopPropagation();
+    var menu = document.getElementById('bmenu-' + idx);
+    var wasOpen = menu.classList.contains('open');
+    closeAllMenus();
+    if (!wasOpen) menu.classList.add('open');
+  };
+
+  function closeAllMenus() {
+    document.querySelectorAll('.bc-dropdown').forEach(function(d){ d.classList.remove('open'); });
+  }
+
+  window.openEditBudget = function(idx) {
+    closeAllMenus();
+    editIdx = idx;
+    var b = budgets[idx];
+    document.getElementById('editName').value = b.name;
+    document.getElementById('editSpent').value = b.spent;
+    document.getElementById('editLimit').value = b.limit;
+    document.getElementById('editModal').classList.add('open');
+  };
+
+  window.closeEditModal = function() {
+    document.getElementById('editModal').classList.remove('open');
+    editIdx = null;
+  };
+
+  window.deleteBudget = function(idx) {
+    closeAllMenus();
+    var name = budgets[idx].name;
+    budgets.splice(idx, 1);
+    renderAll();
+    showToast('"' + name + '" eliminada', 'info');
+  };
+
+  function addCategory() {
+    var name = document.getElementById('ncName').value.trim();
+    var limit = parseFloat(document.getElementById('ncLimit').value);
+    var iconSel = document.getElementById('ncIcon').value;
+
+    var nameInput = document.getElementById('ncName');
+    var limitInput = document.getElementById('ncLimit');
+    nameInput.classList.remove('error');
+    limitInput.classList.remove('error');
+
+    if (!name) { nameInput.classList.add('error'); nameInput.focus(); return; }
+    if (!limit || limit <= 0) { limitInput.classList.add('error'); limitInput.focus(); return; }
+    if (budgets.some(function(b){ return b.name.toLowerCase() === name.toLowerCase(); })) {
+      nameInput.classList.add('error');
+      showToast('Esa categor\u00eda ya existe', 'error');
+      return;
+    }
+
+    var colors = ['#455A64','#00695C','#795548','#0277BD','#AD1457','#6A1B9A','#E65100','#1565C0','#C62828','#2E7D32'];
+    var randomColor = colors[budgets.length % colors.length];
+
+    budgets.push({
+      id: Date.now(),
+      name: name,
+      spent: 0,
+      limit: limit,
+      icon: iconSel,
+      color: randomColor,
+      bg: randomColor + '1a',
     });
 
-    function renderAll() {
-      renderSummaryCards();
-      renderBudgetCards();
-      updateOverallProgress();
-    }
+    document.getElementById('ncName').value = '';
+    document.getElementById('ncLimit').value = '';
+    renderAll();
+    showToast('"' + name + '" agregada correctamente', 'success');
+  }
 
-    /* ===== OVERALL PROGRESS ===== */
-    function updateOverallProgress() {
-      const totalSpent = budgets.reduce((s, b) => s + b.spent, 0);
-      const totalLimit = budgets.reduce((s, b) => s + b.limit, 0);
-      const pct = totalLimit > 0 ? Math.round((totalSpent / totalLimit) * 100) : 0;
+  document.addEventListener('DOMContentLoaded', function(){
+    renderAll();
 
-      document.getElementById('overallPct').textContent = pct + '%';
-      document.getElementById('overallDetail').textContent = formatCurrency(totalSpent) + ' de ' + formatCurrency(totalLimit);
+    document.getElementById('addCatBtn').addEventListener('click', addCategory);
 
-      const fill = document.getElementById('overallFill');
-      fill.style.width = Math.min(pct, 100) + '%';
-      fill.className = 'progress-fill' + (pct >= 100 ? ' danger' : pct >= 80 ? ' warning' : '');
-    }
+    document.getElementById('saveEditBtn').addEventListener('click', function(){
+      if (editIdx === null) return;
+      var spent = parseFloat(document.getElementById('editSpent').value);
+      var limit = parseFloat(document.getElementById('editLimit').value);
 
-    /* ===== SUMMARY CARDS ===== */
-    function renderSummaryCards() {
-      const totalSpent = budgets.reduce((s, b) => s + b.spent, 0);
-      const available = financials.netIncome - financials.fixedExpenses;
-      const cards = [
-        { label: 'Ingresos netos',  value: formatCurrency(financials.netIncome),    cls: 'positive', icon: 'fa-arrow-trend-up',   iconCls: 'income' },
-        { label: 'Gastos fijos',    value: formatCurrency(financials.fixedExpenses), cls: 'negative', icon: 'fa-arrow-trend-down', iconCls: 'expense' },
-        { label: 'Disponible',      value: formatCurrency(available),               cls: 'neutral',  icon: 'fa-wallet',           iconCls: 'available' },
-      ];
-      document.getElementById('summaryRow').innerHTML = cards.map(c => `
-        <div class="summary-card">
-          <div class="sc-icon ${c.iconCls}"><i class="fas ${c.icon}"></i></div>
-          <div class="sc-info">
-            <span class="sc-label">${c.label}</span>
-            <span class="sc-value ${c.cls}">${c.value}</span>
-          </div>
-        </div>
-      `).join('');
-    }
+      if (isNaN(spent) || spent < 0) { showToast('Monto gastado inv\u00e1lido', 'error'); return; }
+      if (isNaN(limit) || limit <= 0) { showToast('L\u00edmite inv\u00e1lido', 'error'); return; }
 
-    /* ===== BUDGET CARDS ===== */
-    function renderBudgetCards() {
-      const grid = document.getElementById('budgetGrid');
-      if (!budgets.length) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--outline);font-size:14px;"><i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.4;"></i>No hay presupuestos definidos.</div>';
-        return;
-      }
-      grid.innerHTML = budgets.map((b, idx) => {
-        const pct = b.limit > 0 ? Math.round((b.spent / b.limit) * 100) : 0;
-        const remaining = b.limit - b.spent;
-        let statusCls, statusIcon, statusText;
-
-        if (pct >= 100) {
-          statusCls = 'full';
-          statusIcon = 'fa-check-double';
-          statusText = pct > 100 ? 'Presupuesto excedido' : 'Presupuesto completado';
-          if (pct > 100) statusCls = 'over';
-        } else if (pct >= 80) {
-          statusCls = 'warning';
-          statusIcon = 'fa-triangle-exclamation';
-          statusText = 'Cerca del límite';
-        } else {
-          statusCls = 'safe';
-          statusIcon = 'fa-circle-check';
-          statusText = pct <= 50 ? 'Buen ritmo de gasto' : 'Dentro del presupuesto';
-        }
-
-        const fillCls = pct > 100 ? 'over' : pct >= 100 ? 'full' : pct >= 80 ? 'warning' : 'safe';
-
-        return `
-          <div class="budget-card" data-name="${b.name.toLowerCase()}">
-            <div class="bc-header">
-              <div class="bc-header-left">
-                <div class="bc-icon" style="background:${b.bg};color:${b.color};">
-                  <i class="fas ${b.icon}"></i>
-                </div>
-                <span class="bc-cat-name">${escHtml(b.name)}</span>
-              </div>
-              <div style="position:relative;">
-                <button class="bc-menu-btn" onclick="toggleBudgetMenu(event, ${idx})"><i class="fas fa-ellipsis-vertical"></i></button>
-                <div class="bc-dropdown" id="bmenu-${idx}">
-                  <button onclick="openEditBudget(${idx})"><i class="fas fa-pen"></i> Editar</button>
-                  <button class="danger" onclick="deleteBudget(${idx})"><i class="fas fa-trash"></i> Eliminar</button>
-                </div>
-              </div>
-            </div>
-            <div class="bc-amounts">
-              <span class="bc-spent" style="color:${pct > 100 ? 'var(--error)' : 'var(--on-surface)'};">${formatCurrency(b.spent)}</span>
-              <span class="bc-limit">Límite: ${formatCurrency(b.limit)}</span>
-            </div>
-            <div class="bc-progress-track">
-              <div class="bc-progress-fill ${fillCls}" style="width:${Math.min(pct, 100)}%;"></div>
-            </div>
-            <div class="bc-status">
-              <span class="status-chip ${statusCls}"><i class="fas ${statusIcon}"></i> ${statusText}</span>
-              ${pct < 100 ? `<span class="bc-remaining">Restante: ${formatCurrency(remaining)}</span>` : pct > 100 ? `<span class="bc-remaining" style="color:var(--error);">Excedido: ${formatCurrency(Math.abs(remaining))}</span>` : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    /* ===== BUDGET MENU ===== */
-    function toggleBudgetMenu(e, idx) {
-      e.stopPropagation();
-      const menu = document.getElementById('bmenu-' + idx);
-      const wasOpen = menu.classList.contains('open');
-      closeAllMenus();
-      if (!wasOpen) menu.classList.add('open');
-    }
-
-    function closeAllMenus() {
-      document.querySelectorAll('.bc-dropdown').forEach(d => d.classList.remove('open'));
-    }
-
-    /* ===== EDIT BUDGET ===== */
-    function openEditBudget(idx) {
-      closeAllMenus();
-      editIdx = idx;
-      const b = budgets[idx];
-      document.getElementById('editName').value = b.name;
-      document.getElementById('editSpent').value = b.spent;
-      document.getElementById('editLimit').value = b.limit;
-      document.getElementById('editModal').classList.add('open');
-    }
-
-    function closeEditModal() {
-      document.getElementById('editModal').classList.remove('open');
-      editIdx = null;
-    }
-
-    /* ===== DELETE BUDGET ===== */
-    function deleteBudget(idx) {
-      closeAllMenus();
-      const name = budgets[idx].name;
-      budgets.splice(idx, 1);
+      budgets[editIdx].spent = spent;
+      budgets[editIdx].limit = limit;
+      closeEditModal();
       renderAll();
-      showToast(`"${name}" eliminada`, 'info');
-    }
+      showToast('Presupuesto actualizado', 'success');
+    });
 
-    /* ===== NEW CATEGORY ===== */
-    function addCategory() {
-      const name = document.getElementById('ncName').value.trim();
-      const limit = parseFloat(document.getElementById('ncLimit').value);
-      const iconSel = document.getElementById('ncIcon').value;
+    document.getElementById('searchInput').addEventListener('input', function(e){
+      var q = e.target.value.trim().toLowerCase();
+      document.querySelectorAll('.budget-card').forEach(function(card){
+        var name = card.dataset.name || '';
+        card.style.display = name.includes(q) ? '' : 'none';
+      });
+    });
 
-      const nameInput = document.getElementById('ncName');
-      const limitInput = document.getElementById('ncLimit');
-      nameInput.classList.remove('error');
-      limitInput.classList.remove('error');
+    document.getElementById('newBudgetBtn').addEventListener('click', function(){
+      document.getElementById('ncName').focus();
+      document.getElementById('ncName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
 
-      if (!name) { nameInput.classList.add('error'); return; }
-      if (!limit || limit <= 0) { limitInput.classList.add('error'); return; }
-      if (budgets.some(b => b.name.toLowerCase() === name.toLowerCase())) {
-        nameInput.classList.add('error');
-        showToast('Esa categoría ya existe', 'error');
-        return;
+    document.getElementById('aiAnalysisBtn').addEventListener('click', function(){
+      document.getElementById('aiInsight').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      showToast('An\u00e1lisis IA generado', 'info');
+    });
+
+    document.addEventListener('click', function(e){
+      if (!e.target.closest('.bc-menu-btn') && !e.target.closest('.bc-dropdown')) {
+        closeAllMenus();
       }
+    });
 
-      const colors = ['#455A64','#00695C','#795548','#0277BD','#AD1457','#6A1B9A','#E65100','#1565C0','#C62828','#2E7D32'];
-      const randomColor = colors[budgets.length % colors.length];
-
-      budgets.push({
-        id: Date.now(),
-        name,
-        spent: 0,
-        limit,
-        icon: iconSel,
-        color: randomColor,
-        bg: randomColor + '1a',
-      });
-
-      document.getElementById('ncName').value = '';
-      document.getElementById('ncLimit').value = '';
-      renderAll();
-      showToast(`"${name}" agregada correctamente`, 'success');
-    }
-
-    /* ===== EVENTS ===== */
-    function bindEvents() {
-      document.getElementById('addCatBtn').addEventListener('click', addCategory);
-
-      document.getElementById('saveEditBtn').addEventListener('click', () => {
-        if (editIdx === null) return;
-        const spent = parseFloat(document.getElementById('editSpent').value);
-        const limit = parseFloat(document.getElementById('editLimit').value);
-
-        if (isNaN(spent) || spent < 0) { showToast('Monto gastado inválido', 'error'); return; }
-        if (isNaN(limit) || limit <= 0) { showToast('Límite inválido', 'error'); return; }
-
-        budgets[editIdx].spent = spent;
-        budgets[editIdx].limit = limit;
-        closeEditModal();
-        renderAll();
-        showToast('Presupuesto actualizado', 'success');
-      });
-
-      document.getElementById('searchInput').addEventListener('input', (e) => {
-        const q = e.target.value.trim().toLowerCase();
-        document.querySelectorAll('.budget-card').forEach(card => {
-          const name = card.dataset.name || '';
-          card.style.display = name.includes(q) ? '' : 'none';
-        });
-      });
-
-      document.getElementById('newBudgetBtn').addEventListener('click', () => {
-        document.getElementById('ncName').focus();
-        document.getElementById('ncName').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      });
-
-      document.getElementById('aiAnalysisBtn').addEventListener('click', () => {
-        document.getElementById('aiInsight').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        showToast('Análisis IA generado', 'info');
-      });
-
-      // Close menus on outside click
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.bc-menu-btn') && !e.target.closest('.bc-dropdown')) {
-          closeAllMenus();
-        }
-      });
-    }
-
-    /* ===== UTILITIES ===== */
-    function formatCurrency(n) {
-      const sign = n < 0 ? '-' : '';
-      const abs = Math.abs(n);
-      const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      return `${sign}$${formatted}`;
-    }
-
-    function escHtml(s) {
-      const div = document.createElement('div');
-      div.textContent = s;
-      return div.innerHTML;
-    }
-
-    function showToast(msg, type) {
-      const $t = document.getElementById('toast');
-      const $m = document.getElementById('toastMsg');
-      $m.textContent = msg;
-      $t.querySelector('i').className = type === 'success' ? 'fas fa-check-circle' : type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle';
-      $t.className = 'toast ' + type;
-      void $t.offsetWidth;
-      $t.classList.add('show');
-      clearTimeout($t._timer);
-      $t._timer = setTimeout(() => $t.classList.remove('show'), 3500);
-    }
-  </script>
-</body>
-</html>
+    setTimeout(function(){ updateOverallProgress(); }, 300);
+  });
+})();
+</script>
+{% endblock %}
