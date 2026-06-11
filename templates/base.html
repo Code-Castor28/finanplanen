@@ -1,23 +1,129 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}FinanPlanen{% endblock %}</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    {% block extra_head %}{% endblock %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}FinanPlanen{% endblock %}</title>
+  {% load static %}
+  {% load theme_tags %}
+  {% theme_css_variables %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <div class="layout">
-        <nav class="sidebar">
-            {% block sidebar %}{% endblock %}
-        </nav>
-        <main class="content">
-            {% block content %}{% endblock %}
-        </main>
+  <div class="overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="lr">
+        <div class="li"><i class="fas fa-chart-line"></i></div>
+        <div>
+          <span class="ln">FinanPlanen</span>
+          <span class="ls">Gesti&oacute;n Financiera</span>
+        </div>
+      </div>
     </div>
-    <script src="{% static 'js/main.js' %}"></script>
-    {% block extra_scripts %}{% endblock %}
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">Principal</div>
+      <a href="{% url 'core:inicio' %}" class="nav-item{% if section == 'dashboard' %} active{% endif %}">
+        <i class="fas fa-gauge-high"></i><span>Panel Principal</span>
+      </a>
+
+      <div class="sidebar-section">Finanzas</div>
+      <a href="{% url 'accounts:lista' %}" class="nav-item{% if section == 'accounts' %} active{% endif %}">
+        <i class="fas fa-building-columns"></i><span>Cuentas</span>
+      </a>
+      <a href="{% url 'transactions:lista' %}" class="nav-item{% if section == 'transactions' %} active{% endif %}">
+        <i class="fas fa-receipt"></i><span>Transacciones</span>
+      </a>
+      <a href="{% url 'transactions:ingresos' %}" class="nav-item{% if section == 'ingresos' %} active{% endif %}">
+        <i class="fas fa-arrow-trend-up"></i><span>Ingresos</span>
+      </a>
+      <a href="{% url 'transactions:gastos' %}" class="nav-item{% if section == 'gastos' %} active{% endif %}">
+        <i class="fas fa-money-bill-wave"></i><span>Gastos</span>
+      </a>
+      <a href="{% url 'transfers:lista' %}" class="nav-item{% if section == 'transfers' %} active{% endif %}">
+        <i class="fas fa-right-left"></i><span>Transferencias</span>
+      </a>
+      <a href="{% url 'budgets:lista' %}" class="nav-item{% if section == 'budgets' %} active{% endif %}">
+        <i class="fas fa-chart-pie"></i><span>Presupuestos</span>
+      </a>
+      <a href="{% url 'savings:lista' %}" class="nav-item{% if section == 'savings' %} active{% endif %}">
+        <i class="fas fa-bullseye"></i><span>Ahorros</span>
+      </a>
+      <a href="{% url 'categories:lista' %}" class="nav-item{% if section == 'categories' %} active{% endif %}">
+        <i class="fas fa-tags"></i><span>Categor&iacute;as</span>
+      </a>
+
+      <div class="sidebar-section">Configuraci&oacute;n</div>
+      <a href="{% url 'theme:colores_lista' %}" class="nav-item{% if section == 'theme' %} active{% endif %}">
+        <i class="fas fa-palette"></i><span>Colores</span>
+      </a>
+      <a href="{% url 'theme:iconos_lista' %}" class="nav-item{% if section == 'theme' %} active{% endif %}">
+        <i class="fas fa-icons"></i><span>Iconos</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a href="{% url 'users:perfil' %}" class="nav-item{% if section == 'profile' %} active{% endif %}">
+        <i class="fas fa-user"></i><span>Perfil</span>
+      </a>
+      <a href="{% url 'users:salir' %}" class="nav-item">
+        <i class="fas fa-right-from-bracket"></i><span>Cerrar Sesi&oacute;n</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-avatar">{{ user.nombre|first|upper|default:user.nombre_usuario|first|upper }}</div>
+      <div>
+        <span class="user-name">{{ user.nombre }} {{ user.apellido }}</span>
+        <span class="user-badge">@{{ user.nombre_usuario }}</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Men&uacute;"><i class="fas fa-bars"></i></button>
+      <span class="topbar-title">{% block page_title %}FinanPlanen{% endblock %}</span>
+      <div class="topbar-right">
+        <div class="topbar-avatar">{{ user.nombre|first|upper|default:user.nombre_usuario|first|upper }}</div>
+      </div>
+    </div>
+    <div class="content">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <nav class="mob-nav">
+    <div class="mob-nav-inner">
+      <a href="{% url 'core:inicio' %}" class="{% if section == 'dashboard' %}active{% endif %}">
+        <i class="fas fa-gauge-high"></i>Panel
+      </a>
+      <a href="{% url 'accounts:lista' %}" class="{% if section == 'accounts' %}active{% endif %}">
+        <i class="fas fa-building-columns"></i>Cuentas
+      </a>
+      <a href="{% url 'transactions:lista' %}" class="{% if section == 'transactions' %}active{% endif %}">
+        <i class="fas fa-receipt"></i>Transacc.
+      </a>
+      <a href="{% url 'budgets:lista' %}" class="{% if section == 'budgets' %}active{% endif %}">
+        <i class="fas fa-chart-pie"></i>Presup.
+      </a>
+      <a href="{% url 'users:perfil' %}" class="{% if section == 'profile' %}active{% endif %}">
+        <i class="fas fa-user"></i>Perfil
+      </a>
+    </div>
+  </nav>
+
+  <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_scripts %}{% endblock %}
 </body>
 </html>
