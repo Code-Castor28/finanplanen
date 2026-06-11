@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load formatos %}
 
 {% block title %}Presupuestos — FinanPlanen{% endblock %}
 {% block page_title %}Presupuestos{% endblock %}
@@ -271,7 +272,7 @@
   <div class="head-buttons">
     <div class="search-box">
       <i class="fas fa-search"></i>
-      <input type="text" id="searchInput" placeholder="Buscar categor&iacute;a…">
+      <input type="text" id="searchInput" placeholder="Buscar categor&iacute;a&hellip;">
     </div>
   </div>
 </div>
@@ -287,12 +288,12 @@
   <div class="banner-progress">
     <div class="progress-text">
       <span>
-        Has gastado el <span class="pct" id="overallPct">64%</span> de tu presupuesto total.
+        Has gastado el <span class="pct" id="overallPct">{{ pct_general|floatformat:0 }}%</span> de tu presupuesto total.
       </span>
-      <span class="pct-sub" id="overallDetail">$2,425 de $3,000</span>
+      <span class="pct-sub" id="overallDetail">RD$ {{ total_gastado_p|dinero }} de RD$ {{ total_limite|dinero }}</span>
     </div>
     <div class="progress-track">
-      <div class="progress-fill" id="overallFill" style="width:0%"></div>
+      <div class="progress-fill{% if pct_general >= 100 %} danger{% elif pct_general >= 80 %} warning{% endif %}" id="overallFill" style="width:{% if pct_general > 100 %}100{% else %}{{ pct_general|floatformat:0 }}{% endif %}%"></div>
     </div>
   </div>
 </div>
@@ -301,13 +302,89 @@
   <div class="ai-icon"><i class="fas fa-robot"></i></div>
   <div class="ai-content">
     <div class="ai-label">Ahorro Estimado</div>
-    <p id="aiText">Si mantienes este ritmo, podr&iacute;as ahorrar un <strong>15%</strong> adicional comparado con el mes pasado.</p>
+    <p id="aiText">
+      {% if disponible > 0 %}
+      Tus gastos del mes est&aacute;n controlados. Dispones de <strong>RD$ {{ disponible|dinero }}</strong> para ahorrar o invertir.
+      {% else %}
+      Tus gastos han superado tus ingresos este mes. Revisa tus presupuestos para ajustar.
+      {% endif %}
+    </p>
   </div>
 </div>
 
-<section class="summary-row" id="summaryRow"></section>
+<section class="summary-row" id="summaryRow">
+  <div class="summary-card">
+    <div class="sc-icon income"><i class="fas fa-arrow-trend-up"></i></div>
+    <div class="sc-info">
+      <span class="sc-label">Ingresos netos</span>
+      <span class="sc-value positive">RD$ {{ total_ingresos_mes|dinero }}</span>
+    </div>
+  </div>
+  <div class="summary-card">
+    <div class="sc-icon expense"><i class="fas fa-arrow-trend-down"></i></div>
+    <div class="sc-info">
+      <span class="sc-label">Gastos fijos</span>
+      <span class="sc-value negative">RD$ {{ total_gastos_mes|dinero }}</span>
+    </div>
+  </div>
+  <div class="summary-card">
+    <div class="sc-icon available"><i class="fas fa-wallet"></i></div>
+    <div class="sc-info">
+      <span class="sc-label">Disponible</span>
+      <span class="sc-value neutral">RD$ {{ disponible|dinero }}</span>
+    </div>
+  </div>
+</section>
 
-<section class="budget-grid" id="budgetGrid"></section>
+<section class="budget-grid" id="budgetGrid">
+  {% for p in presupuestos %}
+  {% with pct=p.progreso_pct color=p.categoria.color.hex|default:"#455A64" bg=p.categoria.color.hex|default:"#455A64"|add:"1a" %}
+  <div class="budget-card" data-name="{{ p.categoria.nombre|lower }}">
+    <div class="bc-header">
+      <div class="bc-header-left">
+        <div class="bc-icon" style="background:{{ bg }};color:{{ color }};">
+          <i class="fas {% if p.categoria.icono %}{{ p.categoria.icono.clase_css }}{% else %}fa-tag{% endif %}"></i>
+        </div>
+        <span class="bc-cat-name">{{ p.categoria.nombre }}</span>
+      </div>
+      <div style="position:relative;">
+        <button class="bc-menu-btn" onclick="toggleBudgetMenu(event, {{ forloop.counter0 }})"><i class="fas fa-ellipsis-vertical"></i></button>
+        <div class="bc-dropdown" id="bmenu-{{ forloop.counter0 }}">
+          <button hx-get="{% url 'budgets:editar' p.pk %}" hx-target="#modal-content" hx-trigger="click" _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal"><i class="fas fa-pen"></i> Editar</button>
+          <button class="danger" hx-get="{% url 'budgets:eliminar' p.pk %}" hx-target="#modal-content" hx-trigger="click" _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal"><i class="fas fa-trash"></i> Eliminar</button>
+        </div>
+      </div>
+    </div>
+    <div class="bc-amounts">
+      <span class="bc-spent" style="color:{% if pct > 100 %}var(--exp){% else %}var(--os){% endif %};">RD$ {{ p.monto_gastado|dinero }}</span>
+      <span class="bc-limit">L&iacute;mite: RD$ {{ p.monto_limite|dinero }}</span>
+    </div>
+    <div class="bc-progress-track">
+      <div class="bc-progress-fill {% if pct > 100 %}over{% elif pct >= 100 %}full{% elif pct >= 80 %}warning{% else %}safe{% endif %}" style="width:{% if pct > 100 %}100{% else %}{{ pct|floatformat:0 }}{% endif %}%;"></div>
+    </div>
+    <div class="bc-status">
+      {% if pct >= 100 %}
+      <span class="status-chip {% if pct > 100 %}over{% else %}full{% endif %}"><i class="fas {% if pct > 100 %}fa-exclamation-triangle{% else %}fa-check-double{% endif %}"></i> {% if pct > 100 %}Presupuesto excedido{% else %}Presupuesto completado{% endif %}</span>
+      {% elif pct >= 80 %}
+      <span class="status-chip warning"><i class="fas fa-triangle-exclamation"></i> Cerca del l&iacute;mite</span>
+      {% else %}
+      <span class="status-chip safe"><i class="fas fa-circle-check"></i> {% if pct <= 50 %}Buen ritmo de gasto{% else %}Dentro del presupuesto{% endif %}</span>
+      {% endif %}
+      {% if pct < 100 %}
+      <span class="bc-remaining">Restante: RD$ {{ p.restante|dinero }}</span>
+      {% elif pct > 100 %}
+      <span class="bc-remaining" style="color:var(--exp);">Excedido: RD$ {{ p.excedido|dinero }}</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endwith %}
+  {% empty %}
+  <div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--ol);font-size:14px;">
+    <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.4;"></i>
+    No hay presupuestos definidos.
+  </div>
+  {% endfor %}
+</section>
 
 <div class="new-cat-card">
   <div class="new-cat-header">
@@ -315,57 +392,33 @@
     <h3>Nueva Categor&iacute;a</h3>
   </div>
   <p class="new-cat-desc">Define un nuevo l&iacute;mite mensual para tus gastos personalizados.</p>
-  <div class="new-cat-form" id="newCatForm">
+  <form class="new-cat-form" id="newCatForm" method="post"
+        hx-post="{% url 'budgets:crear' %}"
+        hx-target="this"
+        hx-swap="outerHTML"
+        _="on htmx:beforeSend remove .open from #form-modal">
+    {% csrf_token %}
     <div class="field">
-      <label for="ncName">Nombre de Categor&iacute;a</label>
-      <input type="text" id="ncName" placeholder="Ej: Mascotas">
-    </div>
-    <div class="field">
-      <label for="ncLimit">L&iacute;mite Mensual ($)</label>
-      <input type="number" id="ncLimit" step="0.01" min="1" placeholder="Ej: 150.00">
-    </div>
-    <div class="field">
-      <label for="ncIcon">Icono</label>
-      <select id="ncIcon">
-        <option value="fa-paw">Mascotas</option>
-        <option value="fa-dumbbell">Deporte</option>
-        <option value="fa-book">Educaci&oacute;n</option>
-        <option value="fa-plane">Viajes</option>
-        <option value="fa-shirt">Ropa</option>
-        <option value="fa-gift">Regalos</option>
-        <option value="fa-baby">Hijos</option>
-        <option value="fa-car">Auto</option>
-        <option value="fa-palette">Arte</option>
-        <option value="fa-ellipsis">Otro</option>
+      <label for="id_categoria">Categor&iacute;a</label>
+      <select name="categoria" id="id_categoria" class="form-control" required>
+        <option value="">Seleccionar...</option>
+        {% for c in categorias %}
+        <option value="{{ c.pk }}">{{ c.nombre }}</option>
+        {% endfor %}
       </select>
     </div>
-    <button class="btn btn-primary" id="addCatBtn"><i class="fas fa-plus"></i> Agregar</button>
-  </div>
+    <div class="field">
+      <label for="id_monto_limite">L&iacute;mite Mensual (RD$)</label>
+      <input type="number" name="monto_limite" id="id_monto_limite" step="0.01" min="1" placeholder="Ej: 150.00" required class="form-control">
+    </div>
+    <input type="hidden" name="mes" value="{{ hoy.month }}">
+    <input type="hidden" name="año" value="{{ hoy.year }}">
+    <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Agregar</button>
+  </form>
 </div>
 
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <div class="modal-head">
-      <h3><i class="fas fa-pen-to-square" style="color:var(--pc);margin-right:8px;"></i> Editar Presupuesto</h3>
-      <button class="modal-close" onclick="closeEditModal()"><i class="fas fa-xmark"></i></button>
-    </div>
-    <div class="field">
-      <label for="editName">Nombre de Categor&iacute;a</label>
-      <input type="text" id="editName" readonly style="background:var(--slw);cursor:not-allowed;">
-    </div>
-    <div class="field">
-      <label for="editSpent">Monto Gastado ($)</label>
-      <input type="number" id="editSpent" step="0.01" min="0" placeholder="0.00">
-    </div>
-    <div class="field">
-      <label for="editLimit">L&iacute;mite Mensual ($)</label>
-      <input type="number" id="editLimit" step="0.01" min="1" placeholder="0.00">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
-      <button class="btn btn-primary" id="saveEditBtn"><i class="fas fa-check"></i> Guardar Cambios</button>
-    </div>
-  </div>
+<div id="form-modal" class="modal-overlay">
+  <div class="modal" id="modal-content"></div>
 </div>
 {% endblock %}
 
@@ -374,141 +427,14 @@
 (function(){
   'use strict';
 
-  var iconMap = {
-    'Alimentaci\u00f3n':    { icon: 'fa-utensils',        color: '#E65100', bg: 'rgba(230,81,0,0.10)' },
-    'Transporte':      { icon: 'fa-car',             color: '#1565C0', bg: 'rgba(21,101,192,0.10)' },
-    'Entretenimiento': { icon: 'fa-gamepad',         color: '#6A1B9A', bg: 'rgba(106,27,154,0.10)' },
-    'Vivienda':        { icon: 'fa-house',           color: '#2E7D32', bg: 'rgba(46,125,50,0.10)' },
-    'Salud':           { icon: 'fa-heart-pulse',     color: '#AD1457', bg: 'rgba(173,20,87,0.10)' },
-    'Educaci\u00f3n':       { icon: 'fa-book',            color: '#00695C', bg: 'rgba(0,105,92,0.10)' },
-    'Mascotas':        { icon: 'fa-paw',             color: '#795548', bg: 'rgba(121,85,72,0.10)' },
-    'Viajes':          { icon: 'fa-plane',           color: '#0277BD', bg: 'rgba(2,119,189,0.10)' },
-    'Ropa':            { icon: 'fa-shirt',           color: '#C62828', bg: 'rgba(198,40,40,0.10)' },
-    'Regalos':         { icon: 'fa-gift',            color: '#AD1457', bg: 'rgba(173,20,87,0.10)' },
-  };
-
-  var defaultIcon = { icon: 'fa-tag', color: '#455A64', bg: 'rgba(69,90,100,0.10)' };
-
-  var budgets = [
-    { id: 1, name: 'Alimentaci\u00f3n',    spent: 520,  limit: 800,  icon: 'fa-utensils',        color: '#E65100', bg: 'rgba(230,81,0,0.10)' },
-    { id: 2, name: 'Transporte',      spent: 285,  limit: 300,  icon: 'fa-car',             color: '#1565C0', bg: 'rgba(21,101,192,0.10)' },
-    { id: 3, name: 'Entretenimiento', spent: 120,  limit: 400,  icon: 'fa-gamepad',         color: '#6A1B9A', bg: 'rgba(106,27,154,0.10)' },
-    { id: 4, name: 'Vivienda',        spent: 1500, limit: 1500, icon: 'fa-house',           color: '#2E7D32', bg: 'rgba(46,125,50,0.10)' },
-  ];
-
-  var financials = { netIncome: 5800, fixedExpenses: 2100 };
-
-  var editIdx = null;
-
-  function updateOverallProgress() {
-    var totalSpent = budgets.reduce(function(s, b){ return s + b.spent; }, 0);
-    var totalLimit = budgets.reduce(function(s, b){ return s + b.limit; }, 0);
-    var pct = totalLimit > 0 ? Math.round((totalSpent / totalLimit) * 100) : 0;
-
-    document.getElementById('overallPct').textContent = pct + '%';
-    document.getElementById('overallDetail').textContent = fmt(totalSpent) + ' de ' + fmt(totalLimit);
-
-    var fill = document.getElementById('overallFill');
-    fill.style.width = Math.min(pct, 100) + '%';
-    fill.className = 'progress-fill' + (pct >= 100 ? ' danger' : pct >= 80 ? ' warning' : '');
-  }
-
-  function renderSummaryCards() {
-    var totalSpent = budgets.reduce(function(s, b){ return s + b.spent; }, 0);
-    var available = financials.netIncome - financials.fixedExpenses;
-    var cards = [
-      { label: 'Ingresos netos',  value: fmt(financials.netIncome),    cls: 'positive', icon: 'fa-arrow-trend-up',   iconCls: 'income' },
-      { label: 'Gastos fijos',    value: fmt(financials.fixedExpenses), cls: 'negative', icon: 'fa-arrow-trend-down', iconCls: 'expense' },
-      { label: 'Disponible',      value: fmt(available),               cls: 'neutral',  icon: 'fa-wallet',           iconCls: 'available' },
-    ];
-    document.getElementById('summaryRow').innerHTML = cards.map(function(c){
-      return '<div class="summary-card">' +
-        '<div class="sc-icon ' + c.iconCls + '"><i class="fas ' + c.icon + '"></i></div>' +
-        '<div class="sc-info"><span class="sc-label">' + c.label + '</span><span class="sc-value ' + c.cls + '">' + c.value + '</span></div>' +
-        '</div>';
-    }).join('');
-  }
-
-  function renderBudgetCards() {
-    var grid = document.getElementById('budgetGrid');
-    if (!budgets.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--ol);font-size:14px;"><i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.4;"></i>No hay presupuestos definidos.</div>';
-      return;
-    }
-    grid.innerHTML = budgets.map(function(b, idx){
-      var pct = b.limit > 0 ? Math.round((b.spent / b.limit) * 100) : 0;
-      var remaining = b.limit - b.spent;
-      var statusCls, statusIcon, statusText;
-
-      if (pct >= 100) {
-        statusCls = 'full';
-        statusIcon = 'fa-check-double';
-        statusText = pct > 100 ? 'Presupuesto excedido' : 'Presupuesto completado';
-        if (pct > 100) statusCls = 'over';
-      } else if (pct >= 80) {
-        statusCls = 'warning';
-        statusIcon = 'fa-triangle-exclamation';
-        statusText = 'Cerca del l\u00edmite';
-      } else {
-        statusCls = 'safe';
-        statusIcon = 'fa-circle-check';
-        statusText = pct <= 50 ? 'Buen ritmo de gasto' : 'Dentro del presupuesto';
-      }
-
-      var fillCls = pct > 100 ? 'over' : pct >= 100 ? 'full' : pct >= 80 ? 'warning' : 'safe';
-      var escName = esc(b.name);
-      var remainingHtml = '';
-      if (pct < 100) remainingHtml = '<span class="bc-remaining">Restante: ' + fmt(remaining) + '</span>';
-      else if (pct > 100) remainingHtml = '<span class="bc-remaining" style="color:var(--exp);">Excedido: ' + fmt(Math.abs(remaining)) + '</span>';
-
-      return '<div class="budget-card" data-name="' + b.name.toLowerCase() + '">' +
-        '<div class="bc-header">' +
-          '<div class="bc-header-left">' +
-            '<div class="bc-icon" style="background:' + b.bg + ';color:' + b.color + ';">' +
-              '<i class="fas ' + b.icon + '"></i>' +
-            '</div>' +
-            '<span class="bc-cat-name">' + escName + '</span>' +
-          '</div>' +
-          '<div style="position:relative;">' +
-            '<button class="bc-menu-btn" onclick="toggleBudgetMenu(event, ' + idx + ')"><i class="fas fa-ellipsis-vertical"></i></button>' +
-            '<div class="bc-dropdown" id="bmenu-' + idx + '">' +
-              '<button onclick="openEditBudget(' + idx + ')"><i class="fas fa-pen"></i> Editar</button>' +
-              '<button class="danger" onclick="deleteBudget(' + idx + ')"><i class="fas fa-trash"></i> Eliminar</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="bc-amounts">' +
-          '<span class="bc-spent" style="color:' + (pct > 100 ? 'var(--exp)' : 'var(--os)') + ';">' + fmt(b.spent) + '</span>' +
-          '<span class="bc-limit">L\u00edmite: ' + fmt(b.limit) + '</span>' +
-        '</div>' +
-        '<div class="bc-progress-track">' +
-          '<div class="bc-progress-fill ' + fillCls + '" style="width:' + Math.min(pct, 100) + '%;"></div>' +
-        '</div>' +
-        '<div class="bc-status">' +
-          '<span class="status-chip ' + statusCls + '"><i class="fas ' + statusIcon + '"></i> ' + statusText + '</span>' +
-          remainingHtml +
-        '</div>' +
-        '</div>';
-    }).join('');
-  }
-
-  function renderAll() {
-    renderSummaryCards();
-    renderBudgetCards();
-    updateOverallProgress();
-  }
-
-  function fmt(n) {
-    var sign = n < 0 ? '-' : '';
-    var abs = Math.abs(n);
-    var formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return sign + '$' + formatted;
-  }
-
   function esc(s) {
     var d = document.createElement('div');
     d.textContent = s;
     return d.innerHTML;
+  }
+
+  function closeAllMenus() {
+    document.querySelectorAll('.bc-dropdown').forEach(function(d){ d.classList.remove('open'); });
   }
 
   window.toggleBudgetMenu = function(e, idx) {
@@ -519,90 +445,7 @@
     if (!wasOpen) menu.classList.add('open');
   };
 
-  function closeAllMenus() {
-    document.querySelectorAll('.bc-dropdown').forEach(function(d){ d.classList.remove('open'); });
-  }
-
-  window.openEditBudget = function(idx) {
-    closeAllMenus();
-    editIdx = idx;
-    var b = budgets[idx];
-    document.getElementById('editName').value = b.name;
-    document.getElementById('editSpent').value = b.spent;
-    document.getElementById('editLimit').value = b.limit;
-    document.getElementById('editModal').classList.add('open');
-  };
-
-  window.closeEditModal = function() {
-    document.getElementById('editModal').classList.remove('open');
-    editIdx = null;
-  };
-
-  window.deleteBudget = function(idx) {
-    closeAllMenus();
-    var name = budgets[idx].name;
-    budgets.splice(idx, 1);
-    renderAll();
-    showToast('"' + name + '" eliminada', 'info');
-  };
-
-  function addCategory() {
-    var name = document.getElementById('ncName').value.trim();
-    var limit = parseFloat(document.getElementById('ncLimit').value);
-    var iconSel = document.getElementById('ncIcon').value;
-
-    var nameInput = document.getElementById('ncName');
-    var limitInput = document.getElementById('ncLimit');
-    nameInput.classList.remove('error');
-    limitInput.classList.remove('error');
-
-    if (!name) { nameInput.classList.add('error'); nameInput.focus(); return; }
-    if (!limit || limit <= 0) { limitInput.classList.add('error'); limitInput.focus(); return; }
-    if (budgets.some(function(b){ return b.name.toLowerCase() === name.toLowerCase(); })) {
-      nameInput.classList.add('error');
-      showToast('Esa categor\u00eda ya existe', 'error');
-      return;
-    }
-
-    var colors = ['#455A64','#00695C','#795548','#0277BD','#AD1457','#6A1B9A','#E65100','#1565C0','#C62828','#2E7D32'];
-    var randomColor = colors[budgets.length % colors.length];
-
-    budgets.push({
-      id: Date.now(),
-      name: name,
-      spent: 0,
-      limit: limit,
-      icon: iconSel,
-      color: randomColor,
-      bg: randomColor + '1a',
-    });
-
-    document.getElementById('ncName').value = '';
-    document.getElementById('ncLimit').value = '';
-    renderAll();
-    showToast('"' + name + '" agregada correctamente', 'success');
-  }
-
   document.addEventListener('DOMContentLoaded', function(){
-    renderAll();
-
-    document.getElementById('addCatBtn').addEventListener('click', addCategory);
-
-    document.getElementById('saveEditBtn').addEventListener('click', function(){
-      if (editIdx === null) return;
-      var spent = parseFloat(document.getElementById('editSpent').value);
-      var limit = parseFloat(document.getElementById('editLimit').value);
-
-      if (isNaN(spent) || spent < 0) { showToast('Monto gastado inv\u00e1lido', 'error'); return; }
-      if (isNaN(limit) || limit <= 0) { showToast('L\u00edmite inv\u00e1lido', 'error'); return; }
-
-      budgets[editIdx].spent = spent;
-      budgets[editIdx].limit = limit;
-      closeEditModal();
-      renderAll();
-      showToast('Presupuesto actualizado', 'success');
-    });
-
     document.getElementById('searchInput').addEventListener('input', function(e){
       var q = e.target.value.trim().toLowerCase();
       document.querySelectorAll('.budget-card').forEach(function(card){
@@ -612,13 +455,13 @@
     });
 
     document.getElementById('newBudgetBtn').addEventListener('click', function(){
-      document.getElementById('ncName').focus();
-      document.getElementById('ncName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('id_categoria').focus();
+      document.getElementById('id_categoria').scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 
     document.getElementById('aiAnalysisBtn').addEventListener('click', function(){
       document.getElementById('aiInsight').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      showToast('An\u00e1lisis IA generado', 'info');
+      showToast('An&aacute;lisis IA generado', 'info');
     });
 
     document.addEventListener('click', function(e){
@@ -626,8 +469,6 @@
         closeAllMenus();
       }
     });
-
-    setTimeout(function(){ updateOverallProgress(); }, 300);
   });
 })();
 </script>
