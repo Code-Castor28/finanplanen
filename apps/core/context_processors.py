@@ -7,6 +7,7 @@ SECTION_MAP = {
     'categories:lista': 'categories',
     'savings:lista': 'savings',
     'transactions:lista': 'transactions',
+    'transactions:ingresos': 'ingresos',
     'transactions:gastos': 'gastos',
     'transfers:lista': 'transfers',
     'theme:colores_lista': 'theme',
