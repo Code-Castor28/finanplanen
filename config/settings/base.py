@@ -94,3 +94,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.Usuario'
 LOGIN_URL = '/acceso/ingresar/'
+
+# Celery
+CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Santo_Domingo'
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'ejecutar-recurrencias': {
+        'task': 'apps.transfers.tasks.ejecutar_recurrencias',
+        'schedule': crontab(hour=6, minute=0),
+    },
+    'recordatorio-tarjetas': {
+        'task': 'apps.transfers.tasks.recordatorio_tarjetas_credito',
+        'schedule': crontab(hour=9, minute=0),
+    },
+}
