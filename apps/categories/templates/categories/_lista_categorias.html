@@ -1,0 +1,63 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Color</th>
+      <th>Icono</th>
+      <th>Deducible</th>
+      <th>Activo</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cat in categorias %}
+    <tr id="categoria-{{ cat.pk }}">
+      <td>
+        <strong>{{ cat.nombre }}</strong>
+        {% if cat.slug %}<br><code style="font-size:11px;color:var(--ol)">{{ cat.slug }}</code>{% endif %}
+      </td>
+      <td>
+        {% if cat.color %}
+        <span class="color-swatch" style="background:{{ cat.color.hex }}"></span>
+        {% else %}
+        <span style="color:var(--ol)">—</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if cat.icono %}
+        <i class="{{ cat.icono.clase_css }}" style="font-size:18px;color:var(--ov)"></i>
+        {% else %}
+        <span style="color:var(--ol)">—</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if cat.deducible %}<i class="fas fa-check" style="color:var(--inc)"></i>{% else %}<i class="fas fa-times" style="color:var(--ol)"></i>{% endif %}
+      </td>
+      <td>
+        {% if cat.activo %}<i class="fas fa-check" style="color:var(--inc)"></i>{% else %}<i class="fas fa-times" style="color:var(--exp)"></i>{% endif %}
+      </td>
+      <td class="actions">
+        <button class="btn-sm"
+                hx-get="{% url 'categories:editar' cat.pk %}"
+                hx-target="#modal-content"
+                _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-sm btn-danger"
+                hx-get="{% url 'categories:eliminar' cat.pk %}"
+                hx-target="#modal-content"
+                _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6" class="text-center" style="padding:40px 0;color:var(--ol)">
+        <i class="fas fa-folder-open" style="font-size:32px;display:block;margin-bottom:8px;color:var(--olv)"></i>
+        No hay categorías registradas.
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

@@ -1,0 +1,59 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Color</th>
+      <th>Categorías</th>
+      <th>Activo</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for tag in etiquetas %}
+    <tr id="etiqueta-{{ tag.pk }}">
+      <td>
+        <strong>{{ tag.nombre }}</strong>
+        {% if tag.slug %}<br><code style="font-size:11px;color:var(--ol)">{{ tag.slug }}</code>{% endif %}
+      </td>
+      <td>
+        {% if tag.color %}
+        <span class="color-swatch" style="background:{{ tag.color.hex }}"></span>
+        {% else %}
+        <span style="color:var(--ol)">—</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if tag.categorias.count %}
+        {% for cat in tag.categorias.all %}<span class="chip" style="font-size:11px;padding:2px 8px;background:var(--sc);color:var(--ov)">{{ cat.nombre }}</span> {% endfor %}
+        {% else %}
+        <span style="color:var(--ol)">—</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if tag.activo %}<i class="fas fa-check" style="color:var(--inc)"></i>{% else %}<i class="fas fa-times" style="color:var(--exp)"></i>{% endif %}
+      </td>
+      <td class="actions">
+        <button class="btn-sm"
+                hx-get="{% url 'categories:etiqueta_editar' tag.pk %}"
+                hx-target="#modal-content"
+                _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-sm btn-danger"
+                hx-get="{% url 'categories:etiqueta_eliminar' tag.pk %}"
+                hx-target="#modal-content"
+                _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="5" class="text-center" style="padding:40px 0;color:var(--ol)">
+        <i class="fas fa-tag" style="font-size:32px;display:block;margin-bottom:8px;color:var(--olv)"></i>
+        No hay etiquetas registradas.
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
