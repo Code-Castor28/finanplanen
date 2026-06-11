@@ -70,6 +70,10 @@ class DepositoAhorro(models.Model):
         related_name='depositos',
         verbose_name='meta de ahorro'
     )
+    cuenta = models.ForeignKey(
+        'accounts.Cuenta', on_delete=models.PROTECT,
+        null=True, blank=True, verbose_name='cuenta de origen'
+    )
     monto = models.DecimalField(
         max_digits=12, decimal_places=2, verbose_name='monto'
     )

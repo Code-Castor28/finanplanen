@@ -7,6 +7,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .forms import MetaAhorroForm, DepositoAhorroForm
 from .models import MetaAhorro, DepositoAhorro
+from apps.accounts.models import Cuenta
 from apps.theme.models import Color, Icono
 
 
@@ -58,6 +59,11 @@ class MetaAhorroLista(InquilinoMixin, ListView):
             context['total_metas'] = qs.count()
             context['colores'] = Color.objects.filter(inquilino=self.request.user.inquilino, activo=True)
             context['iconos'] = Icono.objects.filter(inquilino=self.request.user.inquilino, activo=True)
+            context['cuentas'] = Cuenta.objects.filter(
+                inquilino=self.request.user.inquilino,
+                tipo__in=['efectivo', 'debito'],
+                activo=True
+            )
 
             metas_list = []
             for m in qs:
@@ -140,6 +146,11 @@ class DepositoAhorroCrear(InquilinoMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy('savings:lista')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['inquilino'] = self.request.user.inquilino
+        return kwargs
 
     def form_valid(self, form):
         super().form_valid(form)
