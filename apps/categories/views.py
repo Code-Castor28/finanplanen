@@ -11,8 +11,9 @@ class InquilinoMixin(LoginRequiredMixin):
         return self.model.objects.filter(inquilino=self.request.user.inquilino)
 
     def form_valid(self, form):
-        form.instance.inquilino = self.request.user.inquilino
-        form.instance.usuario = self.request.user
+        if hasattr(form, 'instance'):
+            form.instance.inquilino = self.request.user.inquilino
+            form.instance.usuario = self.request.user
         return super().form_valid(form)
 
 
@@ -78,7 +79,7 @@ class CategoriaEliminar(InquilinoMixin, DeleteView):
     def get_success_url(self):
         return reverse_lazy('categories:lista')
 
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         self.object = self.get_object()
         self.object.delete()
         response = HttpResponse()
@@ -144,7 +145,7 @@ class EtiquetaEliminar(InquilinoMixin, DeleteView):
     def get_success_url(self):
         return reverse_lazy('categories:lista')
 
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         self.object = self.get_object()
         self.object.delete()
         response = HttpResponse()
