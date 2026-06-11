@@ -1,0 +1,96 @@
+{% load formatos %}
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Método de Pago</th>
+        <th>Categoría</th>
+        <th>Nota</th>
+        <th class="text-right">Monto</th>
+        <th>Comprobante</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for g in gastos %}
+      <tr id="gasto-{{ g.pk }}">
+        <td>{{ g.fecha|date:"d/m/Y" }}</td>
+        <td>
+          <span class="chip" style="background:var(--sc)">
+            {% if g.cuenta.icono %}<i class="{{ g.cuenta.icono.clase_css }}"></i>{% endif %}
+            {{ g.cuenta.nombre }}
+          </span>
+        </td>
+        <td>
+          {% if g.categoria %}
+          <span class="chip" style="background:var(--sc)">
+            {% if g.categoria.icono %}<i class="{{ g.categoria.icono.clase_css }}"></i>{% endif %}
+            {{ g.categoria.nombre }}
+          </span>
+          {% else %}
+          <span style="color:var(--ol)">—</span>
+          {% endif %}
+        </td>
+        <td>{{ g.nota|truncatechars:40|default:"—" }}</td>
+        <td class="text-right" style="font-weight:700;color:var(--exp)">RD$ {{ g.monto|dinero }}</td>
+        <td>
+          {% if g.comprobante %}
+          <a href="{{ g.comprobante.url }}" target="_blank" class="btn-sm">
+            <i class="fas fa-paperclip"></i>
+          </a>
+          {% else %}
+          <span style="color:var(--ol)">—</span>
+          {% endif %}
+        </td>
+        <td class="actions">
+          <button class="btn-sm"
+                  hx-get="{% url 'transactions:gasto_editar' g.pk %}"
+                  hx-target="#modal-content"
+                  _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn-sm btn-danger"
+                  hx-get="{% url 'transactions:gasto_eliminar' g.pk %}"
+                  hx-target="#modal-content"
+                  _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" class="text-center" style="padding:40px 0;color:var(--ol)">
+          <i class="fas fa-receipt" style="font-size:32px;display:block;margin-bottom:8px;color:var(--olv)"></i>
+          No hay gastos registrados.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if is_paginated %}
+<div class="pagination" style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:20px;flex-wrap:wrap">
+  {% if page_obj.has_previous %}
+  <button class="btn btn-sm"
+          hx-get="{% url 'transactions:gastos' %}?page={{ page_obj.previous_page_number }}{% for k,v in filtros.items %}&{{ k }}={{ v }}{% endfor %}"
+          hx-target="#gasto-list"
+          hx-swap="innerHTML"
+          hx-push-url="true">
+    <i class="fas fa-chevron-left"></i>
+  </button>
+  {% endif %}
+  <span style="padding:6px 12px;color:var(--ov)">Pág. {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+  <button class="btn btn-sm"
+          hx-get="{% url 'transactions:gastos' %}?page={{ page_obj.next_page_number }}{% for k,v in filtros.items %}&{{ k }}={{ v }}{% endfor %}"
+          hx-target="#gasto-list"
+          hx-swap="innerHTML"
+          hx-push-url="true">
+    <i class="fas fa-chevron-right"></i>
+  </button>
+  {% endif %}
+</div>
+{% endif %}

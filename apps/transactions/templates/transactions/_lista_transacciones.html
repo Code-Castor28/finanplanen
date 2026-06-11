@@ -1,0 +1,85 @@
+{% load formatos %}
+{% load l10n %}
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Tipo</th>
+        <th>Concepto</th>
+        <th>Categoría</th>
+        <th>Cuenta</th>
+        <th class="text-right">Monto</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in movimientos %}
+      <tr>
+        <td style="color:var(--ol);font-size:13px">{{ t.fecha|date:"d/m/Y" }}</td>
+        <td>
+          {% if t.tipo == 'ingreso' %}
+          <span class="chip" style="background:var(--incb,rgba(27,94,50,.08));color:var(--inc,#1b5e20)">
+            <i class="fas fa-arrow-trend-up"></i> Ingreso
+          </span>
+          {% elif t.tipo == 'gasto' %}
+          <span class="chip" style="background:var(--expb,rgba(211,47,47,.08));color:var(--exp,#d32f2f)">
+            <i class="fas fa-arrow-trend-down"></i> Gasto
+          </span>
+          {% elif t.tipo == 'transferencia' %}
+          <span class="chip" style="background:rgba(26,35,126,.08);color:var(--pc,#1a237e)">
+            <i class="fas fa-right-left"></i> Transferencia
+          </span>
+          {% endif %}
+        </td>
+        <td style="font-weight:500">{{ t.nota|default:"—"|truncatechars:40 }}</td>
+        <td>
+          {% if t.categoria %}
+          <span class="chip" style="background:var(--sc)">
+            {% if t.categoria.icono %}<i class="{{ t.categoria.icono.clase_css }}"></i>{% endif %}
+            {{ t.categoria.nombre }}
+          </span>
+          {% else %}
+          <span style="color:var(--ol)">—</span>
+          {% endif %}
+        </td>
+        <td style="color:var(--ol);font-size:13px">{{ t.cuenta_nombre }}</td>
+        <td class="td-monto {% if t.tipo == 'ingreso' %}positive{% elif t.tipo == 'gasto' %}negative{% endif %}">
+          {% if t.tipo == 'ingreso' %}+{% elif t.tipo == 'gasto' %}-{% endif %}RD$ {{ t.monto|dinero }}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="table-empty">
+          <i class="fas fa-inbox"></i>
+          No hay movimientos registrados.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if is_paginated %}
+<div class="pagination" style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:20px;flex-wrap:wrap">
+  {% if page_obj.has_previous %}
+  <button class="btn btn-sm"
+          hx-get="{% url 'transactions:lista' %}?page={{ page_obj.previous_page_number }}{% for k,v in filtros.items %}&{{ k }}={{ v }}{% endfor %}"
+          hx-target="#tx-list"
+          hx-swap="innerHTML"
+          hx-push-url="true">
+    <i class="fas fa-chevron-left"></i>
+  </button>
+  {% endif %}
+  <span style="padding:6px 12px;color:var(--ov)">Pág. {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+  <button class="btn btn-sm"
+          hx-get="{% url 'transactions:lista' %}?page={{ page_obj.next_page_number }}{% for k,v in filtros.items %}&{{ k }}={{ v }}{% endfor %}"
+          hx-target="#tx-list"
+          hx-swap="innerHTML"
+          hx-push-url="true">
+    <i class="fas fa-chevron-right"></i>
+  </button>
+  {% endif %}
+</div>
+{% endif %}

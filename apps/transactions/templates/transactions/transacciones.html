@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load formatos %}
+{% load l10n %}
+
+{% block title %}Transacciones — FinanPlanen{% endblock %}
+{% block page_title %}Transacciones{% endblock %}
+
+{% block extra_head %}
+<style>
+.summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.summary-card{border-radius:var(--r-lg);padding:24px;position:relative;overflow:hidden;min-height:110px;display:flex;flex-direction:column;justify-content:center}
+.summary-card .bg-icon{position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.12;pointer-events:none}
+.summary-card.ingresos{background:linear-gradient(135deg,#1b5e20,#2e7d32,#388e3c);color:#fff}
+.summary-card.gastos{background:linear-gradient(135deg,#b71c1c,#c62828,#d32f2f);color:#fff}
+.summary-card.balance{background:linear-gradient(135deg,#1a237e,#283593,#3949ab);color:#fff}
+.card-info{position:relative;z-index:1}
+.card-info .card-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.8;display:block}
+.card-info .card-value{font-size:26px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;display:block;margin-top:4px}
+.card-value.positive{color:#a5d6a7}
+.card-value.negative{color:#ef9a9a}
+.table-section{background:var(--slw,#f2f4f7);border-radius:var(--r-lg);overflow:hidden}
+.table-section table{width:100%;border-collapse:collapse}
+.table-section thead th{padding:16px 20px;font-size:11px;font-weight:600;color:var(--ol);letter-spacing:.06em;text-transform:uppercase;text-align:left;background:var(--sc);border-bottom:1px solid var(--olv);white-space:nowrap}
+.table-section thead th.text-right{text-align:right}
+.table-section tbody tr{border-bottom:1px solid var(--sc);transition:background .15s}
+.table-section tbody tr:last-child{border-bottom:none}
+.table-section tbody tr:hover{background:var(--sc)}
+.table-section tbody td{padding:0 20px;height:56px;font-size:14px;vertical-align:middle}
+.td-monto{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.td-monto.positive{color:var(--inc)}
+.td-monto.negative{color:var(--exp)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:var(--r-full);font-size:12px;font-weight:500;white-space:nowrap}
+.chip i{font-size:11px}
+.table-empty{text-align:center;padding:48px 20px;color:var(--ol);font-size:14px}
+.table-empty i{font-size:32px;display:block;margin-bottom:12px;opacity:.4}
+@media(max-width:1200px){.summary-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.summary-row{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Historial de Transacciones</h1>
+    <p class="sub">Vista unificada de todos los movimientos financieros.</p>
+  </div>
+</div>
+
+<form method="get" class="filter-bar" style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;align-items:flex-end">
+  <div class="field" style="min-width:160px">
+    <label>DESDE</label>
+    <input type="date" name="fecha_desde" value="{{ filtros.fecha_desde }}" class="form-control" onchange="this.form.submit()">
+  </div>
+  <div class="field" style="min-width:160px">
+    <label>HASTA</label>
+    <input type="date" name="fecha_hasta" value="{{ filtros.fecha_hasta }}" class="form-control" onchange="this.form.submit()">
+  </div>
+  <div class="field" style="min-width:160px">
+    <label>TIPO</label>
+    <select name="tipo" class="form-control" onchange="this.form.submit()">
+      <option value="">Todos</option>
+      <option value="ingreso" {% if filtros.tipo == 'ingreso' %}selected{% endif %}>Ingresos</option>
+      <option value="gasto" {% if filtros.tipo == 'gasto' %}selected{% endif %}>Gastos</option>
+      <option value="transferencia" {% if filtros.tipo == 'transferencia' %}selected{% endif %}>Transferencias</option>
+    </select>
+  </div>
+  <div class="field" style="min-width:160px">
+    <label>CUENTA</label>
+    <select name="cuenta" class="form-control" onchange="this.form.submit()">
+      <option value="">Todas</option>
+      {% for cta in cuentas %}
+      <option value="{{ cta.pk }}" {% if filtros.cuenta == cta.pk|stringformat:"s" %}selected{% endif %}>{{ cta.nombre }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field" style="min-width:160px">
+    <label>CATEGORÍA</label>
+    <select name="categoria" class="form-control" onchange="this.form.submit()">
+      <option value="">Todas</option>
+      {% for cat in categorias %}
+      <option value="{{ cat.pk }}" {% if filtros.categoria == cat.pk|stringformat:"s" %}selected{% endif %}>{{ cat.nombre }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn btn-secondary" style="padding:10px 16px;font-size:13px">Filtrar</button>
+</form>
+
+<section class="summary-row">
+  <div class="summary-card ingresos">
+    <i class="fas fa-arrow-trend-up bg-icon"></i>
+    <div class="card-info">
+      <span class="card-label">Ingresos</span>
+      <span class="card-value positive">+RD$ {{ total_ingresos|dinero }}</span>
+    </div>
+  </div>
+  <div class="summary-card gastos">
+    <i class="fas fa-arrow-trend-down bg-icon"></i>
+    <div class="card-info">
+      <span class="card-label">Gastos</span>
+      <span class="card-value negative">-RD$ {{ total_gastos|dinero }}</span>
+    </div>
+  </div>
+  <div class="summary-card balance">
+    <i class="fas fa-scale-balanced bg-icon"></i>
+    <div class="card-info">
+      <span class="card-label">Balance</span>
+      <span class="card-value {% if balance >= 0 %}positive{% else %}negative{% endif %}">
+        RD$ {{ balance|dinero }}
+      </span>
+      <span style="font-size:11px;opacity:.7;display:block;margin-top:2px">Balance actual en cuentas</span>
+    </div>
+  </div>
+</section>
+
+<section class="table-section" id="tx-list">
+  {% include 'transactions/_lista_transacciones.html' %}
+</section>
+
+<div id="form-modal" class="modal-overlay">
+  <div class="modal" id="modal-content"></div>
+</div>
+{% endblock %}
