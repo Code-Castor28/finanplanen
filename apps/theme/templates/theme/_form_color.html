@@ -2,7 +2,7 @@
       hx-post="{% if object %}{% url 'theme:colores_editar' object.pk %}{% else %}{% url 'theme:colores_crear' %}{% endif %}"
       hx-target="this"
       hx-swap="outerHTML"
-      _="on htmx:beforeSend remove @open from #form-modal">
+      _="on htmx:beforeSend remove .open from #form-modal">
   {% csrf_token %}
   <div class="form-group">
     <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
@@ -28,7 +28,7 @@
     <button type="submit" class="btn-primary">
       <i class="fas fa-save"></i> {% if object %}Guardar{% else %}Crear{% endif %}
     </button>
-    <button type="button" class="btn-secondary" _="on click remove @open from #form-modal">
+    <button type="button" class="btn-secondary" _="on click remove .open from #form-modal">
       Cancelar
     </button>
   </div>

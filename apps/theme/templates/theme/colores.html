@@ -14,7 +14,7 @@
             hx-get="{% url 'theme:colores_crear' %}"
             hx-target="#modal-content"
             hx-trigger="click"
-            _="on htmx:afterOnLoad wait 10ms then add @open to #form-modal">
+            _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal">
       <i class="fas fa-plus"></i> Nuevo Color
     </button>
   </div>

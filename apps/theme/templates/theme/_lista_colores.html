@@ -21,13 +21,13 @@
         <button class="btn-sm"
                 hx-get="{% url 'theme:colores_editar' color.pk %}"
                 hx-target="#modal-content"
-                _="on htmx:afterOnLoad wait 10ms then add @open to #form-modal">
+                _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal">
           <i class="fas fa-edit"></i>
         </button>
         <button class="btn-sm btn-danger"
                 hx-get="{% url 'theme:colores_eliminar' color.pk %}"
                 hx-target="#modal-content"
-                _="on htmx:afterOnLoad wait 10ms then add @open to #form-modal">
+                _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal">
           <i class="fas fa-trash"></i>
         </button>
       </td>

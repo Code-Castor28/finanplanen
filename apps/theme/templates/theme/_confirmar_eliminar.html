@@ -5,11 +5,11 @@
         hx-post="{{ request.path }}"
         hx-target="this"
         hx-swap="outerHTML"
-        _="on htmx:beforeSend remove @open from #form-modal">
+        _="on htmx:beforeSend remove .open from #form-modal">
     {% csrf_token %}
     <div class="form-actions">
       <button type="submit" class="btn-danger"><i class="fas fa-trash"></i> Eliminar</button>
-      <button type="button" class="btn-secondary" _="on click remove @open from #form-modal">Cancelar</button>
+      <button type="button" class="btn-secondary" _="on click remove .open from #form-modal">Cancelar</button>
     </div>
   </form>
 </div>
