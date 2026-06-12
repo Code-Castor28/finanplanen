@@ -310,6 +310,44 @@ table .actions{display:flex;gap:8px}
 .profile-form{background:var(--sl,#fff);border-radius:16px;padding:32px;box-shadow:0 4px 12px rgba(26,35,126,.05)}
 .empty-hint{color:var(--ol,#767683);font-size:13px;grid-column:1/-1;padding:16px 0;text-align:center}
 
+/* ===== DESKTOP / GENERAL ENHANCEMENTS ===== */
+/* Color de selección de texto */
+::selection{background:rgba(26,35,126,.15);color:var(--os,#191c1e)}
+
+/* Placeholder */
+::placeholder{color:var(--olv,#c6c5d4);opacity:1}
+
+/* Focus visible para navegación por teclado */
+:focus-visible{outline:3px solid var(--pc,#1a237e);outline-offset:2px;border-radius:6px}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none}
+
+/* Hover en filas de tabla */
+table tbody tr{transition:background .12s}
+table tbody tr:hover td{background:var(--slw,#f2f4f7)}
+
+/* Stat-mini: micro-lift al hacer hover */
+.stat-mini{transition:box-shadow .2s,transform .2s}
+@media(hover:hover){.stat-mini:hover{box-shadow:0 8px 24px rgba(26,35,126,.1);transform:translateY(-2px)}}
+
+/* Pay-item: fondo sutil al hover */
+.pay-item{border-radius:8px;transition:background .12s;margin:0 -8px;padding:12px 8px;cursor:default}
+.pay-item:last-child{border-bottom:none}
+@media(hover:hover){.pay-item:hover{background:var(--slw,#f2f4f7)}}
+
+/* Card actions: visible en touch, solo al hover en desktop */
+@media(hover:none){.card-actions{opacity:1!important}}
+
+/* Wallet dots: mayor tap target */
+.wallet .dots{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .15s}
+@media(hover:hover){.wallet .dots:hover{background:var(--sc,#eceef1)}}
+
+/* Balance hero botones hover activos */
+.bh-btn:active{transform:scale(.96)}
+
+/* Sidebar active item: barra indicadora izquierda */
+.nav-item.active{position:relative}
+.nav-item.active::before{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:4px;height:24px;background:#fff;border-radius:0 4px 4px 0;opacity:.8}
+
 /* ===== RESPONSIVE ===== */
 @media(max-width:1024px){
   .grid-mid{grid-template-columns:1fr 1fr}
@@ -360,4 +398,24 @@ table .actions{display:flex;gap:8px}
 @media(max-width:480px){
   .bh-amount{font-size:28px}
   .topbar-title{font-size:17px}
+}
+
+/* ===== LARGE SCREENS (PC/LAPTOP) ===== */
+@media(min-width:1280px){
+  .content{padding:36px 52px 100px}
+  .topbar{padding:18px 52px}
+  .page-head h1{font-size:28px}
+  .grid-mid,.grid-top,.grid-bot,.grid-reports{gap:24px;margin-bottom:24px}
+  .stat-mini{padding:22px}
+  .bottom-grid{gap:24px}
+  .wallet-grid{gap:20px}
+  .card-pad{padding:28px}
+  .balance-hero{padding:32px 40px}
+  .form-group{margin-bottom:22px}
+}
+
+/* Pantallas muy anchas: limitar max-width del contenido */
+@media(min-width:1600px){
+  .main{max-width:1380px}
+  .content{padding:40px 64px 100px}
 }
