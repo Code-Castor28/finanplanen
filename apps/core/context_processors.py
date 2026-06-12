@@ -10,8 +10,8 @@ SECTION_MAP = {
     'transactions:ingresos': 'ingresos',
     'transactions:gastos': 'gastos',
     'transfers:lista': 'transfers',
-    'theme:colores_lista': 'theme',
-    'theme:iconos_lista': 'theme',
+    'theme:colores_lista': 'theme_colores',
+    'theme:iconos_lista': 'theme_iconos',
     'users:perfil': 'profile',
 }
 
