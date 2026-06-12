@@ -4,3 +4,7 @@ staticfiles/
 media/
 pip-log.txt
 __pycache__/
+.opencode/
+.mypy_cache/
+.pytest_cache/
+.vscode/
