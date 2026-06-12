@@ -150,10 +150,19 @@ table .actions{display:flex;gap:8px}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .toast i{font-size:14px}.toast.success i{color:#66bb6a}.toast.error i{color:#ef5350}.toast.info i{color:#42a5f5}
 
-/* ===== SCROLLBAR ===== */
-::-webkit-scrollbar{width:5px;height:5px}
+/* ===== SCROLLBAR GLOBAL ===== */
+::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--olv,#c6c5d4);border-radius:3px}
+::-webkit-scrollbar-thumb{background:var(--olv,#c6c5d4);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--ol,#767683)}
+
+/* Scrollbar del sidebar — oscuro, apenas visible */
+.sidebar-nav{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
+.sidebar-nav::-webkit-scrollbar{width:3px}
+.sidebar-nav::-webkit-scrollbar-track{background:transparent}
+.sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.0);border-radius:4px;transition:background .2s}
+.sidebar-nav:hover::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15)}
+.sidebar-nav::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.3)}
 
 /* ===== DASHBOARD SPECIFIC ===== */
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
