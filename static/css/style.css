@@ -89,7 +89,8 @@ img{max-width:100%;display:block}
 /* ===== FORMS ===== */
 .form-group{margin-bottom:20px}
 .form-group label,.field label{display:block;font-size:12px;font-weight:700;color:var(--ov,#454652);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
-.form-group input,.form-group select,.form-group textarea,.field input,.field select{width:100%;padding:14px 16px;min-height:48px;border:1.5px solid var(--olv,#c6c5d4);border-radius:12px;font-family:inherit;font-size:16px;color:var(--os,#191c1e);background:var(--sl,#fff);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+.form-group input:not([type="checkbox"]):not([type="radio"]),.form-group select,.form-group textarea,.field input:not([type="checkbox"]):not([type="radio"]),.field select{width:100%;padding:14px 16px;min-height:48px;border:1.5px solid var(--olv,#c6c5d4);border-radius:12px;font-family:inherit;font-size:16px;color:var(--os,#191c1e);background:var(--sl,#fff);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+.checkbox-label input[type="checkbox"], .form-group input[type="checkbox"]{width:22px;height:22px;margin:0;cursor:pointer;accent-color:var(--pc,#1a237e);flex-shrink:0;border-radius:6px;outline:none;border:none;box-shadow:none}
 .form-group select,.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23767683' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:44px}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus,.field input:focus,.field select:focus{border-color:var(--pc,#1a237e);box-shadow:0 0 0 4px rgba(26,35,126,.1)}
 .form-group textarea{min-height:100px;resize:vertical;line-height:1.6}
