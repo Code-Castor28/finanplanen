@@ -140,8 +140,8 @@ table .actions{display:flex;gap:8px}
 .color-dot.sel{border-color:var(--os,#191c1e)}
 
 /* ===== TOAST ===== */
-.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--is,#2d3133);color:var(--io,#eff1f4);padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;box-shadow:0 12px 32px rgba(26,35,126,.12);z-index:2000;transition:transform .3s;display:flex;align-items:center;gap:8px;white-space:nowrap;pointer-events:none}
-.toast.show{transform:translateX(-50%) translateY(0)}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--is,#2d3133);color:var(--io,#eff1f4);padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;box-shadow:0 12px 32px rgba(26,35,126,.12);z-index:2000;transition:transform .3s,opacity .3s;display:flex;align-items:center;gap:8px;white-space:nowrap;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .toast i{font-size:14px}.toast.success i{color:#66bb6a}.toast.error i{color:#ef5350}.toast.info i{color:#42a5f5}
 
 /* ===== SCROLLBAR ===== */
