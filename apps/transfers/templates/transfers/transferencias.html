@@ -67,7 +67,7 @@
           <select name="origen" class="form-control" required>
             <option value="">Seleccionar...</option>
             {% for cta in cuentas %}
-            <option value="{{ cta.pk }}">{{ cta.nombre }} — RD$ {{ cta.balance|dinero }}</option>
+            <option value="{{ cta.pk }}">{{ cta }}</option>
             {% endfor %}
           </select>
         </div>
@@ -76,7 +76,7 @@
           <select name="destino" class="form-control" required>
             <option value="">Seleccionar...</option>
             {% for cta in cuentas %}
-            <option value="{{ cta.pk }}">{{ cta.nombre }} — RD$ {{ cta.balance|dinero }}</option>
+            <option value="{{ cta.pk }}">{{ cta }}</option>
             {% endfor %}
           </select>
         </div>

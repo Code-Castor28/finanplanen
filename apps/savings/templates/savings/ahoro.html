@@ -256,7 +256,7 @@
           <select name="cuenta" class="form-control" required>
             <option value="">Seleccionar...</option>
             {% for c in cuentas %}
-            <option value="{{ c.pk }}">{{ c.nombre }} ({{ c.get_tipo_display }}) — RD$ {{ c.balance|dinero }}</option>
+            <option value="{{ c.pk }}">{{ c }}</option>
             {% endfor %}
           </select>
         </div>

@@ -87,7 +87,7 @@
           <select name="cuenta" class="form-control" required>
             <option value="">Seleccionar...</option>
             {% for cta in cuentas %}
-            <option value="{{ cta.pk }}">{{ cta.nombre }}</option>
+            <option value="{{ cta.pk }}">{{ cta }}</option>
             {% endfor %}
           </select>
         </div>

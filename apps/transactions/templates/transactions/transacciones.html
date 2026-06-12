@@ -70,7 +70,7 @@
     <select name="cuenta" class="form-control" onchange="this.form.submit()">
       <option value="">Todas</option>
       {% for cta in cuentas %}
-      <option value="{{ cta.pk }}" {% if filtros.cuenta == cta.pk|stringformat:"s" %}selected{% endif %}>{{ cta.nombre }}</option>
+      <option value="{{ cta.pk }}" {% if filtros.cuenta == cta.pk|stringformat:"s" %}selected{% endif %}>{{ cta }}</option>
       {% endfor %}
     </select>
   </div>
