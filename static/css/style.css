@@ -15,8 +15,7 @@ body{font-family:'Inter',sans-serif;background:var(--slw,#f2f4f7);color:var(--os
 --is:#2d3133;--io:#eff1f4;
 --s2:0 12px 32px rgba(26,35,126,.12);
 --r:.5rem;--rm:.75rem;--rl:1rem;--rxl:1.5rem;--rf:9999px}
-a{color:var(--pc,#1a237e);text-decoration:none}
-a:hover{text-decoration:underline}
+a{color:var(--pc,#1a237e);text-decoration:none;transition:color .15s}
 img{max-width:100%;display:block}
 
 /* ===== LAYOUT ===== */
