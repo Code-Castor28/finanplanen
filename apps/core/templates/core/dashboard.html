@@ -8,6 +8,12 @@
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+.chip-pos { background: var(--incb) !important; color: var(--inc) !important; }
+.chip-neg { background: var(--expb) !important; color: var(--exp) !important; }
+.text-inc { color: var(--inc) !important; }
+.text-exp { color: var(--exp) !important; }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -45,7 +51,7 @@
   </div>
   <div class="stat-mini">
     <div class="sm-top"><div class="sm-icon ic3"><i class="fas fa-piggy-bank"></i></div><span class="sm-label">Ahorro neto</span></div>
-    <div class="sm-value" id="statSav" style="color:{% if ahorro_neto >= 0 %}var(--inc){% else %}var(--exp){% endif %}">{% if ahorro_neto >= 0 %}+{% endif %}RD$ {{ ahorro_neto|dinero }}</div>
+    <div class="sm-value {% if ahorro_neto >= 0 %}text-inc{% else %}text-exp{% endif %}" id="statSav">{% if ahorro_neto >= 0 %}+{% endif %}RD$ {{ ahorro_neto|dinero }}</div>
     <div class="sm-change pos"><i class="fas fa-arrow-up"></i> +{{ ahorro_cambio|floatformat:1 }}% vs mes anterior</div>
   </div>
 </section>
@@ -90,7 +96,7 @@
           {% for r in recientes %}
           <tr>
             <td style="font-weight:600">{{ r.comercio }}<span style="display:block;font-size:11px;color:var(--ol);margin-top:1px">{{ r.fecha|date:"d M Y" }}</span></td>
-            <td><span class="chip" style="background:{{ r.categoria_bg }};color:{{ r.categoria_color }}"><i class="fas {{ r.categoria_icono }}"></i> {{ r.categoria|upper }}</span></td>
+            <td><span class="chip dyn-chip" data-bg="{{ r.categoria_bg }}" data-color="{{ r.categoria_color }}"><i class="fas {{ r.categoria_icono }}"></i> {{ r.categoria|upper }}</span></td>
             <td class="{% if r.tipo == 'ingreso' %}pos{% else %}neg{% endif %}" style="text-align:right;font-weight:600">{% if r.tipo == 'ingreso' %}+{% endif %}RD$ {{ r.monto|dinero }}</td>
           </tr>
           {% empty %}
@@ -122,7 +128,7 @@
               <td>RD$ {{ s.ingresos|dinero }}</td>
               <td>RD$ {{ s.gastos|dinero }}</td>
               <td class="{% if s.superavit %}pos{% else %}neg{% endif %}" style="font-weight:600">{% if s.superavit %}+{% endif %}RD$ {{ s.ahorro|dinero }}</td>
-              <td><span class="chip" style="background:{% if s.superavit %}var(--incb){% else %}var(--expb){% endif %};color:{% if s.superavit %}var(--inc){% else %}var(--exp){% endif %}"><i class="fas {% if s.superavit %}fa-circle-check{% else %}fa-triangle-exclamation{% endif %}"></i> {% if s.superavit %}SUPER&Aacute;VIT{% else %}D&Eacute;FICIT{% endif %}</span></td>
+              <td><span class="chip {% if s.superavit %}chip-pos{% else %}chip-neg{% endif %}"><i class="fas {% if s.superavit %}fa-circle-check{% else %}fa-triangle-exclamation{% endif %}"></i> {% if s.superavit %}SUPER&Aacute;VIT{% else %}D&Eacute;FICIT{% endif %}</span></td>
             </tr>
             {% empty %}
             <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ol)">No hay datos disponibles.</td></tr>
@@ -149,15 +155,33 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script id="months-data" type="application/json">{{ months_json|safe }}</script>
+<script id="income-data" type="application/json">{{ income_json|safe }}</script>
+<script id="expense-data" type="application/json">{{ expense_json|safe }}</script>
+<script id="savings-data" type="application/json">{{ savings_json|safe }}</script>
+<script id="cat-data" type="application/json">{{ cat_json|safe }}</script>
+<script id="savings-rows-data" type="application/json">
+[
+  {% for s in savings_rows %}
+  ["{{ s.mes|escapejs }}", "{{ s.ingresos|escapejs }}", "{{ s.gastos|escapejs }}", "{{ s.ahorro|escapejs }}", "{% if s.superavit %}SUPERÁVIT{% else %}DÉFICIT{% endif %}"]{% if not forloop.last %},{% endif %}
+  {% endfor %}
+]
+</script>
 <script>
 (function(){
   "use strict";
 
-  var months = {{ months_json|safe }};
-  var incomeData = {{ income_json|safe }};
-  var expenseData = {{ expense_json|safe }};
-  var savingsData = {{ savings_json|safe }};
-  var catData = {{ cat_json|safe }};
+  // Aplicar colores a los chips dinámicos sin causar errores en el IDE
+  document.querySelectorAll('.dyn-chip').forEach(function(el) {
+    el.style.backgroundColor = el.getAttribute('data-bg');
+    el.style.color = el.getAttribute('data-color');
+  });
+
+  var months = JSON.parse(document.getElementById('months-data').textContent);
+  var incomeData = JSON.parse(document.getElementById('income-data').textContent);
+  var expenseData = JSON.parse(document.getElementById('expense-data').textContent);
+  var savingsData = JSON.parse(document.getElementById('savings-data').textContent);
+  var catData = JSON.parse(document.getElementById('cat-data').textContent);
 
   document.getElementById('refreshBtn').addEventListener('click', function(){
     showToast('Datos actualizados');
@@ -171,10 +195,7 @@
 
   document.getElementById('exportCsv').addEventListener('click', function(){
     var headers = ['Mes','Ingresos','Gastos','Ahorro','Estado'];
-    var rows = [];
-    {% for s in savings_rows %}
-    rows.push(['{{ s.mes }}','{{ s.ingresos }}','{{ s.gastos }}','{{ s.ahorro }}','{% if s.superavit %}SUPERÁVIT{% else %}DÉFICIT{% endif %}']);
-    {% endfor %}
+    var rows = JSON.parse(document.getElementById('savings-rows-data').textContent);
     var csv = '\uFEFF' + headers.join(';') + '\n' + rows.map(function(r){return r.join(';')}).join('\n');
     var a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
@@ -361,8 +382,8 @@
         }
       },
       scales: {
-        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 12, weight: '600', family: "'Inter', sans-serif" }, color: '#6b7280' } },
-        y: { stacked: true, grid: { color: gridColor }, border: { display: false }, ticks: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#9ca3af', callback: function(v){ return 'RD$' + (v/1000).toFixed(0) + 'k'; } } }
+        x: { grid: { display: false }, ticks: { font: { size: 12, weight: '600', family: "'Inter', sans-serif" }, color: '#6b7280' } },
+        y: { grid: { color: gridColor }, border: { display: false }, ticks: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#9ca3af', callback: function(v){ return 'RD$' + (v/1000).toFixed(0) + 'k'; } } }
       }
     }
   });
