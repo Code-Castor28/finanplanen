@@ -1,0 +1,34 @@
+<div class="modal-head">
+  <h3>{% if object %}Editar Presupuesto{% else %}Nuevo Presupuesto{% endif %}</h3>
+  <button class="modal-close" _="on click remove .open from #form-modal"><i class="fas fa-xmark"></i></button>
+</div>
+<p class="sub">Define el límite mensual para tus gastos en esta categoría.</p>
+<form method="post"
+      hx-post="{% if object %}{% url 'budgets:editar' object.pk %}{% else %}{% url 'budgets:crear' %}{% endif %}"
+      hx-target="this"
+      hx-swap="outerHTML"
+      _="on htmx:beforeSend remove .open from #form-modal">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="{{ form.categoria.id_for_label }}">{{ form.categoria.label }}</label>
+    {{ form.categoria }}
+    {% for error in form.categoria.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div class="form-group">
+    <label for="{{ form.monto_limite.id_for_label }}">{{ form.monto_limite.label }}</label>
+    {{ form.monto_limite }}
+    {% for error in form.monto_limite.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  
+  <input type="hidden" name="mes" value="{% if object %}{{ object.mes }}{% else %}{% now 'n' %}{% endif %}">
+  <input type="hidden" name="año" value="{% if object %}{{ object.año }}{% else %}{% now 'Y' %}{% endif %}">
+
+  <div class="modal-actions">
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-save"></i> {% if object %}Guardar{% else %}Crear{% endif %}
+    </button>
+    <button type="button" class="btn btn-secondary" _="on click remove .open from #form-modal">
+      Cancelar
+    </button>
+  </div>
+</form>

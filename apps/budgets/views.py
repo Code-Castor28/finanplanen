@@ -85,7 +85,7 @@ class PresupuestoLista(InquilinoMixin, ListView):
 class PresupuestoCrear(InquilinoMixin, CreateView):
     model = Presupuesto
     form_class = PresupuestoForm
-    template_name = 'theme/_form_presupuesto.html'
+    template_name = 'budgets/_form_presupuesto.html'
 
     def get_success_url(self):
         return reverse_lazy('budgets:lista')
@@ -105,7 +105,7 @@ class PresupuestoCrear(InquilinoMixin, CreateView):
 class PresupuestoEditar(InquilinoMixin, UpdateView):
     model = Presupuesto
     form_class = PresupuestoForm
-    template_name = 'theme/_form_presupuesto.html'
+    template_name = 'budgets/_form_presupuesto.html'
 
     def get_success_url(self):
         return reverse_lazy('budgets:lista')

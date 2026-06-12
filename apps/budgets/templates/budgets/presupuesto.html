@@ -281,7 +281,7 @@
   <div class="banner-top">
     <h2>Resumen Mensual</h2>
     <div class="banner-actions">
-      <button class="btn-banner accent" id="newBudgetBtn"><i class="fas fa-plus"></i> Nuevo Presupuesto</button>
+      <button class="btn-banner accent" id="newBudgetBtn" hx-get="{% url 'budgets:crear' %}" hx-target="#modal-content" hx-trigger="click" _="on htmx:afterOnLoad wait 10ms then add .open to #form-modal"><i class="fas fa-plus"></i> Nuevo Presupuesto</button>
       <button class="btn-banner" id="aiAnalysisBtn"><i class="fas fa-wand-magic-sparkles"></i> An&aacute;lisis IA</button>
     </div>
   </div>
@@ -386,36 +386,7 @@
   {% endfor %}
 </section>
 
-<div class="new-cat-card">
-  <div class="new-cat-header">
-    <div class="nc-icon"><i class="fas fa-folder-plus"></i></div>
-    <h3>Nueva Categor&iacute;a</h3>
-  </div>
-  <p class="new-cat-desc">Define un nuevo l&iacute;mite mensual para tus gastos personalizados.</p>
-  <form class="new-cat-form" id="newCatForm" method="post"
-        hx-post="{% url 'budgets:crear' %}"
-        hx-target="this"
-        hx-swap="outerHTML"
-        _="on htmx:beforeSend remove .open from #form-modal">
-    {% csrf_token %}
-    <div class="field">
-      <label for="id_categoria">Categor&iacute;a</label>
-      <select name="categoria" id="id_categoria" class="form-control" required>
-        <option value="">Seleccionar...</option>
-        {% for c in categorias %}
-        <option value="{{ c.pk }}">{{ c.nombre }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="field">
-      <label for="id_monto_limite">L&iacute;mite Mensual (RD$)</label>
-      <input type="number" name="monto_limite" id="id_monto_limite" step="0.01" min="1" placeholder="Ej: 150.00" required class="form-control">
-    </div>
-    <input type="hidden" name="mes" value="{{ hoy.month }}">
-    <input type="hidden" name="año" value="{{ hoy.year }}">
-    <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Agregar</button>
-  </form>
-</div>
+
 
 <div id="form-modal" class="modal-overlay">
   <div class="modal" id="modal-content"></div>
@@ -454,10 +425,7 @@
       });
     });
 
-    document.getElementById('newBudgetBtn').addEventListener('click', function(){
-      document.getElementById('id_categoria').focus();
-      document.getElementById('id_categoria').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    });
+
 
     document.getElementById('aiAnalysisBtn').addEventListener('click', function(){
       document.getElementById('aiInsight').scrollIntoView({ behavior: 'smooth', block: 'center' });
