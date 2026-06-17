@@ -20,16 +20,11 @@ class Command(BaseCommand):
         key = ec.generate_private_key(ec.SECP256R1(), default_backend())
 
         priv_raw = key.private_bytes(
-            encoding=serialization.Encoding.PEM,
+            encoding=serialization.Encoding.DER,
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.NoEncryption(),
         )
-        priv_b64 = (
-            priv_raw.decode()
-            .replace('-----BEGIN PRIVATE KEY-----\n', '')
-            .replace('\n-----END PRIVATE KEY-----\n', '')
-            .replace('\n', '')
-        )
+        priv_b64 = base64.b64encode(priv_raw).decode()
 
         pub_raw = key.public_key().public_bytes(
             encoding=serialization.Encoding.X962,

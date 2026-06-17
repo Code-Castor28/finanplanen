@@ -1,8 +1,6 @@
-import base64
 from pathlib import Path
 
 import environ
-from cryptography.hazmat.primitives import serialization
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -105,14 +103,13 @@ LOGIN_URL = '/acceso/ingresar/'
 VAPID_PUBLIC_KEY = env('VAPID_PUBLIC_KEY', default='')
 _raw_vapid_private = env('VAPID_PRIVATE_KEY', default='')
 if _raw_vapid_private and not _raw_vapid_private.startswith('-----BEGIN '):
-    _key = serialization.load_der_private_key(
-        base64.b64decode(_raw_vapid_private.strip()), password=None,
+    _b64 = _raw_vapid_private.strip()
+    _lines = [_b64[i:i+64] for i in range(0, len(_b64), 64)]
+    VAPID_PRIVATE_KEY = (
+        '-----BEGIN PRIVATE KEY-----\n'
+        + '\n'.join(_lines)
+        + '\n-----END PRIVATE KEY-----\n'
     )
-    VAPID_PRIVATE_KEY = _key.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.PKCS8,
-        encryption_algorithm=serialization.NoEncryption(),
-    ).decode()
 else:
     VAPID_PRIVATE_KEY = _raw_vapid_private
 VAPID_ADMIN_EMAIL = env('VAPID_ADMIN_EMAIL', default='admin@example.com')
