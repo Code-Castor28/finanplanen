@@ -101,3 +101,9 @@
 - [x] 15.9 Tarea Celery movida a `apps/notifications/tasks.py`: pushes reales con pywebpush (T-7, T-5, T-2, T-0)
 - [x] 15.10 Agregar enlace "Notificaciones" en sidebar de `base.html`
 - [x] 15.11 Migrations + `python manage.py check` 0 issues
+
+## Fase 16 — Sesión por Inactividad (Idle Timeout)
+- [x] 16.1 JS idle detection en `static/js/main.js` (15 min sin actividad)
+- [x] 16.2 Modal countdown 60s en `templates/base.html`
+- [x] 16.3 Banner "sesión expirada" en `login.html` vía sessionStorage
+- [x] 16.4 Redirección a `/acceso/salir/` al llegar a 0

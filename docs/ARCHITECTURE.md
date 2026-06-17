@@ -11,7 +11,8 @@ Aplicación web de gestión financiera personal construida con Django 4 + HTMX. 
 | Backend | Django 4.x (Python 3.11+) |
 | Frontend | Django Templates + HTMX (sin framework JS) |
 | Base de datos | MySQL 8.x (todos los entornos) |
-| Cola de tareas | Celery + Redis (recordatorios email) |
+| Cola de tareas | Celery + Redis (recordatorios email + push) |
+| Notificaciones push | pywebpush + VAPID + Service Worker |
 | Servidor WSGI | Gunicorn |
 | Proxy inverso | Nginx |
 | CSS | CSS puro |
@@ -26,6 +27,7 @@ finanplanen/
 │   ├── budgets/            # Presupuestos mensuales por categoría
 │   ├── categories/         # Categorías + Etiquetas
 │   ├── core/               # Inicio, dashboard, utilidades compartidas
+│   ├── notifications/      # Suscripciones push, PWA, tarea Celery recordatorios
 │   ├── savings/            # Metas de ahorro + depósitos
 │   ├── theme/              # Registro de colores e iconos, variables CSS
 │   ├── transactions/       # CRUD transacciones (ingresos/gastos/tarjeta)
@@ -41,7 +43,8 @@ finanplanen/
 │   ├── js/
 │   └── img/
 ├── templates/
-│   └── base.html           # Layout maestro (sidebar, navbar, colores, estructura)
+│   ├── base.html           # Layout maestro (sidebar, navbar, colores, estructura)
+│   └── sw.js               # Service Worker (notificaciones push PWA)
 ├── media/                  # Archivos subidos (avatares, comprobantes)
 ├── requirements.txt        # Dependencias (Django, django-environ, etc.)
 ├── manage.py
@@ -49,7 +52,7 @@ finanplanen/
 └── AGENTS.md
 ```
 
-## Modelo de Datos (13 Modelos)
+## Modelo de Datos (14 Modelos)
 
 ### 1. Inquilino (Tenant)
 | Campo | Tipo | Notas |
@@ -239,6 +242,17 @@ finanplanen/
 | actualizado | DateTimeField | auto_now |
 | **Unique** | | inquilino + slug |
 
+### 14. SuscripcionPush
+| Campo | Tipo | Notas |
+|---|---|---|
+| id | AutoField | PK |
+| usuario | ForeignKey(Usuario) | CASCADE |
+| endpoint | TextField | Unique — URL de Google/Apple FCM |
+| p256dh | TextField | Llave pública del navegador (cifrado) |
+| auth | TextField | Token de autenticación del navegador |
+| creado_en | DateTimeField | auto_now_add |
+| activo | BooleanField | Default True |
+
 ## Relaciones entre Entidades
 
 ```
@@ -279,6 +293,7 @@ Color (1) ──< MetaAhorro (N)         [FK color]
 Icono (1) ──< Cuenta (N)             [FK icono]
 Icono (1) ──< Categoria (N)          [FK icono]
 Icono (1) ──< MetaAhorro (N)         [FK icono]
+Usuario (1) ──< SuscripcionPush (N)   [FK usuario]
 ```
 
 ## Diseño de URLs
@@ -338,7 +353,11 @@ Icono (1) ──< MetaAhorro (N)         [FK icono]
 /tema/iconos/                         → tema:iconos_lista
 /tema/iconos/crear/                   → tema:iconos_crear
 /tema/iconos/<id>/editar/             → tema:iconos_editar
-/tema/iconos/<id>/eliminar/           → tema:iconos_eliminar
+/tema/iconos/<id>/eliminar/          → tema:iconos_eliminar
+
+/notificaciones/api/guardar/        → notificaciones:guardar
+/notificaciones/api/eliminar/       → notificaciones:eliminar
+/sw.js                              → service-worker (TemplateView)
 ```
 
 ## Decisiones Arquitectónicas Clave
@@ -348,7 +367,7 @@ Icono (1) ──< MetaAhorro (N)         [FK icono]
 3. **Modelo Transaccion universal** — ingresos, gastos y pagos de tarjeta son registros `Transaccion`; signo siempre positivo, campo `tipo` discrimina
 4. **Todas las páginas extienden `base.html`** — layout consistente con sidebar, colores, header y footer
 5. **Transferencia crea 2 registros Transaccion** — débito de origen + crédito a destino, más un registro `Transferencia` de enlace
-6. **Tarjetas de crédito como Cuentas** — con `fecha_corte` y `fecha_pago`; transacciones pendientes tienen `pagado=False`; tareas Celery envían recordatorios email a T-7, T-5, T-2 antes de `fecha_pago`
+6. **Tarjetas de crédito como Cuentas** — con `fecha_corte` y `fecha_pago`; transacciones pendientes tienen `pagado=False`; tareas Celery envían recordatorios push a T-7, T-5, T-2 y el mismo día del pago
 7. **Etiquetas como sub-items** — M2M con Categoria para pertenecer a múltiples categorías; sin subcategorías jerárquicas
 8. **Presupuesto.monto_gastado** — desnormalizado, actualizado vía signal Django al guardar/borrar Transaccion
 9. **Todos los montos** — almacenados como `DecimalField(max_digits=12, decimal_places=2)`
@@ -356,6 +375,7 @@ Icono (1) ──< MetaAhorro (N)         [FK icono]
 11. **Soft-delete** — modelos tienen campo `activo` en lugar de borrado físico
 12. **Aislamiento por Inquilino** — todos los modelos de datos llevan FK a `Inquilino`, auto-poblado desde `usuario.inquilino`. Cada usuario es su propio inquilino (1:1). El modelo `Inquilino` existe para futuras necesidades SaaS (facturación, config, plan).
 13. **Colores e iconos dinámicos** — `Color` e `Icono` son modelos registrados por el usuario en la app `tema`. `Cuenta`, `Categoria`, `Etiqueta` y `MetaAhorro` los referencian vía FK. Los colores generan propiedades CSS personalizadas (`--clr-{slug}`) inyectadas en `base.html` vía template tag.
+14. **Notificaciones push sin APIs externas** — usando pywebpush + VAPID. El servidor Django envía notificaciones directo al navegador del usuario vía Google FCM / Apple APNs, sin costo. El Service Worker `sw.js` recibe el mensaje incluso con la app cerrada.
 
 ## Sistema de Variables CSS
 
@@ -380,12 +400,29 @@ Todas las plantillas referencian colores vía `var(--clr-{slug})` en lugar de va
 1. Usuario compra algo → se crea `Transaccion` con `tipo='CP'`, `pagado=False`, `cuenta=tarjeta_credito`
 2. Cuando el usuario paga el extracto → `Transferencia` desde cuenta débito a cuenta crédito
 3. Al pagar, todas las `Transaccion` pendientes de esa tarjeta con `fecha <= fecha_pago` se marcan `pagado=True`
-4. Tarea periódica Celery revisa `fecha_pago` diariamente y envía recordatorios email a T-7, T-5, T-2
+4. Tarea periódica Celery revisa `fecha_pago` diariamente y envía notificaciones push a T-7, T-5, T-2 y el día del pago
 
 ## Tareas Celery
 
-| Tarea | Horario | Descripción |
-|---|---|---|
-| revisar_transferencias_recurrentes | Diario | Crea Transferencia + Transacciones para recurrentes vencidas |
-| revisar_recordatorios_tarjeta | Diario | Envía recordatorios email de fechas de pago próximas |
-| actualizar_progreso_ahorros | Diario | (Opcional) Reglas de auto-ahorro |
+| Tarea | Horario | Ubicación | Descripción |
+|---|---|---|---|
+| ejecutar_recurrencias | 06:00 diario | `apps.transfers.tasks` | Crea Transferencias para recurrentes vencidas |
+| enviar_recordatorios_push | 09:00 diario | `apps.notifications.tasks` | Envía notificaciones push (T-7, T-5, T-2, T-0) vía pywebpush |
+
+## Flujo de Notificaciones Push
+
+```
+Usuario activa alertas en Perfil
+  → JS registra Service Worker /sw.js
+  → Navegador genera { endpoint, p256dh, auth }
+  → POST /notificaciones/api/guardar/ → SuscripcionPush en MySQL
+  ↓
+09:00 — Celery Beat ejecuta enviar_recordatorios_push
+  → Consulta tarjetas crédito activas
+  → Calcula próxima fecha de pago
+  → Si diff = 7, 5, 2 ó 0 días → webpush() vía pywebpush
+  → Google/Apple FCM entrega al dispositivo
+  → sw.js muestra notificación nativa
+  ↓
+Si el push responde 404/410 → SuscripcionPush.delete() (limpieza automática)
+```
