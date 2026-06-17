@@ -1,0 +1,28 @@
+<div class="card" style="margin-top:2rem">
+  <div class="panel-head"><i class="fas fa-bell"></i> Notificaciones de Pago</div>
+  <div class="card-pad">
+    <p>Recibe alertas en tu teléfono antes de cada fecha de pago de tus tarjetas de crédito.</p>
+
+    <div id="push-container">
+      <button id="btn-activar-push" class="btn btn-primary" style="display:none">
+        <i class="fas fa-bell"></i> Activar alertas
+      </button>
+      <button id="btn-desactivar-push" class="btn btn-secondary" style="display:none">
+        <i class="fas fa-bell-slash"></i> Desactivar alertas
+      </button>
+      <p id="push-no-soportado" style="display:none;color:#888;margin-top:0.5rem">
+        Tu navegador no soporta notificaciones push.
+      </p>
+    </div>
+
+    <div id="ios-instrucciones" style="display:none;margin-top:0.5rem;padding:0.75rem;background:#e3f2fd;border-radius:8px;font-size:0.9rem">
+      <strong>📱 iPhone:</strong> Para recibir alertas, toca <strong>Compartir ↑</strong> en Safari y selecciona
+      <strong>"Agregar a pantalla de inicio"</strong>. Luego vuelve aquí y activa las alertas.
+    </div>
+  </div>
+</div>
+
+<script>
+  window.VAPID_PUBLIC_KEY = "{{ vapid_public_key }}";
+</script>
+<script src="/static/js/push-notifications.js"></script>
