@@ -40,4 +40,46 @@
     toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 3000);
   };
   window.toast = window.showToast;
+
+  /* Session idle timeout — 15 min inactividad → 60s cuenta regresiva → logout */
+  var IDLE_TIMEOUT = 5 * 60 * 1000;
+  var COUNTDOWN = 30;
+  var idleTimer, countdownInterval;
+  var idleModal = document.getElementById('idle-modal');
+  var countdownEl = document.getElementById('idle-countdown');
+  var continueBtn = document.getElementById('idle-continue');
+
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    clearInterval(countdownInterval);
+    if (idleModal) idleModal.classList.remove('open');
+    idleTimer = setTimeout(showIdleWarning, IDLE_TIMEOUT);
+  }
+
+  function showIdleWarning() {
+    if (!idleModal) return;
+    idleModal.classList.add('open');
+    var remaining = COUNTDOWN;
+    if (countdownEl) countdownEl.textContent = remaining;
+    countdownInterval = setInterval(function() {
+      remaining--;
+      if (countdownEl) countdownEl.textContent = remaining;
+      if (remaining <= 0) {
+        clearInterval(countdownInterval);
+        sessionStorage.setItem('sesion_expirada', '1');
+        window.location.href = '/acceso/salir/';
+      }
+    }, 1000);
+  }
+
+  if (window.location.pathname.indexOf('/acceso/') === -1) {
+    var activityEvents = ['mousedown', 'mousemove', 'click', 'keydown', 'touchstart', 'scroll', 'wheel'];
+    for (var i = 0; i < activityEvents.length; i++) {
+      document.addEventListener(activityEvents[i], resetIdleTimer);
+    }
+    resetIdleTimer();
+    if (continueBtn) {
+      continueBtn.addEventListener('click', resetIdleTimer);
+    }
+  }
 })();
