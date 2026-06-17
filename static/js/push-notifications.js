@@ -22,6 +22,14 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     if (!btnActivar) return;
 
+    if (!window.VAPID_PUBLIC_KEY) {
+        if (noSoportado) {
+            noSoportado.style.display = 'block';
+            noSoportado.textContent = 'Notificaciones push no configuradas. Contacta al administrador.';
+        }
+        return;
+    }
+
     const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     const esPWA = window.matchMedia('(display-mode: standalone)').matches;
 
@@ -35,7 +43,18 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
-    const registro = await navigator.serviceWorker.register('/sw.js');
+    let registro;
+    try {
+        registro = await navigator.serviceWorker.register('/sw.js');
+    } catch (err) {
+        console.warn('Service Worker no disponible:', err);
+        if (noSoportado) {
+            noSoportado.style.display = 'block';
+            noSoportado.textContent = 'El Service Worker no está disponible. Recarga la página o contacta al administrador.';
+        }
+        return;
+    }
+
     const suscripcion = await registro.pushManager.getSubscription();
 
     if (suscripcion) {
