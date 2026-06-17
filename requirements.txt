@@ -15,7 +15,7 @@ click-plugins==1.1.1.2
 click-repl==0.3.0
 colorama==0.4.6
 cryptography==49.0.0
-Django==4.2.20
+Django==4.2.30
 django-environ==0.13.0
 frozenlist==1.8.0
 gunicorn==26.0.0
