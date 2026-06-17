@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from pywebpush import webpush, WebPushException
 from apps.notifications.models import SuscripcionPush
+from apps.notifications.utils import get_vapid_private_key_pem
 
 
 class Command(BaseCommand):
@@ -31,6 +32,12 @@ class Command(BaseCommand):
         titulo = options['titulo']
         cuerpo = options['cuerpo']
         usuario_filter = options['usuario']
+
+        try:
+            vapid_key_pem = get_vapid_private_key_pem()
+        except ValueError as e:
+            self.stdout.write(self.style.ERROR(f'✗ {e}'))
+            return
 
         suscripciones = SuscripcionPush.objects.filter(activo=True).select_related('usuario')
 
@@ -62,7 +69,7 @@ class Command(BaseCommand):
                         'keys': {'p256dh': sub.p256dh, 'auth': sub.auth},
                     },
                     data=json.dumps(mensaje),
-                    vapid_private_key=settings.VAPID_PRIVATE_KEY,
+                    vapid_private_key=vapid_key_pem,
                     vapid_claims={'sub': f'mailto:{settings.VAPID_ADMIN_EMAIL}'},
                 )
                 self.stdout.write(self.style.SUCCESS(f'  ✓ {sub.usuario} — {sub.endpoint[:60]}...'))

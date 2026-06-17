@@ -1,30 +1,19 @@
+import base64
+
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ec
 
 
 class Command(BaseCommand):
-    help = 'Genera un nuevo par de llaves VAPID y las escribe en el .env'
+    help = 'Genera un par de llaves VAPID estándar (raw 32B) y las guarda en .env'
 
     def handle(self, *args, **options):
-        try:
-            from cryptography.hazmat.primitives import serialization
-            from cryptography.hazmat.backends import default_backend
-            from cryptography.hazmat.primitives.asymmetric import ec
-            import base64
-        except ImportError:
-            raise CommandError(
-                'La librería "cryptography" no está instalada. '
-                'Corre: pip install cryptography'
-            )
+        key = ec.generate_private_key(ec.SECP256R1())
 
-        key = ec.generate_private_key(ec.SECP256R1(), default_backend())
-
-        priv_raw = key.private_bytes(
-            encoding=serialization.Encoding.DER,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.NoEncryption(),
-        )
-        priv_b64 = base64.b64encode(priv_raw).decode()
+        priv_raw = key.private_numbers().private_value.to_bytes(32, 'big')
+        priv_b64 = base64.urlsafe_b64encode(priv_raw).rstrip(b'=').decode()
 
         pub_raw = key.public_key().public_bytes(
             encoding=serialization.Encoding.X962,
@@ -37,23 +26,14 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(f'No se encontró {env_path}'))
             return
 
-        lines = env_path.read_text().splitlines()
+        content = env_path.read_text()
+        lines = content.splitlines()
         nuevas = []
-        seen_private = False
         for line in lines:
             if line.startswith('VAPID_PUBLIC_KEY='):
                 nuevas.append(f'VAPID_PUBLIC_KEY={pub_b64}')
             elif line.startswith('VAPID_PRIVATE_KEY='):
-                if not seen_private:
-                    nuevas.append(f'VAPID_PRIVATE_KEY={priv_b64}')
-                    seen_private = True
-            elif seen_private and line and not line.startswith('VAPID_') and '=' not in line:
-                continue
-            elif seen_private and line == '':
-                nuevas.append(line)
-            elif seen_private and line.startswith('VAPID_ADMIN_EMAIL='):
-                nuevas.append(line)
-                seen_private = False
+                nuevas.append(f'VAPID_PRIVATE_KEY={priv_b64}')
             else:
                 nuevas.append(line)
         env_path.write_text('\n'.join(nuevas) + '\n')

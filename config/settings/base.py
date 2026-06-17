@@ -99,19 +99,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.Usuario'
 LOGIN_URL = '/acceso/ingresar/'
 
-# VAPID (Web Push)
+# VAPID (Web Push) — solo strings crudos, la reconstrucción PEM se hace en utils.py
 VAPID_PUBLIC_KEY = env('VAPID_PUBLIC_KEY', default='')
-_raw_vapid_private = env('VAPID_PRIVATE_KEY', default='')
-if _raw_vapid_private and not _raw_vapid_private.startswith('-----BEGIN '):
-    _b64 = _raw_vapid_private.strip()
-    _lines = [_b64[i:i+64] for i in range(0, len(_b64), 64)]
-    VAPID_PRIVATE_KEY = (
-        '-----BEGIN EC PRIVATE KEY-----\n'
-        + '\n'.join(_lines)
-        + '\n-----END EC PRIVATE KEY-----\n'
-    )
-else:
-    VAPID_PRIVATE_KEY = _raw_vapid_private
+VAPID_PRIVATE_KEY = env('VAPID_PRIVATE_KEY', default='')
 VAPID_ADMIN_EMAIL = env('VAPID_ADMIN_EMAIL', default='admin@example.com')
 
 # Celery

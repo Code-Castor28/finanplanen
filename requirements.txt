@@ -15,7 +15,7 @@ click-plugins==1.1.1.2
 click-repl==0.3.0
 colorama==0.4.6
 cron-descriptor==1.4.5
-cryptography>=46,<49
+cryptography>=46
 Django==4.2.30
 django-celery-beat==2.9.0
 django-environ==0.13.0

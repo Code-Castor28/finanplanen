@@ -6,6 +6,7 @@ from pywebpush import webpush, WebPushException
 from django.conf import settings
 from apps.accounts.models import Cuenta
 from .models import SuscripcionPush
+from .utils import get_vapid_private_key_pem
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,12 @@ def enviar_recordatorios_push():
     tarjetas = Cuenta.objects.filter(
         tipo='credito', activo=True
     ).exclude(dia_pago='').select_related('usuario', 'inquilino')
+
+    try:
+        vapid_key_pem = get_vapid_private_key_pem()
+    except ValueError as e:
+        logger.error(f'VAPID: {e}')
+        return 'Error: llaves VAPID no configuradas'
 
     enviadas = 0
     for t in tarjetas:
@@ -67,7 +74,7 @@ def enviar_recordatorios_push():
                         'keys': {'p256dh': sub.p256dh, 'auth': sub.auth},
                     },
                     data=json.dumps(mensaje),
-                    vapid_private_key=settings.VAPID_PRIVATE_KEY,
+                    vapid_private_key=vapid_key_pem,
                     vapid_claims={'sub': f'mailto:{settings.VAPID_ADMIN_EMAIL}'},
                 )
                 enviadas += 1
