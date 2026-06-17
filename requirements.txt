@@ -14,9 +14,12 @@ click-didyoumean==0.3.1
 click-plugins==1.1.1.2
 click-repl==0.3.0
 colorama==0.4.6
+cron-descriptor==1.4.5
 cryptography==49.0.0
 Django==4.2.30
+django-celery-beat==2.9.0
 django-environ==0.13.0
+django-timezone-field==7.2.2
 frozenlist==1.8.0
 gunicorn==26.0.0
 http_ece==1.2.1
@@ -31,6 +34,7 @@ propcache==0.5.2
 py-vapid==1.9.4
 pycparser==3.0
 PyMySQL==1.2.0
+python-crontab==3.3.0
 python-dateutil==2.9.0.post0
 pywebpush==2.3.0
 redis==6.4.0
