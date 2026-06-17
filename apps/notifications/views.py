@@ -1,9 +1,14 @@
+import hashlib
 import json
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 from .models import SuscripcionPush
+
+
+def _hash_endpoint(endpoint):
+    return hashlib.sha256(endpoint.encode()).hexdigest()
 
 
 @login_required
@@ -20,9 +25,10 @@ def guardar_suscripcion(request):
             return JsonResponse({'error': 'Datos incompletos'}, status=400)
 
         suscripcion, creada = SuscripcionPush.objects.update_or_create(
-            endpoint=endpoint,
+            endpoint_hash=_hash_endpoint(endpoint),
             defaults={
                 'usuario': request.user,
+                'endpoint': endpoint,
                 'p256dh': p256dh,
                 'auth': auth,
                 'activo': True,
@@ -50,7 +56,7 @@ def eliminar_suscripcion(request):
 
         SuscripcionPush.objects.filter(
             usuario=request.user,
-            endpoint=endpoint,
+            endpoint_hash=_hash_endpoint(endpoint),
         ).delete()
 
         return JsonResponse({'status': 'ok'})

@@ -6,4 +6,4 @@ from .models import SuscripcionPush
 class SuscripcionPushAdmin(admin.ModelAdmin):
     list_display = ('usuario', 'activo', 'creado_en')
     list_filter = ('activo',)
-    search_fields = ('usuario__nombre_usuario', 'endpoint')
+    search_fields = ('usuario__nombre_usuario', 'endpoint_hash')
