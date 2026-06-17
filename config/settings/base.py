@@ -105,9 +105,14 @@ LOGIN_URL = '/acceso/ingresar/'
 VAPID_PUBLIC_KEY = env('VAPID_PUBLIC_KEY', default='')
 _raw_vapid_private = env('VAPID_PRIVATE_KEY', default='')
 if _raw_vapid_private and not _raw_vapid_private.startswith('-----BEGIN '):
-    VAPID_PRIVATE_KEY = serialization.load_der_private_key(
+    _key = serialization.load_der_private_key(
         base64.b64decode(_raw_vapid_private.strip()), password=None,
     )
+    VAPID_PRIVATE_KEY = _key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption(),
+    ).decode()
 else:
     VAPID_PRIVATE_KEY = _raw_vapid_private
 VAPID_ADMIN_EMAIL = env('VAPID_ADMIN_EMAIL', default='admin@example.com')
