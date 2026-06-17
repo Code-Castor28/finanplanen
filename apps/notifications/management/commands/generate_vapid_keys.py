@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
         priv_raw = key.private_bytes(
             encoding=serialization.Encoding.DER,
-            format=serialization.PrivateFormat.PKCS8,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
             encryption_algorithm=serialization.NoEncryption(),
         )
         priv_b64 = base64.b64encode(priv_raw).decode()

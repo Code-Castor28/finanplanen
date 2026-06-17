@@ -106,9 +106,9 @@ if _raw_vapid_private and not _raw_vapid_private.startswith('-----BEGIN '):
     _b64 = _raw_vapid_private.strip()
     _lines = [_b64[i:i+64] for i in range(0, len(_b64), 64)]
     VAPID_PRIVATE_KEY = (
-        '-----BEGIN PRIVATE KEY-----\n'
+        '-----BEGIN EC PRIVATE KEY-----\n'
         + '\n'.join(_lines)
-        + '\n-----END PRIVATE KEY-----\n'
+        + '\n-----END EC PRIVATE KEY-----\n'
     )
 else:
     VAPID_PRIVATE_KEY = _raw_vapid_private
