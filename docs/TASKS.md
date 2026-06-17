@@ -67,20 +67,37 @@
 - [x] 10.3 CRUD metas + formulario de depósito
 
 ## Fase 11 — Presupuestos
-- [ ] 11.1 Modelo `Presupuesto`
-- [ ] 11.2 CRUD presupuestos con HTMX
+- [x] 11.1 Modelo `Presupuesto` (monto_limite, monto_gastado, mes, año, progreso_pct, restante, excedido)
+- [x] 11.2 CRUD presupuestos con HTMX (lista, crear, editar, eliminar)
+- [x] 11.3 Signal: `Presupuesto.monto_gastado` se actualiza al crear/borrar `Gasto`
 
 ## Fase 12 — Dashboard
-- [ ] 12.1 Vista dashboard con resumen (ingresos, gastos, saldo)
-- [ ] 12.2 Chart.js: gráfico ingresos vs gastos por mes
-- [ ] 12.3 Últimas transacciones + alertas presupuestos
-- [ ] 12.4 Template `dashboard.html`
+- [x] 12.1 Vista `PanelPrincipal` con resumen (ingresos, gastos, saldo, cambios % vs mes anterior)
+- [x] 12.2 Chart.js: 4 gráficos (barras ingreso/gasto, dona categorías, línea ahorro, barras apiladas evolución)
+- [x] 12.3 Últimas 10 transacciones + tabla ahorro mensual con superávit/déficit
+- [x] 12.4 Template `dashboard.html` (397 líneas, extiende base.html)
 
-## Fase 13 — Signals (restantes)
-- [ ] 13.1 Signal `Presupuesto.monto_gastado` (al guardar/borrar Gasto)
-- [ ] 13.2 Signal `MetaAhorro.monto_actual` (al guardar/borrar DepositoAhorro, Ingreso)
+## Fase 13 — Signals
+- [x] 13.1 Signal `Presupuesto.monto_gastado` (al guardar/borrar Gasto) — `apps/budgets/signals.py`
+- [x] 13.2 Signal `MetaAhorro.monto_actual` (al guardar/borrar DepositoAhorro) — `apps/savings/signals.py`
+- [x] 13.3 Signals `Cuenta.balance` para Ingreso, Gasto, Transferencia — `apps/transactions/signals.py`, `apps/transfers/signals.py`
+- [x] 13.4 Signal auto-crear Tenant al registrar Usuario — `apps/users/signals.py`
 
 ## Fase 14 — Celery
-- [ ] 14.1 Config Celery en `config/celery.py`
-- [ ] 14.2 Tarea: revisar transferencias recurrentes vencidas
-- [ ] 14.3 Tarea: enviar recordatorios tarjeta crédito (T-7, T-5, T-2)
+- [x] 14.1 Config Celery en `config/celery.py` + `config/__init__.py`
+- [x] 14.2 Tarea `ejecutar_recurrencias`: transferencias recurrentes vencidas (06:00 diario)
+- [x] 14.3 Tarea `recordatorio_tarjetas_credito`: recordatorios tarjeta crédito (09:00 diario)
+- [x] 14.4 Config: Redis broker/backend, beat schedule, JSON serializer, zona horaria
+
+## Fase 15 — Web Push / PWA (Notificaciones Push)
+- [x] 15.1 Crear app `apps/notifications/` + modelo `SuscripcionPush` (endpoint, p256dh, auth, usuario FK)
+- [x] 15.2 Configurar VAPID keys en `.env` + `settings.py` + `requirements.txt` (pywebpush ya estaba)
+- [x] 15.3 Crear Service Worker `templates/sw.js` + ruta `/sw.js` en `urls.py`
+- [x] 15.4 Crear `static/manifest.json` + PWA meta tags en `base.html`
+- [x] 15.5 Crear iconos PWA placeholder (`icon-192`, `icon-512`, `badge-72`, `apple-touch-icon`)
+- [x] 15.6 API backend: `guardar_suscripcion` / `eliminar_suscripcion` (views + urls)
+- [x] 15.7 Frontend: `static/js/push-notifications.js` (suscripción/desuscripción push)
+- [x] 15.8 Template partial `_push_config.html` incluido en página de perfil
+- [x] 15.9 Tarea Celery movida a `apps/notifications/tasks.py`: pushes reales con pywebpush (T-7, T-5, T-2, T-0)
+- [x] 15.10 Agregar enlace "Notificaciones" en sidebar de `base.html`
+- [x] 15.11 Migrations + `python manage.py check` 0 issues
