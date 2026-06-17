@@ -78,7 +78,7 @@ def enviar_recordatorios_push():
                 enviadas += 1
             except WebPushException as e:
                 code = e.response.status_code if e.response else None
-                if code in (404, 410):
+                if code in (400, 403, 404, 410):
                     sub.delete()
                 else:
                     logger.error(f'Push error {code}: {e}')

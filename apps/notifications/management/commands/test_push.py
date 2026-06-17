@@ -75,7 +75,7 @@ class Command(BaseCommand):
             except WebPushException as e:
                 code = e.response.status_code if e.response else '?'
                 self.stdout.write(self.style.ERROR(f'  ✗ {sub.usuario} — HTTP {code}: {e}'))
-                if code in (404, 410):
+                if code in (400, 403, 404, 410):
                     sub.delete()
                     self.stdout.write(self.style.WARNING(f'    → Suscripción eliminada'))
                 fallidas += 1
