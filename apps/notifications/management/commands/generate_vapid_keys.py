@@ -44,11 +44,21 @@ class Command(BaseCommand):
 
         lines = env_path.read_text().splitlines()
         nuevas = []
+        seen_private = False
         for line in lines:
             if line.startswith('VAPID_PUBLIC_KEY='):
                 nuevas.append(f'VAPID_PUBLIC_KEY={pub_b64}')
             elif line.startswith('VAPID_PRIVATE_KEY='):
-                nuevas.append(f'VAPID_PRIVATE_KEY={priv_b64}')
+                if not seen_private:
+                    nuevas.append(f'VAPID_PRIVATE_KEY={priv_b64}')
+                    seen_private = True
+            elif seen_private and line and not line.startswith('VAPID_') and '=' not in line:
+                continue
+            elif seen_private and line == '':
+                nuevas.append(line)
+            elif seen_private and line.startswith('VAPID_ADMIN_EMAIL='):
+                nuevas.append(line)
+                seen_private = False
             else:
                 nuevas.append(line)
         env_path.write_text('\n'.join(nuevas) + '\n')
