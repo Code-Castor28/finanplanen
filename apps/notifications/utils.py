@@ -19,9 +19,8 @@ def get_vapid_private_key_pem():
     raw_pub = base64.urlsafe_b64decode(raw_pub_str + '==')
 
     private_value = int.from_bytes(raw_priv, byteorder='big')
-    public_numbers = ec.EllipticCurvePublicNumbers.from_encoded_point(
-        ec.SECP256R1(), raw_pub,
-    )
+    public_key = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256R1(), raw_pub)
+    public_numbers = public_key.public_numbers()
     private_numbers = ec.EllipticCurvePrivateNumbers(
         private_value=private_value,
         public_numbers=public_numbers,
