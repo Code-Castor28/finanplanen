@@ -50,6 +50,7 @@ class CuentaCrear(InquilinoMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        kwargs['inquilino'] = self.request.user.inquilino
         tipo = self.request.GET.get('tipo')
         if tipo == 'efectivo':
             kwargs['tipo_filter'] = 'efectivo'
@@ -76,6 +77,11 @@ class CuentaEditar(InquilinoMixin, UpdateView):
     model = Cuenta
     form_class = CuentaForm
     template_name = 'accounts/_form_cuenta.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['inquilino'] = self.request.user.inquilino
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy('accounts:lista')

@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.text import slugify
 from .models import Cuenta
 
 
@@ -21,8 +22,20 @@ class CuentaForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        self.inquilino = kwargs.pop('inquilino', None)
         tipo_filter = kwargs.pop('tipo_filter', None)
         super().__init__(*args, **kwargs)
         if tipo_filter:
             choices = [c for c in self.fields['tipo'].choices if c[0] == tipo_filter or (tipo_filter == 'tarjeta' and c[0] in ('credito', 'debito'))]
             self.fields['tipo'].choices = choices
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if nombre and self.inquilino:
+            slug = slugify(nombre)
+            qs = Cuenta.objects.filter(inquilino=self.inquilino, slug=slug)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError('Ya existe una cuenta con ese nombre.')
+        return nombre
