@@ -15,7 +15,7 @@
       <i class="fa-solid fa-circle-question" data-tippy-content="Un nombre descriptivo para identificar la cuenta, ej: 'BBVA Oro', 'Efectivo diario'" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
     </label>
     {{ form.nombre }}
-    {% for error in form.nombre.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    <span class="field-error">{% for error in form.nombre.errors %}{{ error }}{% endfor %}</span>
   </div>
   <div class="form-group">
     <label for="{{ form.tipo.id_for_label }}">
@@ -23,7 +23,7 @@
       <i class="fa-solid fa-circle-question" data-tippy-content="Efectivo (dinero físico), Débito (fondo de garantía) o Crédito (tarjeta con saldo pendiente)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
     </label>
     {{ form.tipo }}
-    {% for error in form.tipo.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    <span class="field-error">{% for error in form.tipo.errors %}{{ error }}{% endfor %}</span>
   </div>
   <div class="form-group">
     <label>
@@ -34,7 +34,7 @@
       <span style="padding:10px 12px;background:var(--sc);color:var(--ov);font-weight:700;font-size:14px">RD$</span>
       {{ form.balance }}
     </div>
-    {% for error in form.balance.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    <span class="field-error">{% for error in form.balance.errors %}{{ error }}{% endfor %}</span>
   </div>
   <div id="tarjeta-fields">
     <div class="field-row">
@@ -43,16 +43,16 @@
           {{ form.emisor.label }}
           <i class="fa-solid fa-circle-question" data-tippy-content="Banco o entidad que emitió la tarjeta, ej: 'BBVA', 'Santander', 'PayPal'" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
         </label>
-        {{ form.emisor }}
-        {% for error in form.emisor.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    {{ form.emisor }}
+    <span class="field-error">{% for error in form.emisor.errors %}{{ error }}{% endfor %}</span>
       </div>
       <div class="field">
         <label for="{{ form.ultimos_digitos.id_for_label }}">
           {{ form.ultimos_digitos.label }}
           <i class="fa-solid fa-circle-question" data-tippy-content="Últimos 4 dígitos de la tarjeta para identificarla fácilmente entre varias del mismo banco" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
         </label>
-        {{ form.ultimos_digitos }}
-        {% for error in form.ultimos_digitos.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    {{ form.ultimos_digitos }}
+    <span class="field-error">{% for error in form.ultimos_digitos.errors %}{{ error }}{% endfor %}</span>
       </div>
     </div>
     <div id="credito-fields" class="field-row">
@@ -61,16 +61,16 @@
           {{ form.dia_corte.label }}
           <i class="fa-solid fa-circle-question" data-tippy-content="Día del mes en que cierra el estado de cuenta. Entre el corte y el pago suele haber ~20 días." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
         </label>
-        {{ form.dia_corte }}
-        {% for error in form.dia_corte.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    {{ form.dia_corte }}
+    <span class="field-error">{% for error in form.dia_corte.errors %}{{ error }}{% endfor %}</span>
       </div>
       <div class="field">
         <label for="{{ form.dia_pago.id_for_label }}">
           {{ form.dia_pago.label }}
           <i class="fa-solid fa-circle-question" data-tippy-content="Día del mes en que debes pagar la tarjeta. Usaremos esta fecha para recordatorios." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
         </label>
-        {{ form.dia_pago }}
-        {% for error in form.dia_pago.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    {{ form.dia_pago }}
+    <span class="field-error">{% for error in form.dia_pago.errors %}{{ error }}{% endfor %}</span>
       </div>
     </div>
     <div id="vencimiento-field" class="form-group">
@@ -78,8 +78,8 @@
         {{ form.vencimiento.label }}
         <i class="fa-solid fa-circle-question" data-tippy-content="Fecha de vencimiento de la tarjeta (formato: MM/AA, ej: 12/27)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
       </label>
-      {{ form.vencimiento }}
-      {% for error in form.vencimiento.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    {{ form.vencimiento }}
+    <span class="field-error">{% for error in form.vencimiento.errors %}{{ error }}{% endfor %}</span>
     </div>
   </div>
   <div class="field-row">
@@ -88,16 +88,16 @@
         {{ form.color.label }}
         <i class="fa-solid fa-circle-question" data-tippy-content="Color para identificar visualmente esta cuenta en listas y gráficos" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
       </label>
-      {{ form.color }}
-      {% for error in form.color.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    {{ form.color }}
+    <span class="field-error">{% for error in form.color.errors %}{{ error }}{% endfor %}</span>
     </div>
     <div class="field">
       <label for="{{ form.icono.id_for_label }}">
         {{ form.icono.label }}
         <i class="fa-solid fa-circle-question" data-tippy-content="Icono para identificar visualmente esta cuenta en el menú" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
       </label>
-      {{ form.icono }}
-      {% for error in form.icono.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    {{ form.icono }}
+    <span class="field-error">{% for error in form.icono.errors %}{{ error }}{% endfor %}</span>
     </div>
   </div>
   <div class="form-group">

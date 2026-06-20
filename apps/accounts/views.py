@@ -137,4 +137,4 @@ def validar_campo(request):
     errors = form.errors.get(field, [])
     if errors:
         return HttpResponse(f'<span class="field-error">{errors[0]}</span>')
-    return HttpResponse()
+    return HttpResponse('<span class="field-error"></span>')
