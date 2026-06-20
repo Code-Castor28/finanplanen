@@ -9,7 +9,7 @@
       hx-post="{% if object %}{% url 'transactions:ingreso_editar' object.pk %}{% else %}{% url 'transactions:ingreso_crear' %}{% endif %}"
       hx-target="this"
       hx-swap="outerHTML"
-      _="on htmx:beforeSend remove .open from #form-modal">
+      _="on htmx:afterRequest if htmx:response.headers['HX-Redirect'] then remove .open from #form-modal">
   {% csrf_token %}
   <div class="field-row">
     <div class="field">

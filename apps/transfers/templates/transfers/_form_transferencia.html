@@ -8,7 +8,7 @@
       hx-post="{% if object %}{% url 'transfers:editar' object.pk %}{% else %}{% url 'transfers:crear' %}{% endif %}"
       hx-target="this"
       hx-swap="outerHTML"
-      _="on htmx:beforeSend remove .open from #form-modal">
+      _="on htmx:afterRequest if htmx:response.headers['HX-Redirect'] then remove .open from #form-modal">
   {% csrf_token %}
   <div class="field-row">
     <div class="field">

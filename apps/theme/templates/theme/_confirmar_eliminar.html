@@ -14,7 +14,7 @@
         hx-post="{{ request.path }}"
         hx-target="this"
         hx-swap="outerHTML"
-        _="on htmx:beforeSend remove .open from #form-modal">
+        _="on htmx:afterRequest if htmx:response.headers['HX-Redirect'] then remove .open from #form-modal">
     {% csrf_token %}
     <div style="display:flex;gap:12px">
       <button type="submit" style="flex:1;padding:12px;border:2px solid transparent;border-radius:var(--r,8px);background:var(--exp,#dc3545);color:#fff;font-weight:600;font-size:14px;cursor:pointer;transition:.15s"

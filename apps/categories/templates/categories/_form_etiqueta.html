@@ -7,7 +7,7 @@
       hx-post="{% if object %}{% url 'categories:etiqueta_editar' object.pk %}{% else %}{% url 'categories:etiqueta_crear' %}{% endif %}"
       hx-target="this"
       hx-swap="outerHTML"
-      _="on htmx:beforeSend remove .open from #form-modal">
+      _="on htmx:afterRequest if htmx:response.headers['HX-Redirect'] then remove .open from #form-modal">
   {% csrf_token %}
   <div class="form-group">
     <label for="{{ form.nombre.id_for_label }}">
