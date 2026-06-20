@@ -10,33 +10,47 @@
       _="on htmx:beforeSend remove .open from #form-modal">
   {% csrf_token %}
   <div class="form-group">
-    <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+    <label for="{{ form.nombre.id_for_label }}">
+      {{ form.nombre.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Nombre descriptivo para la categoría, ej: 'Alimentación', 'Transporte'" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.nombre }}
     {% for error in form.nombre.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
-    <label for="{{ form.slug.id_for_label }}">{{ form.slug.label }}</label>
+    <label for="{{ form.slug.id_for_label }}">
+      {{ form.slug.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Identificador único para URLs. Se genera automáticamente desde el nombre." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.slug }}
     {% for error in form.slug.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
-    <label for="{{ form.color.id_for_label }}">{{ form.color.label }}</label>
+    <label for="{{ form.color.id_for_label }}">
+      {{ form.color.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Color para identificar esta categoría en gráficos y listas" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.color }}
     {% for error in form.color.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
-    <label for="{{ form.icono.id_for_label }}">{{ form.icono.label }}</label>
+    <label for="{{ form.icono.id_for_label }}">
+      {{ form.icono.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Icono visual para identificar esta categoría" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.icono }}
     {% for error in form.icono.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
     <label class="checkbox-label">
       {{ form.deducible }} {{ form.deducible.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Marca si los gastos en esta categoría son deducibles de impuestos" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
     </label>
   </div>
   <div class="form-group">
     <label class="checkbox-label">
       {{ form.activo }} {{ form.activo.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Desmarca para desactivar esta categoría sin eliminarla" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
     </label>
   </div>
   <div class="modal-actions">

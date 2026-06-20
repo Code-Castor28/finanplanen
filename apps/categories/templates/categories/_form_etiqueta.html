@@ -10,22 +10,34 @@
       _="on htmx:beforeSend remove .open from #form-modal">
   {% csrf_token %}
   <div class="form-group">
-    <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+    <label for="{{ form.nombre.id_for_label }}">
+      {{ form.nombre.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Nombre descriptivo para la etiqueta" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.nombre }}
     {% for error in form.nombre.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
-    <label for="{{ form.slug.id_for_label }}">{{ form.slug.label }}</label>
+    <label for="{{ form.slug.id_for_label }}">
+      {{ form.slug.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Identificador único para URLs. Se genera automáticamente desde el nombre." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.slug }}
     {% for error in form.slug.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
-    <label for="{{ form.color.id_for_label }}">{{ form.color.label }}</label>
+    <label for="{{ form.color.id_for_label }}">
+      {{ form.color.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Color para identificar esta etiqueta" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.color }}
     {% for error in form.color.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
-    <label for="{{ form.categorias.id_for_label }}">{{ form.categorias.label }}</label>
+    <label for="{{ form.categorias.id_for_label }}">
+      {{ form.categorias.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Selecciona las categorías a las que aplica esta etiqueta" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     <input type="text" class="search-select" placeholder="Buscar categoría..." onkeyup="filterSelect(this, '{{ form.categorias.id_for_label }}')" style="margin-bottom:8px;width:100%;padding:10px 12px;border:1.5px solid var(--olv,#c6c5d4);border-radius:8px;font-family:inherit;font-size:14px;outline:none">
     {{ form.categorias }}
     {% for error in form.categorias.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
@@ -42,6 +54,7 @@
   <div class="form-group">
     <label class="checkbox-label">
       {{ form.activo }} {{ form.activo.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Desmarca para desactivar esta etiqueta sin eliminarla" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
     </label>
   </div>
   <div class="modal-actions">

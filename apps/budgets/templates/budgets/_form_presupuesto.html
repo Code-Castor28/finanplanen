@@ -10,12 +10,18 @@
       _="on htmx:beforeSend remove .open from #form-modal">
   {% csrf_token %}
   <div class="form-group">
-    <label for="{{ form.categoria.id_for_label }}">{{ form.categoria.label }}</label>
+    <label for="{{ form.categoria.id_for_label }}">
+      {{ form.categoria.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Categoría a la que aplica este presupuesto" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.categoria }}
     {% for error in form.categoria.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
-    <label for="{{ form.monto_limite.id_for_label }}">{{ form.monto_limite.label }}</label>
+    <label for="{{ form.monto_limite.id_for_label }}">
+      {{ form.monto_limite.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Límite de gasto mensual para esta categoría (RD$)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.monto_limite }}
     {% for error in form.monto_limite.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
