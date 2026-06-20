@@ -144,7 +144,9 @@
   }
   el.addEventListener('input', fmt);
   el.addEventListener('blur', function(){
-    var n = parseFloat(el.value.replace(/,/g, '')) || 0;
+    var raw = el.value.replace(/,/g, '').trim();
+    if (raw === '' || raw === '0' || raw === '0.00') return;
+    var n = parseFloat(raw) || 0;
     el.value = n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
   });
   el.addEventListener('focus', function(){ el.select(); });

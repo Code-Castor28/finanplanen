@@ -33,6 +33,8 @@ class CuentaForm(forms.ModelForm):
         self.inquilino = kwargs.pop('inquilino', None)
         tipo_filter = kwargs.pop('tipo_filter', None)
         super().__init__(*args, **kwargs)
+        if not self.instance.pk:
+            self.initial['balance'] = ''
         if tipo_filter:
             choices = [c for c in self.fields['tipo'].choices if c[0] == tipo_filter or (tipo_filter == 'tarjeta' and c[0] in ('credito', 'debito'))]
             self.fields['tipo'].choices = choices
