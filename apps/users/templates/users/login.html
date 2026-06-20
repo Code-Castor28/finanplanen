@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--p:#000666;--pc:#1a237e;--op:#ffffff;--opc:#8690ee;--sl:#ffffff;--slw:#f2f4f7;--sc:#eceef1;--os:#191c1e;--ov:#454652;--ol:#767683;--olv:#c6c5d4;--st:#4c56af;--inc:#2E7D32;--incb:rgba(46,125,50,.1);--exp:#C62828;--expb:rgba(198,40,40,.1);--s2:0 12px 32px rgba(26,35,126,.12);--r:.5rem;--rm:.75rem;--rl:1rem;--rxl:1.5rem;--rf:9999px}
@@ -125,7 +126,10 @@ body{font-family:'Inter',sans-serif;color:var(--os);-webkit-font-smoothing:antia
         {% csrf_token %}
         {% for field in form %}
         <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          <label for="{{ field.id_for_label }}">
+            {{ field.label }}
+            <i class="fa-solid fa-circle-question" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em" data-tippy-content="{% if field.name == 'username' %}Nombre de usuario que usaste al registrarte{% else %}Tu contraseña de acceso{% endif %}"></i>
+          </label>
           <div class="input-wrap">
             {{ field }}
             <i class="fas fa-{% if field.name == 'username' %}user{% else %}lock{% endif %} input-icon"></i>
@@ -144,7 +148,12 @@ body{font-family:'Inter',sans-serif;color:var(--os);-webkit-font-smoothing:antia
     </div>
   </div>
 </div>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
 <script>
+document.addEventListener('DOMContentLoaded', function(){
+  tippy('[data-tippy-content]', { placement: 'top', theme: 'light', animation: 'scale', maxWidth: 280 });
+});
 if (sessionStorage.getItem('sesion_expirada')) {
   sessionStorage.removeItem('sesion_expirada');
   document.addEventListener('DOMContentLoaded', function(){
