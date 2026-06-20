@@ -60,7 +60,6 @@
             hx-post="{% url 'transfers:crear' %}"
             hx-target="#transferencia-list"
             hx-swap="afterbegin"
-            hx-select-oob="#form-errors"
             _="on htmx:afterRequest if htmx:response.headers['HX-Redirect'] then window.location.href = htmx:response.headers['HX-Redirect']">
         {% csrf_token %}
         <div id="form-errors">
