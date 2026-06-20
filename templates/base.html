@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light.css">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="manifest" href="{% static 'manifest.json' %}">
   <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
@@ -152,6 +153,21 @@
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
   <script src="{% static 'js/main.js' %}"></script>
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+  <script>
+  function initTippy() {
+    tippy('[data-tippy-content]', {
+      placement: 'top',
+      theme: 'light',
+      animation: 'scale',
+      maxWidth: 280,
+    });
+  }
+  document.addEventListener('DOMContentLoaded', initTippy);
+  document.addEventListener('htmx:afterSwap', initTippy);
+  document.addEventListener('htmx:afterSettle', initTippy);
+  </script>
   {% block extra_scripts %}{% endblock %}
 </body>
 </html>

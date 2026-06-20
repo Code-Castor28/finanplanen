@@ -10,17 +10,26 @@
       _="on htmx:beforeSend remove .open from #form-modal">
   {% csrf_token %}
   <div class="form-group">
-    <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+    <label for="{{ form.nombre.id_for_label }}">
+      {{ form.nombre.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Un nombre descriptivo para identificar la cuenta, ej: 'BBVA Oro', 'Efectivo diario'" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.nombre }}
     {% for error in form.nombre.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
-    <label for="{{ form.tipo.id_for_label }}">{{ form.tipo.label }}</label>
+    <label for="{{ form.tipo.id_for_label }}">
+      {{ form.tipo.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Efectivo (dinero físico), Débito (fondo de garantía) o Crédito (tarjeta con saldo pendiente)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.tipo }}
     {% for error in form.tipo.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
-    <label>Balance</label>
+    <label>
+      Balance
+      <i class="fa-solid fa-circle-question" data-tippy-content="Saldo actual. En crédito: saldo pendiente. En débito/efectivo: dinero disponible." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     <div style="display:flex;align-items:center;border:1.5px solid var(--olv);border-radius:8px;overflow:hidden">
       <span style="padding:10px 12px;background:var(--sc);color:var(--ov);font-weight:700;font-size:14px">RD$</span>
       {{ form.balance }}
@@ -30,42 +39,63 @@
   <div id="tarjeta-fields">
     <div class="field-row">
       <div class="field">
-        <label for="{{ form.emisor.id_for_label }}">{{ form.emisor.label }}</label>
+        <label for="{{ form.emisor.id_for_label }}">
+          {{ form.emisor.label }}
+          <i class="fa-solid fa-circle-question" data-tippy-content="Banco o entidad que emitió la tarjeta, ej: 'BBVA', 'Santander', 'PayPal'" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+        </label>
         {{ form.emisor }}
         {% for error in form.emisor.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
       </div>
       <div class="field">
-        <label for="{{ form.ultimos_digitos.id_for_label }}">{{ form.ultimos_digitos.label }}</label>
+        <label for="{{ form.ultimos_digitos.id_for_label }}">
+          {{ form.ultimos_digitos.label }}
+          <i class="fa-solid fa-circle-question" data-tippy-content="Últimos 4 dígitos de la tarjeta para identificarla fácilmente entre varias del mismo banco" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+        </label>
         {{ form.ultimos_digitos }}
         {% for error in form.ultimos_digitos.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
       </div>
     </div>
     <div id="credito-fields" class="field-row">
       <div class="field">
-        <label for="{{ form.dia_corte.id_for_label }}">{{ form.dia_corte.label }}</label>
+        <label for="{{ form.dia_corte.id_for_label }}">
+          {{ form.dia_corte.label }}
+          <i class="fa-solid fa-circle-question" data-tippy-content="Día del mes en que cierra el estado de cuenta. Entre el corte y el pago suele haber ~20 días." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+        </label>
         {{ form.dia_corte }}
         {% for error in form.dia_corte.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
       </div>
       <div class="field">
-        <label for="{{ form.dia_pago.id_for_label }}">{{ form.dia_pago.label }}</label>
+        <label for="{{ form.dia_pago.id_for_label }}">
+          {{ form.dia_pago.label }}
+          <i class="fa-solid fa-circle-question" data-tippy-content="Día del mes en que debes pagar la tarjeta. Usaremos esta fecha para recordatorios." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+        </label>
         {{ form.dia_pago }}
         {% for error in form.dia_pago.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
       </div>
     </div>
     <div id="vencimiento-field" class="form-group">
-      <label for="{{ form.vencimiento.id_for_label }}">{{ form.vencimiento.label }}</label>
+      <label for="{{ form.vencimiento.id_for_label }}">
+        {{ form.vencimiento.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Fecha de vencimiento de la tarjeta (formato: MM/AA, ej: 12/27)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
       {{ form.vencimiento }}
       {% for error in form.vencimiento.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
     </div>
   </div>
   <div class="field-row">
     <div class="field">
-      <label for="{{ form.color.id_for_label }}">{{ form.color.label }}</label>
+      <label for="{{ form.color.id_for_label }}">
+        {{ form.color.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Color para identificar visualmente esta cuenta en listas y gráficos" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
       {{ form.color }}
       {% for error in form.color.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
     </div>
     <div class="field">
-      <label for="{{ form.icono.id_for_label }}">{{ form.icono.label }}</label>
+      <label for="{{ form.icono.id_for_label }}">
+        {{ form.icono.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Icono para identificar visualmente esta cuenta en el menú" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
       {{ form.icono }}
       {% for error in form.icono.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
     </div>
@@ -73,6 +103,7 @@
   <div class="form-group">
     <label class="checkbox-label">
       {{ form.activo }} {{ form.activo.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Desmarca para ocultar la cuenta sin eliminarla. Puedes reactivarla después." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
     </label>
   </div>
   <div class="modal-actions">
