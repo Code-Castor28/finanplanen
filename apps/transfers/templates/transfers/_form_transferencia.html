@@ -12,18 +12,27 @@
   {% csrf_token %}
   <div class="field-row">
     <div class="field">
-      <label for="{{ form.origen.id_for_label }}">{{ form.origen.label }}</label>
+      <label for="{{ form.origen.id_for_label }}">
+        {{ form.origen.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Cuenta de origen — de aquí saldrá el dinero" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
       {{ form.origen }}
       {% for error in form.origen.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
     </div>
     <div class="field">
-      <label for="{{ form.destino.id_for_label }}">{{ form.destino.label }}</label>
+      <label for="{{ form.destino.id_for_label }}">
+        {{ form.destino.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Cuenta de destino — aquí llegará el dinero" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
       {{ form.destino }}
       {% for error in form.destino.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
     </div>
   </div>
   <div class="form-group">
-    <label>Monto</label>
+    <label>
+      Monto
+      <i class="fa-solid fa-circle-question" data-tippy-content="Monto a transferir en RD$" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     <div style="display:flex;align-items:center;border:1.5px solid var(--olv);border-radius:8px;overflow:hidden">
       <span style="padding:10px 12px;background:var(--sc);color:var(--ov);font-weight:700;font-size:14px">RD$</span>
       {{ form.monto }}
@@ -32,13 +41,19 @@
   </div>
   <div class="field-row">
     <div class="field">
-      <label for="{{ form.fecha.id_for_label }}">{{ form.fecha.label }}</label>
+      <label for="{{ form.fecha.id_for_label }}">
+        {{ form.fecha.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Fecha de la transferencia" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
       {{ form.fecha }}
       {% for error in form.fecha.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
     </div>
   </div>
   <div class="form-group">
-    <label for="{{ form.nota.id_for_label }}">{{ form.nota.label }}</label>
+    <label for="{{ form.nota.id_for_label }}">
+      {{ form.nota.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Descripción opcional para recordar el motivo de la transferencia" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.nota }}
     {% for error in form.nota.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>

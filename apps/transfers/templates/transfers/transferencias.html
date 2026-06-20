@@ -63,7 +63,10 @@
             _="on htmx:afterRequest if htmx:response.headers['HX-Redirect'] then window.location.href = htmx:response.headers['HX-Redirect']">
         {% csrf_token %}
         <div class="field">
-          <label>Cuenta Origen</label>
+          <label>
+            Cuenta Origen
+            <i class="fa-solid fa-circle-question" data-tippy-content="Cuenta de origen — de aquí saldrá el dinero" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <select name="origen" class="form-control" required>
             <option value="">Seleccionar...</option>
             {% for cta in cuentas %}
@@ -72,7 +75,10 @@
           </select>
         </div>
         <div class="field">
-          <label>Cuenta Destino</label>
+          <label>
+            Cuenta Destino
+            <i class="fa-solid fa-circle-question" data-tippy-content="Cuenta de destino — aquí llegará el dinero" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <select name="destino" class="form-control" required>
             <option value="">Seleccionar...</option>
             {% for cta in cuentas %}
@@ -81,7 +87,10 @@
           </select>
         </div>
         <div class="field">
-          <label>Monto</label>
+          <label>
+            Monto
+            <i class="fa-solid fa-circle-question" data-tippy-content="Monto a transferir en RD$" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <div style="display:flex;align-items:center;border:1.5px solid var(--olv);border-radius:8px;overflow:hidden">
             <span style="padding:10px 12px;background:var(--sc);color:var(--ov);font-weight:700;font-size:20px">RD$</span>
             <input type="number" name="monto" step="0.01" min="0.01" placeholder="0.00" required
@@ -89,11 +98,17 @@
           </div>
         </div>
         <div class="field">
-          <label>Fecha</label>
+          <label>
+            Fecha
+            <i class="fa-solid fa-circle-question" data-tippy-content="Fecha de la transferencia" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <input type="date" name="fecha" value="{{ hoy }}" class="form-control" required>
         </div>
         <div class="field">
-          <label>Nota / Referencia</label>
+          <label>
+            Nota / Referencia
+            <i class="fa-solid fa-circle-question" data-tippy-content="Descripción opcional, ej: 'Transferencia mensual a ahorros'" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <textarea name="nota" rows="3" class="form-control" placeholder="Ej: Transferencia mensual a ahorros"></textarea>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;font-weight:600;justify-content:center">
