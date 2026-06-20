@@ -1,10 +1,13 @@
 import re
 from django import forms
+from django.urls import reverse_lazy
 from django.utils.text import slugify
 from .models import Cuenta
 
 
 class CuentaForm(forms.ModelForm):
+    _validar_url = reverse_lazy('accounts:validar_campo')
+
     class Meta:
         model = Cuenta
         fields = [
@@ -38,6 +41,18 @@ class CuentaForm(forms.ModelForm):
         if tipo_filter:
             choices = [c for c in self.fields['tipo'].choices if c[0] == tipo_filter or (tipo_filter == 'tarjeta' and c[0] in ('credito', 'debito'))]
             self.fields['tipo'].choices = choices
+
+        pk = str(self.instance.pk) if self.instance.pk else ''
+        htmx_attrs = {
+            'hx-post': str(self._validar_url),
+            'hx-trigger': 'blur',
+            'hx-target': 'next .field-error',
+            'hx-swap': 'outerHTML',
+        }
+        for field_name in ['nombre', 'ultimos_digitos', 'vencimiento', 'dia_corte', 'dia_pago']:
+            attrs = htmx_attrs.copy()
+            attrs['hx-vals'] = f'{{"field":"{field_name}","instance_pk":"{pk}"}}'
+            self.fields[field_name].widget.attrs.update(attrs)
 
     def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre')

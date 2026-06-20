@@ -8,4 +8,5 @@ urlpatterns = [
     path('crear/', views.CuentaCrear.as_view(), name='crear'),
     path('<int:pk>/editar/', views.CuentaEditar.as_view(), name='editar'),
     path('<int:pk>/eliminar/', views.CuentaEliminar.as_view(), name='eliminar'),
+    path('validar-campo/', views.validar_campo, name='validar_campo'),
 ]

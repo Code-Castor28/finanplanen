@@ -1,7 +1,9 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.urls import reverse_lazy
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .forms import CuentaForm
 from .models import Cuenta
@@ -116,3 +118,23 @@ class CuentaEliminar(InquilinoMixin, DeleteView):
         ctx = super().get_context_data(**kwargs)
         ctx['model_name'] = 'cuenta'
         return ctx
+
+
+@login_required
+@require_POST
+def validar_campo(request):
+    field = request.POST.get('field')
+    value = request.POST.get('value', '')
+    instance_pk = request.POST.get('instance_pk')
+    instance = None
+    if instance_pk:
+        try:
+            instance = Cuenta.objects.get(pk=instance_pk, inquilino=request.user.inquilino)
+        except Cuenta.DoesNotExist:
+            pass
+    form = CuentaForm(data={field: value}, instance=instance, inquilino=request.user.inquilino)
+    form.is_valid()
+    errors = form.errors.get(field, [])
+    if errors:
+        return HttpResponse(f'<span class="field-error">{errors[0]}</span>')
+    return HttpResponse()
