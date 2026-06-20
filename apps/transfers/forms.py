@@ -16,3 +16,14 @@ class TransferenciaForm(forms.ModelForm):
             'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'nota': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Ej. Transferencia mensual'}),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        origen = cleaned.get('origen')
+        destino = cleaned.get('destino')
+        monto = cleaned.get('monto')
+        if origen and destino and origen == destino:
+            raise forms.ValidationError('La cuenta de origen y destino deben ser diferentes.')
+        if monto is not None and monto <= 0:
+            raise forms.ValidationError('El monto debe ser mayor a cero.')
+        return cleaned

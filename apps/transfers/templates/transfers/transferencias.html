@@ -60,8 +60,18 @@
             hx-post="{% url 'transfers:crear' %}"
             hx-target="#transferencia-list"
             hx-swap="afterbegin"
+            hx-select-oob="#form-errors"
             _="on htmx:afterRequest if htmx:response.headers['HX-Redirect'] then window.location.href = htmx:response.headers['HX-Redirect']">
         {% csrf_token %}
+        <div id="form-errors">
+        {% if form.errors %}
+          {% for error in form.non_field_errors %}
+          <div style="padding:12px 16px;border-radius:8px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:16px;background:rgba(198,40,40,.1);color:#C62828">
+            <i class="fas fa-exclamation-circle"></i> {{ error }}
+          </div>
+          {% endfor %}
+        {% endif %}
+        </div>
         <div class="field">
           <label>
             Cuenta Origen

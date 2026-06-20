@@ -1,3 +1,4 @@
+from datetime import date
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from django.http import HttpResponse
@@ -48,11 +49,18 @@ class TransferenciaLista(InquilinoMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['section'] = 'transfers'
         context['filtros'] = self.request.GET
-        context['hoy'] = __import__('datetime').date.today().isoformat()
+        context['hoy'] = date.today().isoformat()
 
         if not self.request.headers.get('HX-Request'):
             inquilino = self.request.user.inquilino
             context['cuentas'] = Cuenta.objects.filter(inquilino=inquilino).order_by('nombre')
+            hoy = date.today()
+            total_mes = Transferencia.objects.filter(
+                inquilino=inquilino,
+                fecha__year=hoy.year,
+                fecha__month=hoy.month
+            ).aggregate(total=Sum('monto'))['total'] or 0
+            context['total_mes'] = total_mes
         return context
 
 
