@@ -167,6 +167,9 @@
   document.addEventListener('DOMContentLoaded', initTippy);
   document.addEventListener('htmx:afterSwap', initTippy);
   document.addEventListener('htmx:afterSettle', initTippy);
+  document.addEventListener('htmx:beforeSwap', function(e) {
+    if (e.detail.xhr.status === 422) e.detail.shouldSwap = true;
+  });
   </script>
   {% block extra_scripts %}{% endblock %}
 </body>
