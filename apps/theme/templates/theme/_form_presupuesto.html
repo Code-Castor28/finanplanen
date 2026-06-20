@@ -4,8 +4,8 @@
 </div>
 <form method="post"
       hx-post="{% if object %}{% url 'budgets:editar' object.pk %}{% else %}{% url 'budgets:crear' %}{% endif %}"
-      hx-target="this"
-      hx-swap="outerHTML"
+      hx-target="#modal-content"
+      hx-swap="innerHTML"
       _="on htmx:afterRequest if htmx:response.headers['HX-Redirect'] then remove .open from #form-modal">
   {% csrf_token %}
   {% for field in form %}

@@ -5,8 +5,8 @@
 <p class="sub">Completa los campos para {% if object %}actualizar la{% else %}crear una nueva{% endif %} etiqueta.</p>
 <form method="post"
       hx-post="{% if object %}{% url 'categories:etiqueta_editar' object.pk %}{% else %}{% url 'categories:etiqueta_crear' %}{% endif %}"
-      hx-target="this"
-      hx-swap="outerHTML"
+      hx-target="#modal-content"
+      hx-swap="innerHTML"
       _="on htmx:afterRequest if htmx:response.headers['HX-Redirect'] then remove .open from #form-modal">
   {% csrf_token %}
   <div class="form-group">
