@@ -130,4 +130,39 @@
   }
   if(tipo){ tipo.addEventListener('change', toggle); toggle(); }
 })();
+
+(function(){
+  var el = document.getElementById('{{ form.balance.id_for_label }}');
+  if (!el) return;
+  function fmt(){
+    var v = el.value.replace(/[^\d.]/g, '');
+    var p = v.split('.');
+    if (p.length > 2) p = [p[0], p.slice(1).join('')];
+    if (p[0]) p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (p[1] !== undefined) { if (p[1].length > 2) p[1] = p[1].slice(0,2); }
+    el.value = p.join('.');
+  }
+  el.addEventListener('input', fmt);
+  el.addEventListener('blur', function(){
+    var n = parseFloat(el.value.replace(/,/g, '')) || 0;
+    el.value = n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  });
+  el.addEventListener('focus', function(){ el.select(); });
+  fmt();
+})();
+
+(function(){
+  var el = document.getElementById('{{ form.vencimiento.id_for_label }}');
+  if (!el) return;
+  el.addEventListener('input', function(){
+    var v = this.value.replace(/\D/g, '').slice(0, 4);
+    if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2);
+    this.value = v;
+  });
+})();
+
+['{{ form.ultimos_digitos.id_for_label }}', '{{ form.dia_corte.id_for_label }}', '{{ form.dia_pago.id_for_label }}'].forEach(function(id){
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('input', function(){ this.value = this.value.replace(/\D/g, ''); });
+});
 </script>
