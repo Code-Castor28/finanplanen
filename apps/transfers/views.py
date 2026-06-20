@@ -82,20 +82,15 @@ class TransferenciaCrear(InquilinoMixin, CreateView):
         if self.request.headers.get('HX-Request'):
             if self.request.headers.get('HX-Target') == 'transferencia-list':
                 errors = form.non_field_errors()
-                parts = ['<div id="form-errors" hx-swap-oob="true">']
-                if errors:
-                    for e in errors:
-                        parts.append(
-                            '<div style="padding:12px 16px;border-radius:8px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:16px;background:rgba(198,40,40,.1);color:#C62828">'
-                            '<i class="fas fa-exclamation-circle"></i> %s</div>' % e
-                        )
-                else:
-                    parts.append(
-                        '<div style="padding:12px 16px;border-radius:8px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:16px;background:rgba(198,40,40,.1);color:#C62828">'
-                        '<i class="fas fa-exclamation-circle"></i> Error en el formulario</div>'
-                    )
-                parts.append('</div>')
-                return HttpResponse(''.join(parts), status=422)
+                error_msg = errors[0] if errors else 'Error en el formulario'
+                html = (
+                    '<div style="padding:12px 16px;border-radius:8px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;background:rgba(198,40,40,.1);color:#C62828">'
+                    '<i class="fas fa-exclamation-circle"></i> %s</div>'
+                ) % error_msg
+                response = HttpResponse(html, status=422)
+                response['HX-Retarget'] = '#form-errors'
+                response['HX-Reswap'] = 'innerHTML'
+                return response
             return self.render_to_response(self.get_context_data(form=form), status=422)
         return super().form_invalid(form)
 
