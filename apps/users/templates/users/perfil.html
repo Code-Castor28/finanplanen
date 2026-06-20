@@ -21,17 +21,54 @@
 
   <form method="post" enctype="multipart/form-data" class="profile-form">
     {% csrf_token %}
-    {% for field in form %}
     <div class="form-group">
-      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-      {{ field }}
-      {% if field.errors %}
-        {% for error in field.errors %}
-          <span class="field-error">{{ error }}</span>
-        {% endfor %}
-      {% endif %}
+      <label for="{{ form.nombre.id_for_label }}">
+        {{ form.nombre.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Tu nombre real (opcional)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
+      {{ form.nombre }}
+      {% for error in form.nombre.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
     </div>
-    {% endfor %}
+    <div class="form-group">
+      <label for="{{ form.apellido.id_for_label }}">
+        {{ form.apellido.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Tu apellido real (opcional)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
+      {{ form.apellido }}
+      {% for error in form.apellido.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.correo.id_for_label }}">
+        {{ form.correo.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Correo electrónico para recuperación de cuenta" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
+      {{ form.correo }}
+      {% for error in form.correo.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.telefono.id_for_label }}">
+        {{ form.telefono.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Teléfono de contacto (opcional)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
+      {{ form.telefono }}
+      {% for error in form.telefono.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.avatar.id_for_label }}">
+        {{ form.avatar.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Foto de perfil (se mostrará en la esquina superior)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
+      {{ form.avatar }}
+      {% for error in form.avatar.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.ingreso_mensual.id_for_label }}">
+        {{ form.ingreso_mensual.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Tu ingreso mensual aproximado para ayudarte con el presupuesto (RD$)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
+      {{ form.ingreso_mensual }}
+      {% for error in form.ingreso_mensual.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    </div>
     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
   </form>
 
