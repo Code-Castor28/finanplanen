@@ -13,18 +13,27 @@
   {% csrf_token %}
   <div class="field-row">
     <div class="field">
-      <label for="{{ form.cuenta.id_for_label }}">{{ form.cuenta.label }}</label>
+      <label for="{{ form.cuenta.id_for_label }}">
+        {{ form.cuenta.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Cuenta donde entrará el dinero" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
       {{ form.cuenta }}
       {% for error in form.cuenta.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
     </div>
     <div class="field">
-      <label for="{{ form.categoria.id_for_label }}">{{ form.categoria.label }}</label>
+      <label for="{{ form.categoria.id_for_label }}">
+        {{ form.categoria.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Clasifica este ingreso para llevar el control de tus finanzas" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
       {{ form.categoria }}
       {% for error in form.categoria.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
     </div>
   </div>
   <div class="form-group">
-    <label>Monto</label>
+    <label>
+      Monto
+      <i class="fa-solid fa-circle-question" data-tippy-content="Monto en RD$ — usa punto para decimales (ej: 1500.00)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     <div style="display:flex;align-items:center;border:1.5px solid var(--olv);border-radius:8px;overflow:hidden">
       <span style="padding:10px 12px;background:var(--sc);color:var(--ov);font-weight:700;font-size:14px">RD$</span>
       {{ form.monto }}
@@ -33,18 +42,27 @@
   </div>
   <div class="field-row">
     <div class="field">
-      <label for="{{ form.fecha.id_for_label }}">{{ form.fecha.label }}</label>
+      <label for="{{ form.fecha.id_for_label }}">
+        {{ form.fecha.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Fecha en que se recibió el ingreso" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
       {{ form.fecha }}
       {% for error in form.fecha.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
     </div>
   </div>
   <div class="form-group">
-    <label for="{{ form.nota.id_for_label }}">{{ form.nota.label }}</label>
+    <label for="{{ form.nota.id_for_label }}">
+      {{ form.nota.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Descripción opcional para recordar de qué se trata este ingreso" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.nota }}
     {% for error in form.nota.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
-    <label for="{{ form.comprobante.id_for_label }}">{{ form.comprobante.label }}</label>
+    <label for="{{ form.comprobante.id_for_label }}">
+      {{ form.comprobante.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Foto del recibo o comprobante (opcional)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
     {{ form.comprobante }}
     {% for error in form.comprobante.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>

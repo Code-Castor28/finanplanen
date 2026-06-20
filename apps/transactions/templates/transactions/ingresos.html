@@ -83,7 +83,10 @@
             _="on htmx:afterRequest if htmx:response.headers['HX-Redirect'] then window.location.href = htmx:response.headers['HX-Redirect']">
         {% csrf_token %}
         <div class="field">
-          <label>Cuenta</label>
+          <label>
+            Cuenta
+            <i class="fa-solid fa-circle-question" data-tippy-content="Cuenta donde entrará el dinero" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <select name="cuenta" class="form-control" required>
             <option value="">Seleccionar...</option>
             {% for cta in cuentas %}
@@ -92,7 +95,10 @@
           </select>
         </div>
         <div class="field">
-          <label>Importe</label>
+          <label>
+            Importe
+            <i class="fa-solid fa-circle-question" data-tippy-content="Monto del ingreso en RD$ — usa punto para decimales (ej: 1500.00)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <div style="display:flex;align-items:center;border:1.5px solid var(--olv);border-radius:8px;overflow:hidden">
             <span style="padding:10px 12px;background:var(--sc);color:var(--ov);font-weight:700;font-size:20px">RD$</span>
             <input type="number" name="monto" step="0.01" min="0.01" placeholder="0.00" required
@@ -101,7 +107,10 @@
         </div>
         <div class="field-row">
           <div class="field">
-            <label>Categoría</label>
+            <label>
+              Categoría
+              <i class="fa-solid fa-circle-question" data-tippy-content="Clasifica este ingreso para llevar el control" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+            </label>
             <select name="categoria" class="form-control">
               <option value="">Seleccionar...</option>
               {% for cat in categorias %}
@@ -110,12 +119,18 @@
             </select>
           </div>
           <div class="field">
-            <label>Fecha</label>
+            <label>
+              Fecha
+              <i class="fa-solid fa-circle-question" data-tippy-content="Fecha en que se recibió el ingreso" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+            </label>
             <input type="date" name="fecha" value="{{ hoy }}" class="form-control" required>
           </div>
         </div>
         <div class="field">
-          <label>Nota / Referencia</label>
+          <label>
+            Nota / Referencia
+            <i class="fa-solid fa-circle-question" data-tippy-content="Descripción opcional, ej: 'Pago de nómina'" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <textarea name="nota" rows="3" class="form-control" placeholder="Ej: Pago de nómina"></textarea>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;font-weight:600;justify-content:center">
