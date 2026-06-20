@@ -81,5 +81,21 @@
     if (continueBtn) {
       continueBtn.addEventListener('click', resetIdleTimer);
     }
+
+    var hiddenAt = null;
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        hiddenAt = Date.now();
+      } else if (hiddenAt !== null) {
+        var elapsed = Date.now() - hiddenAt;
+        hiddenAt = null;
+        if (elapsed >= IDLE_TIMEOUT) {
+          sessionStorage.setItem('sesion_expirada', '1');
+          window.location.href = '/acceso/salir/';
+        } else {
+          resetIdleTimer();
+        }
+      }
+    });
   }
 })();
