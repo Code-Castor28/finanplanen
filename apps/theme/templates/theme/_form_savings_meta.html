@@ -8,13 +8,56 @@
       hx-swap="outerHTML"
       _="on htmx:beforeSend remove .open from #form-modal">
   {% csrf_token %}
-  {% for field in form %}
   <div class="form-group">
-    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-    {{ field }}
-    {% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    <label for="{{ form.nombre.id_for_label }}">
+      {{ form.nombre.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Nombre de tu meta de ahorro, ej: 'Viaje a Europa', 'Fondo de emergencia'" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
+    {{ form.nombre }}
+    {% for error in form.nombre.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
-  {% endfor %}
+  <div class="form-group">
+    <label for="{{ form.meta.id_for_label }}">
+      {{ form.meta.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Monto total que deseas alcanzar (RD$)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
+    {{ form.meta }}
+    {% for error in form.meta.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div class="form-group">
+    <label for="{{ form.fecha_limite.id_for_label }}">
+      {{ form.fecha_limite.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Fecha límite para cumplir esta meta (opcional)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
+    {{ form.fecha_limite }}
+    {% for error in form.fecha_limite.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div class="field-row">
+    <div class="field">
+      <label for="{{ form.color.id_for_label }}">
+        {{ form.color.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Color para identificar esta meta en el panel" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
+      {{ form.color }}
+      {% for error in form.color.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    </div>
+    <div class="field">
+      <label for="{{ form.icono.id_for_label }}">
+        {{ form.icono.label }}
+        <i class="fa-solid fa-circle-question" data-tippy-content="Icono visual para identificar esta meta" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+      </label>
+      {{ form.icono }}
+      {% for error in form.icono.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="{{ form.nota.id_for_label }}">
+      {{ form.nota.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Nota opcional sobre esta meta" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
+    {{ form.nota }}
+    {% for error in form.nota.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
   <div class="modal-actions">
     <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {% if object %}Guardar{% else %}Crear{% endif %}</button>
     <button type="button" class="btn btn-secondary" _="on click remove .open from #form-modal">Cancelar</button>

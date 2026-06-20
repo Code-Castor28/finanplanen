@@ -182,22 +182,34 @@
       {% csrf_token %}
       <div style="margin-top:16px">
         <div class="field">
-          <label>Nombre de la Meta</label>
+          <label>
+            Nombre de la Meta
+            <i class="fa-solid fa-circle-question" data-tippy-content="Nombre descriptivo, ej: 'Fondo de Emergencia'" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <input type="text" name="nombre" placeholder="Ej: Fondo de Emergencia" required class="form-control">
         </div>
         <div class="field-row">
           <div class="field">
-            <label>Meta Total (RD$)</label>
+            <label>
+              Meta Total (RD$)
+              <i class="fa-solid fa-circle-question" data-tippy-content="Monto total que deseas ahorrar (RD$)" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+            </label>
             <input type="number" name="meta" step="0.01" min="1" placeholder="Ej: 20000.00" required class="form-control">
           </div>
           <div class="field">
-            <label>Fecha L&iacute;mite</label>
+            <label>
+              Fecha L&iacute;mite
+              <i class="fa-solid fa-circle-question" data-tippy-content="Fecha opcional para alcanzar esta meta" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+            </label>
             <input type="date" name="fecha_limite" class="form-control">
           </div>
         </div>
         <div class="field-row">
           <div class="field">
-            <label>Color</label>
+            <label>
+              Color
+              <i class="fa-solid fa-circle-question" data-tippy-content="Color para identificar esta meta en el panel" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+            </label>
             <select name="color" class="form-control">
               <option value="">Seleccionar...</option>
               {% for c in colores %}
@@ -206,7 +218,10 @@
             </select>
           </div>
           <div class="field">
-            <label>Icono</label>
+            <label>
+              Icono
+              <i class="fa-solid fa-circle-question" data-tippy-content="Icono visual para identificar esta meta" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+            </label>
             <select name="icono" class="form-control">
               <option value="">Seleccionar...</option>
               {% for i in iconos %}
@@ -216,7 +231,10 @@
           </div>
         </div>
         <div class="field">
-          <label>Nota</label>
+          <label>
+            Nota
+            <i class="fa-solid fa-circle-question" data-tippy-content="Nota opcional sobre esta meta" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <textarea name="nota" rows="3" class="form-control" placeholder="Ej: Para tranquilidad financiera"></textarea>
         </div>
       </div>
@@ -243,7 +261,10 @@
       {% csrf_token %}
       <div style="margin-top:16px">
         <div class="field">
-          <label>Meta</label>
+          <label>
+            Meta
+            <i class="fa-solid fa-circle-question" data-tippy-content="Selecciona la meta a la que se asignará este depósito" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <select name="meta" class="form-control" required>
             <option value="">Seleccionar...</option>
             {% for m in metas %}
@@ -252,7 +273,10 @@
           </select>
         </div>
         <div class="field">
-          <label>Cuenta de Origen</label>
+          <label>
+            Cuenta de Origen
+            <i class="fa-solid fa-circle-question" data-tippy-content="Cuenta de donde saldrá el dinero para este depósito" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <select name="cuenta" class="form-control" required>
             <option value="">Seleccionar...</option>
             {% for c in cuentas %}
@@ -261,15 +285,24 @@
           </select>
         </div>
         <div class="field">
-          <label>Monto a Depositar (RD$)</label>
+          <label>
+            Monto a Depositar (RD$)
+            <i class="fa-solid fa-circle-question" data-tippy-content="Monto a depositar en RD$" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <input type="number" name="monto" step="0.01" min="0.01" placeholder="Ej: 500.00" required class="form-control">
         </div>
         <div class="field">
-          <label>Fecha</label>
+          <label>
+            Fecha
+            <i class="fa-solid fa-circle-question" data-tippy-content="Fecha del depósito" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <input type="date" name="fecha" value="{{ hoy }}" class="form-control" required>
         </div>
         <div class="field">
-          <label>Nota</label>
+          <label>
+            Nota
+            <i class="fa-solid fa-circle-question" data-tippy-content="Nota opcional sobre este depósito" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+          </label>
           <textarea name="nota" rows="3" class="form-control" placeholder="Ej: Dep&oacute;sito quincenal"></textarea>
         </div>
       </div>

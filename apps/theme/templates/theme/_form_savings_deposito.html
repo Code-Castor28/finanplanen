@@ -8,13 +8,46 @@
       hx-swap="outerHTML"
       _="on htmx:beforeSend remove .open from #form-modal">
   {% csrf_token %}
-  {% for field in form %}
   <div class="form-group">
-    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-    {{ field }}
-    {% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+    <label for="{{ form.meta.id_for_label }}">
+      {{ form.meta.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Meta de ahorro a la que se asignará este depósito" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
+    {{ form.meta }}
+    {% for error in form.meta.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
-  {% endfor %}
+  <div class="form-group">
+    <label for="{{ form.cuenta.id_for_label }}">
+      {{ form.cuenta.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Cuenta de origen de donde saldrá el dinero" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
+    {{ form.cuenta }}
+    {% for error in form.cuenta.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div class="form-group">
+    <label for="{{ form.monto.id_for_label }}">
+      {{ form.monto.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Monto a depositar en RD$" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
+    {{ form.monto }}
+    {% for error in form.monto.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div class="form-group">
+    <label for="{{ form.fecha.id_for_label }}">
+      {{ form.fecha.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Fecha del depósito" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
+    {{ form.fecha }}
+    {% for error in form.fecha.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
+  <div class="form-group">
+    <label for="{{ form.nota.id_for_label }}">
+      {{ form.nota.label }}
+      <i class="fa-solid fa-circle-question" data-tippy-content="Nota opcional sobre este depósito" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
+    {{ form.nota }}
+    {% for error in form.nota.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+  </div>
   <div class="modal-actions">
     <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Depositar</button>
     <button type="button" class="btn btn-secondary" _="on click remove .open from #form-modal">Cancelar</button>
