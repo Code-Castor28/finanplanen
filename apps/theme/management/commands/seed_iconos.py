@@ -4,280 +4,228 @@ from apps.theme.models import Icono
 from apps.users.models import Tenant
 
 ICONOS = [
-    # ===== Tarjetas y Cuentas =====
+    # ===== TARJETAS Y CUENTAS =====
     ('Billetera', 'fa-wallet'),
-    ('Tarjeta crédito', 'fa-credit-card'),
+    ('Tarjeta de Crédito', 'fa-credit-card'),
     ('Banco', 'fa-building-columns'),
-    ('Dinero', 'fa-money-bill'),
+    ('Dinero en Efectivo', 'fa-money-bill'),
     ('Billetes', 'fa-money-bills'),
     ('Monedas', 'fa-coins'),
     ('Dólar', 'fa-dollar-sign'),
     ('Euro', 'fa-euro-sign'),
     ('Balance', 'fa-scale-balanced'),
     ('Cheque', 'fa-money-check'),
-    ('Efectivo', 'fa-sack-dollar'),
-    ('Caja', 'fa-box-open'),
-    ('Cofre', 'fa-chest'),
+    ('Bolsa de Dinero', 'fa-sack-dollar'),
+    ('Caja de Ahorros', 'fa-box-open'),
     ('Alcancía', 'fa-piggy-bank'),
     ('Transferencia', 'fa-arrow-right-arrow-left'),
-    ('Comisión', 'fa-percent'),
-    ('Interés', 'fa-chart-simple'),
-    # ===== Ingresos =====
-    ('Ingresos', 'fa-arrow-trend-up'),
-    ('Salario', 'fa-briefcase'),
+    ('Porcentaje o Comisión', 'fa-percent'),
+    ('Intereses', 'fa-chart-simple'),
+
+    # ===== INGRESOS =====
+    ('Ingresos Generales', 'fa-arrow-trend-up'),
+    ('Salario o Trabajo', 'fa-briefcase'),
     ('Depósito', 'fa-circle-dollar-to-slot'),
-    ('Ganancia', 'fa-money-bill-wave'),
-    ('Renta', 'fa-file-invoice-dollar'),
+    ('Ganancia Flujo', 'fa-money-bill-wave'),
+    ('Factura Cobrada', 'fa-file-invoice-dollar'),
     ('Inversión', 'fa-chart-pie'),
-    ('Dividendo', 'fa-percent'),
-    ('Bono', 'fa-award'),
+    ('Bono o Recompensa', 'fa-award'),
     ('Devolución', 'fa-rotate-left'),
-    ('Venta', 'fa-tag'),
+    ('Venta o Etiqueta', 'fa-tag'),
     ('Propina', 'fa-hand-holding-dollar'),
     ('Premio', 'fa-trophy'),
-    ('Herencia', 'fa-gem'),
-    ('Préstamo', 'fa-hand-holding-hand'),
-    # ===== Gastos =====
-    ('Gastos', 'fa-arrow-trend-down'),
-    ('Compras', 'fa-cart-shopping'),
-    ('Bolsa', 'fa-bag-shopping'),
-    ('Factura', 'fa-receipt'),
+    ('Herencia o Gema', 'fa-gem'),
+
+    # ===== GASTOS =====
+    ('Gastos Generales', 'fa-arrow-trend-down'),
+    ('Compras Carrito', 'fa-cart-shopping'),
+    ('Compras Bolsa', 'fa-bag-shopping'),
+    ('Factura por Pagar', 'fa-receipt'),
     ('Recibo', 'fa-file-invoice'),
-    ('Impuesto', 'fa-file'),
-    ('Multa', 'fa-circle-exclamation'),
-    ('Suscripción', 'fa-arrows-rotate'),
-    ('Cuota', 'fa-hand-holding-hand'),
+    ('Impuestos', 'fa-file-lines'),
+    ('Multa o Alerta', 'fa-circle-exclamation'),
+    ('Suscripciones', 'fa-arrows-rotate'),
+    ('Préstamo o Cuota', 'fa-hand-holding-hand'),
     ('Donación', 'fa-hand-holding-heart'),
-    ('Gasto fijo', 'fa-clock'),
-    ('Gasto variable', 'fa-chart-line'),
-    ('Emergencia', 'fa-truck-medical'),
-    ('Deuda', 'fa-file-invoice'),
-    # ===== Alimentación =====
-    ('Comida', 'fa-utensils'),
-    ('Restaurante', 'fa-plate-wheat'),
+    ('Gasto Variable', 'fa-chart-line'),
+
+    # ===== ALIMENTACIÓN =====
+    ('Comida o Restaurante', 'fa-utensils'),
+    ('Plato de Comida', 'fa-bowl-food'),
     ('Hamburguesa', 'fa-burger'),
     ('Pizza', 'fa-pizza-slice'),
-    ('Comida rápida', 'fa-hotdog'),
-    ('Ensalada', 'fa-carrot'),
+    ('Comida Rápida', 'fa-hotdog'),
+    ('Zanahoria', 'fa-carrot'),
     ('Fruta', 'fa-apple-whole'),
-    ('Verdura', 'fa-leaf'),
-    ('Huevos', 'fa-egg'),
+    ('Vegetales', 'fa-leaf'),
+    ('Huevo', 'fa-egg'),
     ('Queso', 'fa-cheese'),
     ('Pan', 'fa-bread-slice'),
     ('Pastel', 'fa-cake-candles'),
     ('Helado', 'fa-ice-cream'),
     ('Café', 'fa-mug-hot'),
     ('Té', 'fa-mug-saucer'),
-    ('Cerveza', 'fa-beer-mug'),
+    ('Cerveza', 'fa-beer-mug-empty'),
     ('Vino', 'fa-wine-bottle'),
-    ('Coctel', 'fa-cocktail'),
+    ('Coctel', 'fa-martini-glass-citrus'),
     ('Agua', 'fa-droplet'),
     ('Supermercado', 'fa-basket-shopping'),
     ('Carne', 'fa-drumstick-bite'),
     ('Pescado', 'fa-fish'),
-    ('Postre', 'fa-candy-cane'),
-    ('Desayuno', 'fa-sun'),
-    ('Almuerzo', 'fa-cloud-sun'),
-    ('Cena', 'fa-moon'),
-    # ===== Transporte =====
-    ('Auto', 'fa-car'),
+    ('Dulces', 'fa-candy-cane'),
+
+    # ===== TRANSPORTE Y VIAJES =====
+    ('Automóvil', 'fa-car'),
     ('Taxi', 'fa-taxi'),
-    ('Bus', 'fa-bus'),
+    ('Autobús', 'fa-bus'),
     ('Tren', 'fa-train'),
     ('Metro', 'fa-train-subway'),
     ('Avión', 'fa-plane'),
     ('Bicicleta', 'fa-bicycle'),
-    ('Moto', 'fa-motorcycle'),
+    ('Motocicleta', 'fa-motorcycle'),
     ('Gasolina', 'fa-gas-pump'),
     ('Estacionamiento', 'fa-square-parking'),
-    ('Peaje', 'fa-road'),
-    ('Viaje', 'fa-suitcase-rolling'),
+    ('Peaje o Carretera', 'fa-road'),
+    ('Viajes Equipaje', 'fa-suitcase-rolling'),
     ('Pasaporte', 'fa-passport'),
-    ('Carga', 'fa-truck'),
+    ('Camión de Carga', 'fa-truck'),
     ('Mudanza', 'fa-truck-moving'),
-    ('Batería', 'fa-car-battery'),
-    ('Aceite', 'fa-oil-can'),
-    ('Ruta', 'fa-route'),
-    # ===== Compras =====
-    ('Tienda', 'fa-store'),
+    ('Mantenimiento Auto', 'fa-car-battery'),
+    ('Aceite Motor', 'fa-oil-can'),
+    ('Ruta o Mapa', 'fa-route'),
+
+    # ===== COMPRAS Y TECNOLOGÍA =====
+    ('Tienda Física', 'fa-store'),
     ('Ropa', 'fa-shirt'),
-    ('Zapatos', 'fa-shoe-prints'),
-    ('Joyería', 'fa-gem'),
+    ('Calzado', 'fa-shoe-prints'),
     ('Regalo', 'fa-gift'),
-    ('Electrónica', 'fa-laptop'),
-    ('Celular', 'fa-mobile-screen'),
-    ('TV', 'fa-tv'),
-    ('Videojuego', 'fa-gamepad'),
-    ('Música', 'fa-headphones'),
+    ('Computadora', 'fa-laptop'),
+    ('Teléfono Celular', 'fa-mobile-screen-button'),
+    ('Televisión', 'fa-tv'),
+    ('Videojuegos', 'fa-gamepad'),
+    ('Auriculares', 'fa-headphones'),
     ('Cine', 'fa-film'),
     ('Libro', 'fa-book'),
-    ('Mascota', 'fa-paw'),
-    ('Juguete', 'fa-chess-knight'),
-    ('Decoración', 'fa-paintbrush'),
-    ('Mueble', 'fa-couch'),
-    ('Herramienta', 'fa-wrench'),
+    ('Muebles', 'fa-couch'),
+    ('Herramientas', 'fa-wrench'),
     ('Farmacia', 'fa-prescription-bottle'),
     ('Bebé', 'fa-baby'),
-    ('Boda', 'fa-ring'),
-    # ===== Entretenimiento =====
+
+    # ===== ENTRETENIMIENTO Y DEPORTES =====
     ('Boleto', 'fa-ticket'),
-    ('Palomitas', 'fa-popcorn'),
-    ('Concierto', 'fa-guitar'),
-    ('Deporte', 'fa-futbol'),
+    ('Música o Guitarra', 'fa-guitar'),
+    ('Fútbol', 'fa-futbol'),
     ('Gimnasio', 'fa-dumbbell'),
-    ('Piscina', 'fa-person-swimming'),
+    ('Natación', 'fa-person-swimming'),
     ('Correr', 'fa-person-running'),
-    ('Yoga', 'fa-spa'),
-    ('Foto', 'fa-camera'),
+    ('Spa o Yoga', 'fa-spa'),
+    ('Cámara', 'fa-camera'),
     ('Arte', 'fa-palette'),
-    ('Fiesta', 'fa-champagne-glasses'),
-    ('Baile', 'fa-music'),
-    ('Lectura', 'fa-book-open'),
-    ('Play', 'fa-play'),
-    ('Pausa', 'fa-pause'),
-    # ===== Hogar =====
+    ('Celebración', 'fa-champagne-glasses'),
+
+    # ===== HOGAR Y SERVICIOS =====
     ('Casa', 'fa-house'),
     ('Hipoteca', 'fa-house-chimney'),
-    ('Alquiler', 'fa-key'),
+    ('Alquiler Llave', 'fa-key'),
     ('Electricidad', 'fa-bolt'),
-    ('Agua', 'fa-faucet'),
-    ('Gas', 'fa-fire'),
-    ('Internet', 'fa-wifi'),
-    ('Teléfono', 'fa-phone'),
-    ('Mantenimiento', 'fa-wrench'),
+    ('Agua Grifo', 'fa-faucet'),
+    ('Gas o Fuego', 'fa-fire'),
+    ('Internet WiFi', 'fa-wifi'),
+    ('Teléfono Fijo', 'fa-phone'),
     ('Limpieza', 'fa-soap'),
     ('Jardín', 'fa-seedling'),
-    ('Seguro hogar', 'fa-shield-house'),
-    ('Habitación', 'fa-bed'),
+    ('Seguro Hogar', 'fa-shield-cat'),
+    ('Cama', 'fa-bed'),
     ('Baño', 'fa-toilet'),
-    ('Luz', 'fa-lightbulb'),
-    ('Aire', 'fa-fan'),
+    ('Iluminación', 'fa-lightbulb'),
+    ('Ventilación', 'fa-fan'),
     ('Calefacción', 'fa-temperature-high'),
-    # ===== Salud =====
-    ('Salud', 'fa-heart-pulse'),
+
+    # ===== SALUD =====
+    ('Salud Corazón', 'fa-heart-pulse'),
     ('Hospital', 'fa-hospital'),
-    ('Doctor', 'fa-stethoscope'),
-    ('Medicina', 'fa-pills'),
-    ('Seguro salud', 'fa-shield'),
-    ('Emergencia', 'fa-truck-medical'),
+    ('Estetoscopio', 'fa-stethoscope'),
+    ('Medicinas', 'fa-pills'),
+    ('Seguro de Salud', 'fa-shield-halved'),
+    ('Ambulancia', 'fa-truck-medical'),
     ('Dentista', 'fa-tooth'),
     ('Visión', 'fa-eye'),
-    ('Análisis', 'fa-flask'),
-    ('Terapia', 'fa-brain'),
+    ('Laboratorio', 'fa-flask'),
+    ('Salud Mental', 'fa-brain'),
     ('Vacuna', 'fa-syringe'),
-    ('Venda', 'fa-bandage'),
-    ('Peso', 'fa-weight-scale'),
-    ('Ejercicio', 'fa-person-walking'),
-    # ===== Educación =====
-    ('Educación', 'fa-graduation-cap'),
-    ('Curso', 'fa-pencil'),
-    ('Universidad', 'fa-school'),
-    ('Libros', 'fa-book-open'),
-    ('Online', 'fa-laptop-code'),
-    ('Papelería', 'fa-paperclip'),
-    ('Examen', 'fa-clipboard-list'),
-    ('Estudio', 'fa-pen-ruler'),
-    ('Idioma', 'fa-language'),
+    ('Vendaje', 'fa-bandage'),
+    ('Báscula', 'fa-weight-scale'),
+    ('Caminar', 'fa-person-walking'),
+
+    # ===== EDUCACIÓN =====
+    ('Educación Graduación', 'fa-graduation-cap'),
+    ('Lápiz', 'fa-pencil'),
+    ('Escuela o Universidad', 'fa-school'),
+    ('Libro Abierto', 'fa-book-open'),
+    ('Programación', 'fa-laptop-code'),
+    ('Clip', 'fa-paperclip'),
+    ('Examen o Lista', 'fa-clipboard-list'),
+    ('Regla y Lápiz', 'fa-pen-ruler'),
+    ('Idiomas', 'fa-language'),
     ('Certificado', 'fa-certificate'),
-    # ===== Servicios =====
-    ('Suscripción', 'fa-arrows-rotate'),
-    ('Seguro', 'fa-shield-check'),
-    ('Almacenamiento', 'fa-cloud'),
-    ('Membresía', 'fa-id-card'),
-    ('Tarifa', 'fa-barcode'),
-    ('Streaming', 'fa-tower-broadcast'),
-    ('Dominio', 'fa-globe'),
-    ('Hosting', 'fa-server'),
-    # ===== Personas =====
-    ('Usuario', 'fa-user'),
-    ('Pareja', 'fa-heart'),
+
+    # ===== SERVICIOS DIGITALES =====
+    ('Nube', 'fa-cloud'),
+    ('Identificación', 'fa-id-card'),
+    ('Código de Barras', 'fa-barcode'),
+    ('Transmisión', 'fa-tower-broadcast'),
+    ('Web', 'fa-globe'),
+    ('Servidor o Hosting', 'fa-server'),
+
+    # ===== PERSONAS Y MASCOTAS =====
+    ('Usuario Individual', 'fa-user'),
+    ('Pareja o Amor', 'fa-heart'),
     ('Familia', 'fa-users'),
     ('Hijo', 'fa-child'),
-    ('Amigo', 'fa-user-group'),
-    ('Mascota', 'fa-dog'),
+    ('Grupo', 'fa-user-group'),
+    ('Perro', 'fa-dog'),
     ('Gato', 'fa-cat'),
-    ('Boda', 'fa-ring'),
-    ('Cumpleaños', 'fa-cake-candles'),
-    # ===== Notificaciones =====
-    ('Notificación', 'fa-bell'),
-    ('Alarma', 'fa-alarm-clock'),
-    ('Recordatorio', 'fa-clock'),
+
+    # ===== NOTIFICACIONES Y ACCIONES =====
+    ('Campana', 'fa-bell'),
+    ('Reloj', 'fa-clock'),
     ('Calendario', 'fa-calendar'),
-    ('Correo', 'fa-envelope'),
+    ('Email', 'fa-envelope'),
     ('Mensaje', 'fa-message'),
-    ('Llamada', 'fa-phone-volume'),
-    ('Alerta', 'fa-circle-exclamation'),
-    # ===== Acciones =====
+    ('Llamada Volumen', 'fa-phone-volume'),
     ('Agregar', 'fa-plus'),
     ('Quitar', 'fa-minus'),
-    ('OK', 'fa-circle-check'),
-    ('Cancelar', 'fa-circle-xmark'),
+    ('Éxito', 'fa-circle-check'),
+    ('Error', 'fa-circle-xmark'),
     ('Editar', 'fa-pen-to-square'),
     ('Eliminar', 'fa-trash-can'),
     ('Guardar', 'fa-floppy-disk'),
     ('Descargar', 'fa-download'),
     ('Subir', 'fa-upload'),
-    ('Buscar', 'fa-search'),
+    ('Buscar', 'fa-magnifying-glass'),
     ('Filtrar', 'fa-filter'),
-    ('Configurar', 'fa-gear'),
+    ('Configuración', 'fa-gear'),
     ('Compartir', 'fa-share-nodes'),
-    ('Favorito', 'fa-star'),
-    ('Like', 'fa-thumbs-up'),
-    ('Imprimir', 'fa-print'),
-    ('Cerrar', 'fa-xmark'),
-    ('Menú', 'fa-bars'),
-    ('Más', 'fa-ellipsis-vertical'),
-    ('Sincronizar', 'fa-arrows-rotate'),
-    ('Abrir', 'fa-folder-open'),
-    ('Nuevo', 'fa-file-circle-plus'),
-    # ===== Seguridad =====
-    ('Candado', 'fa-lock'),
-    ('Protegido', 'fa-shield-halved'),
-    ('PIN', 'fa-fingerprint'),
-    ('Privacidad', 'fa-eye-slash'),
-    ('Contraseña', 'fa-key'),
-    ('Verificado', 'fa-shield-check'),
-    ('SSL', 'fa-lock'),
-    # ===== Metas y Ahorros =====
-    ('Meta', 'fa-bullseye'),
-    ('Ahorro', 'fa-piggy-bank'),
-    ('Presupuesto', 'fa-chart-simple'),
-    ('Plan', 'fa-clipboard-list'),
-    ('Objetivo', 'fa-flag-checkered'),
-    ('Crecimiento', 'fa-arrow-trend-up'),
-    ('Estadística', 'fa-chart-bar'),
-    ('Reporte', 'fa-chart-column'),
-    # ===== Extra =====
-    ('QR', 'fa-qrcode'),
-    ('Tag', 'fa-tags'),
-    ('Nota', 'fa-note-sticky'),
-    ('Link', 'fa-link'),
-    ('Globo', 'fa-globe'),
-    ('Pin', 'fa-location-dot'),
-    ('Mapa', 'fa-map-location-dot'),
-    ('Brújula', 'fa-compass'),
-    ('Reloj', 'fa-clock'),
-    ('Temporizador', 'fa-timer'),
-    ('Sol', 'fa-sun'),
-    ('Luna', 'fa-moon'),
-    ('Nube', 'fa-cloud'),
-    ('Lluvia', 'fa-cloud-rain'),
-    ('Trueno', 'fa-cloud-bolt'),
-    ('Hoja', 'fa-leaf'),
-    ('Árbol', 'fa-tree'),
-    ('Flor', 'fa-seedling'),
-    ('Corona', 'fa-crown'),
-    ('Medalla', 'fa-medal'),
-    ('Rocket', 'fa-rocket'),
-    ('Infinito', 'fa-infinity'),
-    ('Bandera', 'fa-flag'),
-    ('Corazón', 'fa-heart'),
     ('Estrella', 'fa-star'),
-    ('Check', 'fa-check'),
-    ('Cruz', 'fa-xmark'),
-    ('Info', 'fa-circle-info'),
-    ('Ayuda', 'fa-circle-question'),
-    ('Advertencia', 'fa-triangle-exclamation'),
+    ('Imprimir', 'fa-print'),
+    ('Menú Hamburguesa', 'fa-bars'),
+
+    # ===== METAS Y SEGURIDAD =====
+    ('Candado Cerrado', 'fa-lock'),
+    ('Huella Digital', 'fa-fingerprint'),
+    ('Ojo Oculto', 'fa-eye-slash'),
+    ('Meta Objetivo', 'fa-bullseye'),
+    ('Bandera de Meta', 'fa-flag-checkered'),
+    ('Estadística Barras', 'fa-chart-bar'),
+    ('Estadística Columnas', 'fa-chart-column'),
+    ('Código QR', 'fa-qrcode'),
+    ('Etiquetas', 'fa-tags'),
+    ('Nota Adhesiva', 'fa-note-sticky'),
+    ('Enlace', 'fa-link'),
+    ('Ubicación Pin', 'fa-location-dot'),
+    ('Mapa Destino', 'fa-map-location-dot'),
+    ('Brújula', 'fa-compass'),
+    ('Cohete', 'fa-rocket'),
 ]
 
 ICONOS.sort(key=lambda x: x[0].lower())
@@ -308,26 +256,53 @@ class Command(BaseCommand):
                 continue
 
             creados = 0
+            actualizados = 0
             existentes = 0
             for nombre, clase_css in ICONOS:
-                obj, created = Icono.objects.get_or_create(
+                defaults = {
+                    'usuario': user,
+                    'nombre': nombre,
+                    'slug': slugify(clase_css),
+                }
+                obj, created = Icono.objects.update_or_create(
                     inquilino=tenant,
                     clase_css=clase_css,
-                    defaults={
-                        'usuario': user,
-                        'nombre': nombre,
-                        'slug': slugify(clase_css),
-                    },
+                    defaults=defaults,
                 )
                 if created:
                     creados += 1
                 else:
-                    existentes += 1
+                    if obj.nombre != nombre or obj.slug != defaults['slug']:
+                        for k, v in defaults.items():
+                            setattr(obj, k, v)
+                        obj.save()
+                        actualizados += 1
+                    else:
+                        existentes += 1
 
             total_creados += creados
             self.stdout.write(
-                f'  {tenant.nombre}: {creados} creados, {existentes} ya existentes'
+                f'  {tenant.nombre}: {creados} creados, {actualizados} actualizados, {existentes} sin cambios'
             )
+
+            # Second pass: fix icons with correct nombre but wrong clase_css
+            clases_seed = {c for _, c in ICONOS}
+            mapa_nombre_clase = dict(ICONOS)
+            corregidos = 0
+            for icono in Icono.objects.filter(inquilino=tenant):
+                if icono.clase_css not in clases_seed and icono.nombre in mapa_nombre_clase:
+                    clase_correcta = mapa_nombre_clase[icono.nombre]
+                    if Icono.objects.filter(inquilino=tenant, clase_css=clase_correcta).exists():
+                        # Ya existe otro con la clase correcta, eliminar este (duplicado corrupto)
+                        icono.delete()
+                        corregidos += 1
+                    else:
+                        icono.clase_css = clase_correcta
+                        icono.slug = slugify(clase_correcta)
+                        icono.save()
+                        corregidos += 1
+            if corregidos:
+                self.stdout.write(f'    {corregidos} iconos corregidos (clase_css incorrecta)')
 
         if total_creados:
             self.stdout.write(self.style.SUCCESS(
