@@ -1,4 +1,5 @@
 import re
+from decimal import Decimal
 from django import forms
 from django.urls import reverse_lazy
 from django.utils.text import slugify
@@ -7,6 +8,14 @@ from .models import Cuenta
 
 class CuentaForm(forms.ModelForm):
     _validar_url = reverse_lazy('accounts:validar_campo')
+
+    balance = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'inputmode': 'decimal', 'autocomplete': 'off',
+            'style': 'border:none;background:transparent;flex:1;min-width:0;padding:10px 12px;font-family:inherit;font-size:14px;outline:none',
+        }),
+    )
 
     class Meta:
         model = Cuenta
@@ -17,10 +26,6 @@ class CuentaForm(forms.ModelForm):
         ]
         widgets = {
             'nombre': forms.TextInput(attrs={'placeholder': 'Ej. Visa Signature'}),
-            'balance': forms.TextInput(attrs={
-                'inputmode': 'decimal', 'autocomplete': 'off',
-                'style': 'border:none;background:transparent;flex:1;min-width:0;padding:10px 12px;font-family:inherit;font-size:14px;outline:none',
-            }),
             'emisor': forms.TextInput(attrs={'placeholder': 'Ej. Banco Popular'}),
             'ultimos_digitos': forms.TextInput(attrs={
                 'placeholder': '4412', 'maxlength': '4', 'inputmode': 'numeric',
@@ -56,9 +61,13 @@ class CuentaForm(forms.ModelForm):
 
     def clean_balance(self):
         val = self.cleaned_data.get('balance')
-        if val and isinstance(val, str):
-            val = val.replace(',', '')
-        return val
+        if not val:
+            return Decimal('0')
+        val = val.replace(',', '')
+        try:
+            return Decimal(val)
+        except:
+            raise forms.ValidationError('Introduzca un número válido.')
 
     def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre')
