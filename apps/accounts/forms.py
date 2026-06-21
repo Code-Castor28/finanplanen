@@ -54,6 +54,12 @@ class CuentaForm(forms.ModelForm):
             attrs['hx-vals'] = f'{{"field":"{field_name}","instance_pk":"{pk}"}}'
             self.fields[field_name].widget.attrs.update(attrs)
 
+    def clean_balance(self):
+        val = self.cleaned_data.get('balance')
+        if val and isinstance(val, str):
+            val = val.replace(',', '')
+        return val
+
     def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre')
         if nombre and self.inquilino:
