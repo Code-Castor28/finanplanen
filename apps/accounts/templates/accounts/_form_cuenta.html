@@ -1,5 +1,6 @@
 <style>
 .icon-picker { position:relative; }
+.color-picker { position:relative; }
 .icon-search { width:100%; margin-bottom:8px; padding:8px 10px; border:1.5px solid var(--olv,#ddd); border-radius:6px; font-size:13px; outline:none; box-sizing:border-box; background:var(--bg,#fff); color:var(--tx,#333); }
 .icon-search:focus { border-color:var(--pr,#1a73e8); }
 .icon-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(68px,1fr)); gap:6px; max-height:220px; overflow-y:auto; padding:4px 0; }
@@ -9,6 +10,12 @@
 .icon-tile i { font-size:20px; color:var(--tx,#333); }
 .icon-tile.selected i { color:var(--pr,#1a73e8); }
 .icon-tile span { font-size:10px; color:var(--ov,#666); text-align:center; margin-top:4px; line-height:1.2; word-break:break-all; max-width:68px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.color-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:6px; max-height:200px; overflow-y:auto; padding:4px 0; }
+.color-tile { display:flex; flex-direction:column; align-items:center; padding:8px 4px; border:2px solid transparent; border-radius:8px; cursor:pointer; transition:all .12s ease; gap:4px; }
+.color-tile:hover { background:var(--sc,#f0f2f5); }
+.color-tile.selected { border-color:var(--pr,#1a73e8); background:var(--sc-light,#e8f0fe); }
+.color-swatch { width:28px; height:28px; border-radius:50%; border:1px solid var(--olv,#ddd); flex-shrink:0; }
+.color-tile span { font-size:11px; color:var(--ov,#666); text-align:center; line-height:1.2; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:76px; }
 </style>
 <div class="modal-head">
   <h3>{% if object %}Editar Cuenta{% else %}Nueva Cuenta{% endif %}</h3>
@@ -100,7 +107,18 @@
         {{ form.color.label }}
         <i class="fa-solid fa-circle-question" data-tippy-content="Color para identificar visualmente esta cuenta en listas y gráficos" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
       </label>
-    {{ form.color }}
+      <div class="color-picker">
+        <div style="display:none">{{ form.color }}</div>
+        <input type="text" id="color-search" class="icon-search" placeholder="Buscar color..." autocomplete="off">
+        <div class="color-grid" id="color-grid">
+          {% for color in form.color.field.queryset %}
+          <div class="color-tile{% if form.color.value == color.pk %} selected{% endif %}" data-pk="{{ color.pk }}" data-search="{{ color.nombre|lower }}">
+            <span class="color-swatch" style="background:{{ color.hex }}"></span>
+            <span>{{ color.nombre }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
     <span class="field-error">{% for error in form.color.errors %}{{ error }}{% endfor %}</span>
     </div>
     <div class="field">
@@ -207,6 +225,28 @@
     search.addEventListener('input', function(){
       var q = this.value.toLowerCase().trim();
       grid.querySelectorAll('.icon-tile').forEach(function(t){
+        t.style.display = (!q || (t.dataset.search||'').includes(q)) ? '' : 'none';
+      });
+    });
+  }
+})();
+
+(function(){
+  var grid = document.getElementById('color-grid');
+  var search = document.getElementById('color-search');
+  var select = document.getElementById('{{ form.color.id_for_label }}');
+  if (!grid || !select) return;
+  grid.addEventListener('click', function(e){
+    var tile = e.target.closest('.color-tile');
+    if (!tile) return;
+    grid.querySelectorAll('.color-tile').forEach(function(t){ t.classList.remove('selected'); });
+    tile.classList.add('selected');
+    select.value = tile.dataset.pk;
+  });
+  if (search) {
+    search.addEventListener('input', function(){
+      var q = this.value.toLowerCase().trim();
+      grid.querySelectorAll('.color-tile').forEach(function(t){
         t.style.display = (!q || (t.dataset.search||'').includes(q)) ? '' : 'none';
       });
     });

@@ -316,7 +316,7 @@ class Command(BaseCommand):
                     defaults={
                         'usuario': user,
                         'nombre': nombre,
-                        'slug': slugify(nombre),
+                        'slug': slugify(clase_css),
                     },
                 )
                 if created:

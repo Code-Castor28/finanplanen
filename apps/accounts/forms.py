@@ -43,6 +43,7 @@ class CuentaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.inquilino:
             self.fields['icono'].queryset = self.fields['icono'].queryset.filter(inquilino=self.inquilino)
+            self.fields['color'].queryset = self.fields['color'].queryset.filter(inquilino=self.inquilino)
         if not self.instance.pk:
             self.initial['balance'] = ''
         if tipo_filter:
