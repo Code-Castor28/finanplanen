@@ -31,6 +31,22 @@
 .goals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-bottom:24px}
 
 .ai-banner{background:linear-gradient(135deg,#1a237e,#283593);color:#fff}
+.icon-picker,.color-picker{position:relative}
+.icon-search{width:100%;margin-bottom:8px;padding:8px 10px;border:1.5px solid var(--olv,#ddd);border-radius:6px;font-size:13px;outline:none;box-sizing:border-box;background:var(--bg,#fff);color:var(--tx,#333)}
+.icon-search:focus{border-color:var(--pr,#1a73e8)}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:6px;max-height:220px;overflow-y:auto;padding:4px 0}
+.icon-tile{display:flex;flex-direction:column;align-items:center;padding:8px 2px;border:2px solid transparent;border-radius:8px;cursor:pointer;transition:all .12s ease}
+.icon-tile:hover{background:var(--sc,#f0f2f5)}
+.icon-tile.selected{border-color:var(--pr,#1a73e8);background:var(--sc-light,#e8f0fe)}
+.icon-tile i{font-size:20px;color:var(--tx,#333)}
+.icon-tile.selected i{color:var(--pr,#1a73e8)}
+.icon-tile span{font-size:10px;color:var(--ov,#666);text-align:center;margin-top:4px;line-height:1.2;word-break:break-all;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.color-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;max-height:200px;overflow-y:auto;padding:4px 0}
+.color-tile{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border:2px solid transparent;border-radius:8px;cursor:pointer;transition:all .12s ease;gap:4px}
+.color-tile:hover{background:var(--sc,#f0f2f5)}
+.color-tile.selected{border-color:var(--pr,#1a73e8);background:var(--sc-light,#e8f0fe)}
+.color-swatch{width:28px;height:28px;border-radius:50%;border:1px solid var(--olv,#ddd);flex-shrink:0;display:inline-block}
+.color-tile span{font-size:11px;color:var(--ov,#666);text-align:center;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:76px}
 </style>
 {% endblock %}
 
@@ -210,24 +226,46 @@
               Color
               <i class="fa-solid fa-circle-question" data-tippy-content="Color para identificar esta meta en el panel" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
             </label>
-            <select name="color" class="form-control">
-              <option value="">Seleccionar...</option>
-              {% for c in colores %}
-              <option value="{{ c.pk }}">{{ c.nombre }}</option>
-              {% endfor %}
-            </select>
+            <div class="color-picker">
+              <select name="color" id="new-goal-color" style="display:none">
+                <option value="">Seleccionar...</option>
+                {% for c in colores %}
+                <option value="{{ c.pk }}">{{ c.nombre }}</option>
+                {% endfor %}
+              </select>
+              <input type="text" id="new-goal-color-search" class="icon-search" placeholder="Buscar color..." autocomplete="off">
+              <div class="color-grid" id="new-goal-color-grid">
+                {% for c in colores %}
+                <div class="color-tile" data-pk="{{ c.pk }}" data-search="{{ c.nombre|lower }}">
+                  <span class="color-swatch" style="background:{{ c.hex }}"></span>
+                  <span>{{ c.nombre }}</span>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
           </div>
           <div class="field">
             <label>
               Icono
               <i class="fa-solid fa-circle-question" data-tippy-content="Icono visual para identificar esta meta" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
             </label>
-            <select name="icono" class="form-control">
-              <option value="">Seleccionar...</option>
-              {% for i in iconos %}
-              <option value="{{ i.pk }}">{{ i.nombre }}</option>
-              {% endfor %}
-            </select>
+            <div class="icon-picker">
+              <select name="icono" id="new-goal-icono" style="display:none">
+                <option value="">Seleccionar...</option>
+                {% for i in iconos %}
+                <option value="{{ i.pk }}">{{ i.nombre }}</option>
+                {% endfor %}
+              </select>
+              <input type="text" id="new-goal-icono-search" class="icon-search" placeholder="Buscar icono..." autocomplete="off">
+              <div class="icon-grid" id="new-goal-icono-grid">
+                {% for i in iconos %}
+                <div class="icon-tile" data-pk="{{ i.pk }}" data-search="{{ i.nombre|lower }}">
+                  <i class="fas {{ i.clase_css }}"></i>
+                  <span>{{ i.nombre }}</span>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
           </div>
         </div>
         <div class="field">
@@ -331,6 +369,30 @@
   document.getElementById('newGoalBtn').addEventListener('click', function() {
     document.getElementById('newGoalModal').classList.add('open');
   });
+
+  function initRawPicker(gridId, searchId, selectId, tileClass) {
+    var grid = document.getElementById(gridId);
+    var search = document.getElementById(searchId);
+    var select = document.getElementById(selectId);
+    if (!grid || !select) return;
+    grid.addEventListener('click', function(e){
+      var tile = e.target.closest('.' + tileClass);
+      if (!tile) return;
+      grid.querySelectorAll('.' + tileClass).forEach(function(t){ t.classList.remove('selected'); });
+      tile.classList.add('selected');
+      select.value = tile.dataset.pk;
+    });
+    if (search) {
+      search.addEventListener('input', function(){
+        var q = this.value.toLowerCase().trim();
+        grid.querySelectorAll('.' + tileClass).forEach(function(t){
+          t.style.display = (!q || (t.dataset.search||'').includes(q)) ? '' : 'none';
+        });
+      });
+    }
+  }
+  initRawPicker('new-goal-color-grid', 'new-goal-color-search', 'new-goal-color', 'color-tile');
+  initRawPicker('new-goal-icono-grid', 'new-goal-icono-search', 'new-goal-icono', 'icon-tile');
 })();
 </script>
 {% endblock %}

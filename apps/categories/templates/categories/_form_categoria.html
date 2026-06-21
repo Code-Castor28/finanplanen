@@ -30,7 +30,7 @@
       {{ form.color.label }}
       <i class="fa-solid fa-circle-question" data-tippy-content="Color para identificar esta categoría en gráficos y listas" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
     </label>
-    {{ form.color }}
+    {% include "includes/_color_picker.html" with field=form.color %}
     {% for error in form.color.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
@@ -38,7 +38,7 @@
       {{ form.icono.label }}
       <i class="fa-solid fa-circle-question" data-tippy-content="Icono visual para identificar esta categoría" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
     </label>
-    {{ form.icono }}
+    {% include "includes/_icon_picker.html" with field=form.icono %}
     {% for error in form.icono.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
   </div>
   <div class="form-group">
