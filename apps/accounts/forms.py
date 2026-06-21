@@ -100,6 +100,8 @@ class CuentaForm(forms.ModelForm):
             if len(digits) != 4:
                 raise forms.ValidationError('Formato inválido. Use MM/AA.')
             month = int(digits[:2])
+            if month > 31:
+                raise forms.ValidationError('El mes no puede ser mayor a 31.')
             if month < 1 or month > 12:
                 raise forms.ValidationError('Mes inválido (debe ser 01-12).')
             return f'{digits[:2]}/{digits[2:]}'
@@ -107,12 +109,18 @@ class CuentaForm(forms.ModelForm):
 
     def clean_dia_corte(self):
         val = self.cleaned_data.get('dia_corte')
-        if val and not val.isdigit():
-            raise forms.ValidationError('Solo números.')
+        if val:
+            if not val.isdigit():
+                raise forms.ValidationError('Solo números.')
+            if int(val) > 31:
+                raise forms.ValidationError('El día no puede ser mayor a 31.')
         return val
 
     def clean_dia_pago(self):
         val = self.cleaned_data.get('dia_pago')
-        if val and not val.isdigit():
-            raise forms.ValidationError('Solo números.')
+        if val:
+            if not val.isdigit():
+                raise forms.ValidationError('Solo números.')
+            if int(val) > 31:
+                raise forms.ValidationError('El día no puede ser mayor a 31.')
         return val
