@@ -41,6 +41,8 @@ class CuentaForm(forms.ModelForm):
         self.inquilino = kwargs.pop('inquilino', None)
         tipo_filter = kwargs.pop('tipo_filter', None)
         super().__init__(*args, **kwargs)
+        if self.inquilino:
+            self.fields['icono'].queryset = self.fields['icono'].queryset.filter(inquilino=self.inquilino)
         if not self.instance.pk:
             self.initial['balance'] = ''
         if tipo_filter:
