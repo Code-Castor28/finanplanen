@@ -132,7 +132,7 @@
         <div class="icon-grid" id="icon-grid">
           {% for icono in form.icono.field.queryset %}
           <div class="icon-tile{% if form.icono.value == icono.pk %} selected{% endif %}" data-pk="{{ icono.pk }}" data-search="{{ icono.nombre|lower }}">
-            <i class="{{ icono.clase_css }}"></i>
+            <i class="fas {{ icono.clase_css }}"></i>
             <span>{{ icono.nombre }}</span>
           </div>
           {% endfor %}

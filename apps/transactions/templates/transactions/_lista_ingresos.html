@@ -19,14 +19,14 @@
         <td>{{ ing.fecha|date:"d/m/Y" }}</td>
         <td>
           <span class="chip" style="background:var(--sc)">
-            {% if ing.cuenta.icono %}<i class="{{ ing.cuenta.icono.clase_css }}"></i>{% endif %}
+            {% if ing.cuenta.icono %}<i class="fas {{ ing.cuenta.icono.clase_css }}"></i>{% endif %}
             {{ ing.cuenta.nombre }}
           </span>
         </td>
         <td>
           {% if ing.categoria %}
           <span class="chip" style="background:var(--sc)">
-            {% if ing.categoria.icono %}<i class="{{ ing.categoria.icono.clase_css }}"></i>{% endif %}
+            {% if ing.categoria.icono %}<i class="fas {{ ing.categoria.icono.clase_css }}"></i>{% endif %}
             {{ ing.categoria.nombre }}
           </span>
           {% else %}

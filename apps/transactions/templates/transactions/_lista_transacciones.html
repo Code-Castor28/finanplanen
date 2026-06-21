@@ -36,7 +36,7 @@
         <td>
           {% if t.categoria %}
           <span class="chip" style="background:var(--sc)">
-            {% if t.categoria.icono %}<i class="{{ t.categoria.icono.clase_css }}"></i>{% endif %}
+            {% if t.categoria.icono %}<i class="fas {{ t.categoria.icono.clase_css }}"></i>{% endif %}
             {{ t.categoria.nombre }}
           </span>
           {% else %}

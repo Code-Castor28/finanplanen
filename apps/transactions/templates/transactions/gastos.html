@@ -172,7 +172,7 @@
         <div class="cat-item">
           <div class="cat-top">
             <div class="cat-ico" style="background:{% if cat.color %}{{ cat.color.hex }}1e{% else %}rgba(26,35,126,.08){% endif %};color:{% if cat.color %}{{ cat.color.hex }}{% else %}var(--pc){% endif %}">
-              {% if cat.icono %}<i class="{{ cat.icono.clase_css }}"></i>{% else %}<i class="fas fa-tag"></i>{% endif %}
+              {% if cat.icono %}<i class="fas {{ cat.icono.clase_css }}"></i>{% else %}<i class="fas fa-tag"></i>{% endif %}
             </div>
             <div class="cat-info">
               <b>{{ cat.nombre }}</b>

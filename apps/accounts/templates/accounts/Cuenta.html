@@ -101,7 +101,7 @@
       {% for cta in wallets %}
       <div class="wallet">
         <div class="wallet-ico" style="background:{% if cta.color %}{{ cta.color.hex }}{% else %}#1a7a3c{% endif %}">
-          {% if cta.icono %}<i class="{{ cta.icono.clase_css }}"></i>{% else %}<i class="fas fa-wallet"></i>{% endif %}
+          {% if cta.icono %}<i class="fas {{ cta.icono.clase_css }}"></i>{% else %}<i class="fas fa-wallet"></i>{% endif %}
         </div>
         <div class="info">
           <div class="w-label">{{ cta.nombre }}</div>

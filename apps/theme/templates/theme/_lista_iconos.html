@@ -12,7 +12,7 @@
   <tbody>
     {% for icono in iconos %}
     <tr id="icono-{{ icono.pk }}">
-      <td><i class="{{ icono.clase_css }}"></i></td>
+      <td><i class="fas {{ icono.clase_css }}"></i></td>
       <td>{{ icono.nombre }}</td>
       <td><code>{{ icono.slug }}</code></td>
       <td><code>{{ icono.clase_css }}</code></td>
