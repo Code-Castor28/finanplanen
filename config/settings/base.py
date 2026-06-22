@@ -1,13 +1,27 @@
 from pathlib import Path
-
+import datetime
 import environ
+from django.utils import timezone
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 env = environ.Env()
 environ.Env.read_env(BASE_DIR / '.env')
-
 SECRET_KEY = env('SECRET_KEY')
+
+# Mantenimiento
+MAINTENANCE_MODE          = env.bool('MAINTENANCE_MODE', default=False)
+MAINTENANCE_END_TIME      = env('MAINTENANCE_END_TIME', default=None)
+MAINTENANCE_SUPPORT_EMAIL = env('MAINTENANCE_SUPPORT_EMAIL', default='soporte@finanplanen.com')
+
+_end_time_str = env('MAINTENANCE_END_TIME', default=None)
+if _end_time_str:
+    MAINTENANCE_END_TIME = timezone.make_aware(
+        datetime.datetime.strptime(_end_time_str, '%Y-%m-%d %H:%M:%S')
+    )
+else:
+    MAINTENANCE_END_TIME = None
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -30,6 +44,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'apps.core.middleware.MaintenanceMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -82,7 +97,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-LANGUAGE_CODE = 'es'
+LANGUAGE_CODE = 'es-DO'
 TIME_ZONE = 'America/Santo_Domingo'
 USE_I18N = True
 USE_TZ = True
