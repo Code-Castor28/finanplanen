@@ -54,6 +54,9 @@ def eliminar_suscripcion(request):
         datos = json.loads(request.body)
         endpoint = datos.get('endpoint')
 
+        if not endpoint:
+            return JsonResponse({'error': 'Datos incompletos'}, status=400)
+
         SuscripcionPush.objects.filter(
             usuario=request.user,
             endpoint_hash=_hash_endpoint(endpoint),

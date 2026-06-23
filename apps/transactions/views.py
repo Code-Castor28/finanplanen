@@ -1,13 +1,14 @@
-from datetime import date
+from datetime import date, timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.db.models import Sum
+from django.db.models import Count, Sum
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .forms import IngresoForm, GastoForm
 from .models import Ingreso, Gasto
 from apps.accounts.models import Cuenta
+from apps.budgets.models import Presupuesto
 from apps.categories.models import Categoria
 from apps.transfers.models import Transferencia
 
@@ -62,11 +63,19 @@ class IngresoLista(InquilinoMixin, ListView):
             context['cuentas'] = Cuenta.objects.filter(inquilino=inquilino).order_by('nombre')
 
             cats = Categoria.objects.filter(inquilino=inquilino).order_by('nombre')
-            ingresos_qs = Ingreso.objects.filter(inquilino=inquilino)
+            ing_agg = Ingreso.objects.filter(inquilino=inquilino).values(
+                'categoria_id'
+            ).annotate(
+                total=Sum('monto'), count=Count('id')
+            )
+            ing_stats = {
+                r['categoria_id']: {'total': r['total'] or 0, 'count': r['count']}
+                for r in ing_agg
+            }
             for cat in cats:
-                cat_ingresos = ingresos_qs.filter(categoria=cat)
-                cat.total_ingresos = cat_ingresos.aggregate(s=Sum('monto'))['s'] or 0
-                cat.ingresos_count = cat_ingresos.count()
+                stats = ing_stats.get(cat.pk, {'total': 0, 'count': 0})
+                cat.total_ingresos = stats['total']
+                cat.ingresos_count = stats['count']
             context['categorias'] = cats
 
             qs_all = self.get_queryset()
@@ -83,13 +92,14 @@ class IngresoLista(InquilinoMixin, ListView):
             context['total_mes'] = total_mes
 
             cats_dist = Categoria.objects.filter(inquilino=inquilino).order_by('nombre')
-            total_cats = 0
+            ing_dist_agg = Ingreso.objects.filter(inquilino=inquilino).values(
+                'categoria_id'
+            ).annotate(total=Sum('monto'))
+            dist_totals = {r['categoria_id']: r['total'] or 0 for r in ing_dist_agg}
+            total_cats = sum(dist_totals.values())
             dist_data = []
             for cat in cats_dist:
-                cat_total = Ingreso.objects.filter(
-                    inquilino=inquilino, categoria=cat
-                ).aggregate(s=Sum('monto'))['s'] or 0
-                total_cats += cat_total
+                cat_total = dist_totals.get(cat.pk, 0)
                 dist_data.append({
                     'nombre': cat.nombre,
                     'total': cat_total,
@@ -201,11 +211,19 @@ class GastoLista(InquilinoMixin, ListView):
             context['cuentas'] = Cuenta.objects.filter(inquilino=inquilino).order_by('nombre')
 
             cats = Categoria.objects.filter(inquilino=inquilino).order_by('nombre')
-            gastos_qs = Gasto.objects.filter(inquilino=inquilino)
+            gas_agg = Gasto.objects.filter(inquilino=inquilino).values(
+                'categoria_id'
+            ).annotate(
+                total=Sum('monto'), count=Count('id')
+            )
+            gas_stats = {
+                r['categoria_id']: {'total': r['total'] or 0, 'count': r['count']}
+                for r in gas_agg
+            }
             for cat in cats:
-                cat_gastos = gastos_qs.filter(categoria=cat)
-                cat.total_gastos = cat_gastos.aggregate(s=Sum('monto'))['s'] or 0
-                cat.gastos_count = cat_gastos.count()
+                stats = gas_stats.get(cat.pk, {'total': 0, 'count': 0})
+                cat.total_gastos = stats['total']
+                cat.gastos_count = stats['count']
             context['categorias'] = cats
 
             qs_all = self.get_queryset()
@@ -220,16 +238,21 @@ class GastoLista(InquilinoMixin, ListView):
             )
             total_mes = mes_qs.aggregate(s=Sum('monto'))['s'] or 0
             context['total_mes'] = total_mes
-            context['budget_limit'] = 20000
+
+            budget_agg = Presupuesto.objects.filter(
+                inquilino=inquilino, mes=hoy.month, año=hoy.year
+            ).aggregate(s=Sum('monto_limite'))
+            context['budget_limit'] = budget_agg['s'] or 0
 
             cats_dist = Categoria.objects.filter(inquilino=inquilino).order_by('nombre')
-            total_cats = 0
+            gas_dist_agg = Gasto.objects.filter(inquilino=inquilino).values(
+                'categoria_id'
+            ).annotate(total=Sum('monto'))
+            dist_totals = {r['categoria_id']: r['total'] or 0 for r in gas_dist_agg}
+            total_cats = sum(dist_totals.values())
             dist_data = []
             for cat in cats_dist:
-                cat_total = Gasto.objects.filter(
-                    inquilino=inquilino, categoria=cat
-                ).aggregate(s=Sum('monto'))['s'] or 0
-                total_cats += cat_total
+                cat_total = dist_totals.get(cat.pk, 0)
                 dist_data.append({
                     'nombre': cat.nombre,
                     'total': cat_total,
@@ -318,6 +341,8 @@ class TransaccionLista(LoginRequiredMixin, ListView):
     def _build_movimientos(self, inquilino):
         fecha_desde = self.request.GET.get('fecha_desde')
         fecha_hasta = self.request.GET.get('fecha_hasta')
+        if not fecha_desde and not fecha_hasta:
+            fecha_desde = (date.today() - timedelta(days=90)).isoformat()
         cuenta = self.request.GET.get('cuenta')
         categoria = self.request.GET.get('categoria')
         tipo = self.request.GET.get('tipo')
