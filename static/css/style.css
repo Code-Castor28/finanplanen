@@ -40,7 +40,8 @@ img{max-width:100%;display:block}
 .nav-item:hover{color:rgba(255,255,255,.9);background:rgba(255,255,255,.06)}
 .nav-item.active{color:#fff;background:rgba(255,255,255,.12)}
 .nav-item i{width:20px;text-align:center;font-size:16px}
-.sidebar-footer{padding:16px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px}
+.sidebar-footer{padding:16px 24px 12px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sidebar-version{width:100%;text-align:center;font-size:13px;font-weight:500;color:rgba(255,255,255,.4);padding-top:8px;border-top:1px solid rgba(255,255,255,.06)}
 .sidebar-bottom{padding:12px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:4px}
 .user-avatar{width:36px;height:36px;border-radius:9999px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;flex-shrink:0}
 .user-name{color:#fff;font-size:14px;font-weight:500;display:block}
