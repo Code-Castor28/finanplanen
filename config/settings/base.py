@@ -2,6 +2,7 @@ from pathlib import Path
 import datetime
 import environ
 from django.utils import timezone
+from config import __version__ as APP_VERSION
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -68,6 +69,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.core.context_processors.section',
+                'apps.core.context_processors.app_version',
             ],
         },
     },

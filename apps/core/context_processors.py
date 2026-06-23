@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import resolve
 
 SECTION_MAP = {
@@ -23,3 +24,7 @@ def section(request):
         return {'section': SECTION_MAP.get(url_name, '')}
     except Exception:
         return {}
+
+
+def app_version(request):
+    return {'app_version': getattr(settings, 'APP_VERSION', '')}
