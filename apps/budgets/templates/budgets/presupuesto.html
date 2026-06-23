@@ -338,6 +338,7 @@
 
 <section class="budget-grid" id="budgetGrid">
   {% for p in presupuestos %}
+  {% if p.categoria_id %}
   {% with pct=p.progreso_pct color=p.categoria.color.hex|default:"#455A64" bg=p.categoria.color.hex|default:"#455A64"|add:"1a" %}
   <div class="budget-card" data-name="{{ p.categoria.nombre|lower }}">
     <div class="bc-header">
@@ -378,6 +379,19 @@
     </div>
   </div>
   {% endwith %}
+  {% else %}
+  <div class="budget-card" style="opacity:0.5;">
+    <div class="bc-header">
+      <div class="bc-header-left">
+        <span class="bc-cat-name">Categoría eliminada</span>
+      </div>
+    </div>
+    <div class="bc-amounts">
+      <span class="bc-spent">RD$ {{ p.monto_gastado|dinero }}</span>
+      <span class="bc-limit">Límite: RD$ {{ p.monto_limite|dinero }}</span>
+    </div>
+  </div>
+  {% endif %}
   {% empty %}
   <div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--ol);font-size:14px;">
     <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.4;"></i>

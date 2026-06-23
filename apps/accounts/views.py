@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum
+from django.db.models import ProtectedError, Sum
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
@@ -109,7 +109,14 @@ class CuentaEliminar(InquilinoMixin, DeleteView):
 
     def form_valid(self, form):
         self.object = self.get_object()
-        self.object.delete()
+        try:
+            self.object.delete()
+        except ProtectedError:
+            return HttpResponse(
+                'No se puede eliminar: esta cuenta tiene transacciones asociadas. '
+                'Elimina primero sus ingresos, gastos y transferencias.',
+                status=409,
+            )
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response

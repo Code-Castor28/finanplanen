@@ -71,11 +71,11 @@ class PresupuestoLista(InquilinoMixin, ListView):
         for p in context['presupuestos']:
             presupuestos_json.append({
                 'pk': p.pk,
-                'nombre': p.categoria.nombre,
+                'nombre': p.categoria.nombre if p.categoria_id else 'Sin categoría',
                 'limite': str(p.monto_limite),
                 'gastado': str(p.monto_gastado),
-                'icono': p.categoria.icono.clase_css if p.categoria.icono_id else 'fa-tag',
-                'color': p.categoria.color.hex if p.categoria.color_id else '#455A64',
+                'icono': p.categoria.icono.clase_css if p.categoria_id and p.categoria.icono_id else 'fa-tag',
+                'color': p.categoria.color.hex if p.categoria_id and p.categoria.color_id else '#455A64',
             })
         context['presupuestos_json'] = json.dumps(presupuestos_json, cls=DjangoJSONEncoder)
 

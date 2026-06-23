@@ -11,8 +11,8 @@ class Presupuesto(models.Model):
         verbose_name='usuario'
     )
     categoria = models.ForeignKey(
-        'categories.Categoria', on_delete=models.CASCADE,
-        verbose_name='categoría'
+        'categories.Categoria', on_delete=models.SET_NULL,
+        null=True, blank=True, verbose_name='categoría'
     )
     monto_limite = models.DecimalField(
         max_digits=12, decimal_places=2, verbose_name='límite mensual'
@@ -34,7 +34,8 @@ class Presupuesto(models.Model):
         ordering = ['-año', '-mes', 'categoria__nombre']
 
     def __str__(self):
-        return f'{self.categoria.nombre} ({self.mes}/{self.año})'
+        nombre = self.categoria.nombre if self.categoria_id else 'Sin categoría'
+        return f'{nombre} ({self.mes}/{self.año})'
 
     def progreso_pct(self):
         if self.monto_limite:

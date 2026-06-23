@@ -26,8 +26,11 @@ def _calcular_prox_pago(cuenta):
     return prox
 
 
-@shared_task(name='apps.notifications.tasks.enviar_recordatorios_push')
-def enviar_recordatorios_push():
+@shared_task(
+    name='apps.notifications.tasks.enviar_recordatorios_push',
+    ignore_result=True, bind=True, max_retries=3,
+)
+def enviar_recordatorios_push(self):
     hoy = date.today()
     dias_aviso = [0, 2, 5, 7]
 
@@ -64,7 +67,9 @@ def enviar_recordatorios_push():
             'badge': '/static/img/badge-72.png',
         }
 
-        for sub in SuscripcionPush.objects.filter(usuario=t.usuario, activo=True):
+        for sub in SuscripcionPush.objects.filter(
+            usuario=t.usuario, activo=True
+        ).only('endpoint', 'p256dh', 'auth'):
             try:
                 webpush(
                     subscription_info={
@@ -74,6 +79,7 @@ def enviar_recordatorios_push():
                     data=json.dumps(mensaje),
                     vapid_private_key=vapid_key,
                     vapid_claims={'sub': f'mailto:{settings.VAPID_ADMIN_EMAIL}'},
+                    timeout=10,
                 )
                 enviadas += 1
             except WebPushException as e:

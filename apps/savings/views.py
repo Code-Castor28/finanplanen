@@ -2,6 +2,7 @@ import json
 from datetime import date
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import ProtectedError
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
@@ -128,7 +129,14 @@ class MetaAhorroEliminar(InquilinoMixin, DeleteView):
 
     def form_valid(self, form):
         self.object = self.get_object()
-        self.object.delete()
+        try:
+            self.object.delete()
+        except ProtectedError:
+            return HttpResponse(
+                'No se puede eliminar: esta meta tiene depósitos asociados. '
+                'Elimina primero sus depósitos.',
+                status=409,
+            )
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
