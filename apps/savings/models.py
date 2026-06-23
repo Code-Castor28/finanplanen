@@ -1,3 +1,5 @@
+from decimal import Decimal
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.text import slugify
 
@@ -14,7 +16,9 @@ class MetaAhorro(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='nombre')
     slug = models.SlugField()
     meta = models.DecimalField(
-        max_digits=12, decimal_places=2, verbose_name='meta'
+        max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name='meta'
     )
     monto_actual = models.DecimalField(
         max_digits=12, decimal_places=2, default=0,
@@ -32,7 +36,7 @@ class MetaAhorro(models.Model):
         null=True, blank=True, verbose_name='icono'
     )
     nota = models.TextField(blank=True, verbose_name='nota')
-    activo = models.BooleanField(default=True, verbose_name='activo')
+    activo = models.BooleanField(default=True, db_index=True, verbose_name='activo')
     creado = models.DateTimeField(auto_now_add=True)
     actualizado = models.DateTimeField(auto_now=True)
 
@@ -66,7 +70,7 @@ class DepositoAhorro(models.Model):
         verbose_name='usuario'
     )
     meta = models.ForeignKey(
-        MetaAhorro, on_delete=models.CASCADE,
+        MetaAhorro, on_delete=models.PROTECT,
         related_name='depositos',
         verbose_name='meta de ahorro'
     )
@@ -75,7 +79,9 @@ class DepositoAhorro(models.Model):
         null=True, blank=True, verbose_name='cuenta de origen'
     )
     monto = models.DecimalField(
-        max_digits=12, decimal_places=2, verbose_name='monto'
+        max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name='monto'
     )
     fecha = models.DateField(verbose_name='fecha')
     nota = models.TextField(blank=True, verbose_name='nota')

@@ -47,7 +47,7 @@ class Cuenta(models.Model):
     vencimiento = models.CharField(
         max_length=10, blank=True, verbose_name='vencimiento'
     )
-    activo = models.BooleanField(default=True)
+    activo = models.BooleanField(default=True, db_index=True)
     creado = models.DateTimeField(auto_now_add=True)
     actualizado = models.DateTimeField(auto_now=True)
 

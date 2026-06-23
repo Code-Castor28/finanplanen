@@ -32,7 +32,7 @@ class PresupuestoLista(InquilinoMixin, ListView):
         hoy = date.today()
         return super().get_queryset().filter(
             mes=hoy.month, año=hoy.year, activo=True
-        ).select_related('categoria', 'categoria__icono')
+        ).select_related('categoria', 'categoria__icono', 'categoria__color')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

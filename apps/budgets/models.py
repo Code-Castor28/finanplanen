@@ -1,3 +1,5 @@
+from decimal import Decimal
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -15,7 +17,9 @@ class Presupuesto(models.Model):
         null=True, blank=True, verbose_name='categoría'
     )
     monto_limite = models.DecimalField(
-        max_digits=12, decimal_places=2, verbose_name='límite mensual'
+        max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name='límite mensual'
     )
     monto_gastado = models.DecimalField(
         max_digits=12, decimal_places=2, default=0,
@@ -23,7 +27,7 @@ class Presupuesto(models.Model):
     )
     mes = models.IntegerField(verbose_name='mes')
     año = models.IntegerField(verbose_name='año')
-    activo = models.BooleanField(default=True, verbose_name='activo')
+    activo = models.BooleanField(default=True, db_index=True, verbose_name='activo')
     creado = models.DateTimeField(auto_now_add=True)
     actualizado = models.DateTimeField(auto_now=True)
 

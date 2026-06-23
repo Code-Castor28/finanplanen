@@ -1,4 +1,5 @@
 import json
+import random
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -58,30 +59,57 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
         context['gasto_cambio'] = pct_change(gas_mes, gas_ant)
         context['ahorro_cambio'] = pct_change(ing_mes - gas_mes, ing_ant - gas_ant)
 
-        # --- Últimos 6 meses para charts ---
+        # --- Últimos 6 meses (una sola consulta con TruncMonth) ---
         seis_meses = [hoy - relativedelta(months=i) for i in range(5, -1, -1)]
+        inicio_periodo = seis_meses[0]
+
+        ingresos_agg = list(Ingreso.objects.filter(
+            inquilino=inquilino, fecha__gte=inicio_periodo, fecha__lte=hoy
+        ).annotate(mes=TruncMonth('fecha')).values('mes').annotate(
+            total=Sum('monto')
+        ))
+        gastos_agg = list(Gasto.objects.filter(
+            inquilino=inquilino, fecha__gte=inicio_periodo, fecha__lte=hoy
+        ).annotate(mes=TruncMonth('fecha')).values('mes').annotate(
+            total=Sum('monto')
+        ))
+
+        ing_dict = {(r['mes'].year, r['mes'].month): r['total'] for r in ingresos_agg}
+        gas_dict = {(r['mes'].year, r['mes'].month): r['total'] for r in gastos_agg}
+
         labels_meses = []
         income_data = []
         expense_data = []
         savings_data = []
+        savings_rows = []
 
         for m in seis_meses:
-            label = m.strftime('%b')
-            labels_meses.append(label)
-            total_ing = Ingreso.objects.filter(
-                inquilino=inquilino, fecha__month=m.month, fecha__year=m.year
-            ).aggregate(t=Sum('monto'))['t'] or 0
-            total_gas = Gasto.objects.filter(
-                inquilino=inquilino, fecha__month=m.month, fecha__year=m.year
-            ).aggregate(t=Sum('monto'))['t'] or 0
-            income_data.append(float(total_ing))
-            expense_data.append(float(total_gas))
-            savings_data.append(float(total_ing - total_gas))
+            key = (m.year, m.month)
+            labels_meses.append(m.strftime('%b'))
+            total_ing = float(ing_dict.get(key, 0) or 0)
+            total_gas = float(gas_dict.get(key, 0) or 0)
+            income_data.append(total_ing)
+            expense_data.append(total_gas)
+            savings_data.append(total_ing - total_gas)
+
+        for m in reversed(seis_meses):
+            key = (m.year, m.month)
+            ti = ing_dict.get(key, 0) or 0
+            tg = gas_dict.get(key, 0) or 0
+            ahorro = ti - tg
+            savings_rows.append({
+                'mes': m.strftime('%B %Y'),
+                'ingresos': ti,
+                'gastos': tg,
+                'ahorro': ahorro,
+                'superavit': ahorro >= 0,
+            })
 
         context['months_json'] = json.dumps(labels_meses)
         context['income_json'] = json.dumps(income_data)
         context['expense_json'] = json.dumps(expense_data)
         context['savings_json'] = json.dumps(savings_data)
+        context['savings_rows'] = savings_rows
 
         # --- Gastos por categoría (mes actual) ---
         gastos_por_cat = Gasto.objects.filter(
@@ -103,9 +131,11 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
 
         context['cat_json'] = json.dumps(cat_data)
 
-        # --- Transacciones recientes ---
+        # --- Transacciones recientes (con select_related) ---
         movs = []
-        for ing in Ingreso.objects.filter(inquilino=inquilino).order_by('-fecha', '-creado')[:10]:
+        for ing in Ingreso.objects.filter(
+            inquilino=inquilino
+        ).select_related('categoria', 'categoria__icono', 'categoria__color').order_by('-fecha', '-creado')[:10]:
             movs.append({
                 'fecha': ing.fecha,
                 'creado': ing.creado,
@@ -117,7 +147,9 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
                 'monto': ing.monto,
                 'tipo': 'ingreso',
             })
-        for gas in Gasto.objects.filter(inquilino=inquilino).order_by('-fecha', '-creado')[:10]:
+        for gas in Gasto.objects.filter(
+            inquilino=inquilino
+        ).select_related('categoria', 'categoria__icono', 'categoria__color').order_by('-fecha', '-creado')[:10]:
             movs.append({
                 'fecha': gas.fecha,
                 'creado': gas.creado,
@@ -132,29 +164,9 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
         movs.sort(key=lambda x: (x['fecha'], x['creado']), reverse=True)
         context['recientes'] = movs[:10]
 
-        # --- Ahorro mensual (tabla reportes) ---
-        savings_rows = []
-        for m in reversed(seis_meses):
-            ti = Ingreso.objects.filter(
-                inquilino=inquilino, fecha__month=m.month, fecha__year=m.year
-            ).aggregate(t=Sum('monto'))['t'] or 0
-            tg = Gasto.objects.filter(
-                inquilino=inquilino, fecha__month=m.month, fecha__year=m.year
-            ).aggregate(t=Sum('monto'))['t'] or 0
-            ahorro = ti - tg
-            savings_rows.append({
-                'mes': m.strftime('%B %Y'),
-                'ingresos': ti,
-                'gastos': tg,
-                'ahorro': ahorro,
-                'superavit': ahorro >= 0,
-            })
-        context['savings_rows'] = savings_rows
-
         return context
 
 
 def fa_random():
-    import random
     icons = ['fa-receipt', 'fa-cart-shopping', 'fa-tag', 'fa-circle']
     return random.choice(icons)

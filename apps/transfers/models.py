@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
@@ -13,17 +14,19 @@ class Transferencia(models.Model):
         verbose_name='usuario'
     )
     origen = models.ForeignKey(
-        'accounts.Cuenta', on_delete=models.CASCADE,
+        'accounts.Cuenta', on_delete=models.PROTECT,
         related_name='transferencias_origen',
         verbose_name='cuenta origen'
     )
     destino = models.ForeignKey(
-        'accounts.Cuenta', on_delete=models.CASCADE,
+        'accounts.Cuenta', on_delete=models.PROTECT,
         related_name='transferencias_destino',
         verbose_name='cuenta destino'
     )
     monto = models.DecimalField(
-        max_digits=12, decimal_places=2, verbose_name='monto'
+        max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name='monto'
     )
     fecha = models.DateField(verbose_name='fecha')
     nota = models.TextField(blank=True, verbose_name='nota')
@@ -55,17 +58,19 @@ class RecurrenciaTransferencia(models.Model):
         verbose_name='usuario'
     )
     origen = models.ForeignKey(
-        'accounts.Cuenta', on_delete=models.CASCADE,
+        'accounts.Cuenta', on_delete=models.PROTECT,
         related_name='recurrencias_origen',
         verbose_name='cuenta origen'
     )
     destino = models.ForeignKey(
-        'accounts.Cuenta', on_delete=models.CASCADE,
+        'accounts.Cuenta', on_delete=models.PROTECT,
         related_name='recurrencias_destino',
         verbose_name='cuenta destino'
     )
     monto = models.DecimalField(
-        max_digits=12, decimal_places=2, verbose_name='monto'
+        max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name='monto'
     )
     periodicidad = models.CharField(
         max_length=10, choices=PERIODICIDAD_CHOICES,
@@ -75,9 +80,9 @@ class RecurrenciaTransferencia(models.Model):
         default=1, verbose_name='día',
         help_text='Día del mes (1-31) o día de semana (0=lun, 6=dom)'
     )
-    proxima_ejecucion = models.DateField(verbose_name='próxima ejecución')
+    proxima_ejecucion = models.DateField(db_index=True, verbose_name='próxima ejecución')
     nota = models.TextField(blank=True, verbose_name='nota')
-    activo = models.BooleanField(default=True, verbose_name='activo')
+    activo = models.BooleanField(default=True, db_index=True, verbose_name='activo')
     creado = models.DateTimeField(auto_now_add=True)
     actualizado = models.DateTimeField(auto_now=True)
 

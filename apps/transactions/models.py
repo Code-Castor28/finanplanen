@@ -1,3 +1,5 @@
+from decimal import Decimal
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -11,7 +13,7 @@ class Ingreso(models.Model):
         verbose_name='usuario'
     )
     cuenta = models.ForeignKey(
-        'accounts.Cuenta', on_delete=models.CASCADE,
+        'accounts.Cuenta', on_delete=models.PROTECT,
         verbose_name='cuenta'
     )
     categoria = models.ForeignKey(
@@ -19,9 +21,11 @@ class Ingreso(models.Model):
         null=True, blank=True, verbose_name='categoría'
     )
     monto = models.DecimalField(
-        max_digits=12, decimal_places=2, verbose_name='monto'
+        max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name='monto'
     )
-    fecha = models.DateField(verbose_name='fecha')
+    fecha = models.DateField(db_index=True, verbose_name='fecha')
     nota = models.TextField(blank=True, verbose_name='nota')
     comprobante = models.FileField(
         upload_to='comprobantes/', blank=True,
@@ -49,7 +53,7 @@ class Gasto(models.Model):
         verbose_name='usuario'
     )
     cuenta = models.ForeignKey(
-        'accounts.Cuenta', on_delete=models.CASCADE,
+        'accounts.Cuenta', on_delete=models.PROTECT,
         verbose_name='método de pago'
     )
     categoria = models.ForeignKey(
@@ -57,9 +61,11 @@ class Gasto(models.Model):
         null=True, blank=True, verbose_name='categoría'
     )
     monto = models.DecimalField(
-        max_digits=12, decimal_places=2, verbose_name='monto'
+        max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name='monto'
     )
-    fecha = models.DateField(verbose_name='fecha')
+    fecha = models.DateField(db_index=True, verbose_name='fecha')
     nota = models.TextField(blank=True, verbose_name='nota')
     comprobante = models.FileField(
         upload_to='comprobantes/', blank=True,
