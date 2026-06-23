@@ -100,3 +100,28 @@
 - Mantener ARCHITECTURE.md sincronizado con la evolución del proyecto
 - Cualquier decisión arquitectónica que contradiga AGENTS.md debe discutirse explícitamente con el usuario primero
 - Marcar tareas completadas en TASKS.md (`- [x]`) al finalizar cada una
+
+# Instrucciones para Agentes de Código (AI)
+
+## Workflow obligatorio
+
+Antes de escribir **cualquier línea de código**, sigue este orden:
+
+### 1. Crear tarea en `docs/TASKS.md`
+- Agrega el ítem en la fase correspondiente con formato `- [ ] N.N Descripción`
+- Si no existe la fase, créala
+
+### 2. Crear entrada en `docs/BITACORA.md`
+- Agrega una fila en la tabla con: fecha, archivo, líneas, descripción del cambio, motivo
+- Formato: `YYYY-MM-DD | archivo | líneas | qué cambió | por qué`
+
+### 3. Solo entonces: codificar
+
+## Reglas
+
+- Cada cambio en un archivo debe tener su correspondiente entrada en la bitácora
+- Si el cambio involucra migraciones, ejecuta `makemigrations` y `migrate` y documéntalo
+- Si el cambio requiere modificar tests, actualízalos antes de marcar la tarea como `[x]`
+- No marques una tarea como completada hasta haber verificado que funciona (test, lint, typecheck)
+- La bitácora es el registro fuente de verdad — debe estar siempre actualizada antes de hacer commit
+- Cuando trabajes con hallazgos de `docs/AUDITORIA.md`, referencia el número de hallazgo en la bitácora (ej. "Sección 1, item 1")
