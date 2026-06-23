@@ -29,6 +29,8 @@
         <div>
           <span class="ln">FinanPlanen</span>
           <span class="ls">Gesti&oacute;n Financiera</span>
+        <span class="user-name">{{ user.nombre }} {{ user.apellido }}</span>
+        <span class="user-badge">{{ user.nombre_usuario }}</span>
         </div>
       </div>
     </a>
@@ -85,13 +87,6 @@
         <i class="fas fa-right-from-bracket"></i><span>Cerrar Sesi&oacute;n</span>
       </a>
     </div>
-
-    <div class="sidebar-footer">
-      <div class="user-avatar">{{ user.nombre|first|upper|default:user.nombre_usuario|first|upper }}</div>
-      <div>
-        <span class="user-name">{{ user.nombre }} {{ user.apellido }}</span>
-        <span class="user-badge">@{{ user.nombre_usuario }}</span>
-      </div>
       <div class="sidebar-version">v{{ app_version }}</div>
     </div>
   </aside>
