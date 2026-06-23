@@ -107,3 +107,33 @@
 - [x] 16.2 Modal countdown 60s en `templates/base.html`
 - [x] 16.3 Banner "sesión expirada" en `login.html` vía sessionStorage
 - [x] 16.4 Redirección a `/acceso/salir/` al llegar a 0
+
+## Fase 17 — Correcciones de Auditoría (Hallazgos y Soluciones)
+
+### Batch 1 — Críticos
+- [x] P19 Capturar ProtectedError en CuentaEliminar y MetaAhorroEliminar
+- [x] P23 Proteger acceso a categoria.nombre en budgets/ (views, models, template)
+- [x] C5 on_delete=CASCADE → PROTECT/SET_NULL en modelos financieros + migraciones
+- [x] C1+C2 transaction.atomic() + select_for_update + .create() individual en transfers/tasks.py
+- [x] C3 F('balance') + transaction.atomic() + logger en signals.py
+- [x] C4 timeout=10 + ignore_result + .only() en notifications/tasks.py
+
+### Batch 2 — Altos
+- [x] P6 MinValueValidator en campos de monto
+- [x] P7 Dashboard: select_related + TruncMonth + fix import random
+- [x] P8 Añadir categoria__color a select_related en budgets/views.py
+- [x] P9 db_index en campos críticos + migrate
+- [ ] P10 ignore_result en transfers/tasks.py (ya hecho en C1+C2)
+- [x] P11 Separar Redis backend a DB 1 + CELERY_RESULT_EXPIRES
+
+### Batch 3 — Medios
+- [x] P12 annotate en IngresoLista/GastoLista + budget_limit real
+- [x] P13 Validar endpoint en eliminar_suscripcion
+- [x] P17 Filtro fecha default en TransaccionLista
+
+### Batch 4 — Bajos
+- [x] P18 except→ (ValueError, InvalidOperation) en forms.py
+- [x] P20 LOGGING config en base.py
+- [x] P21 HSTS + X_FRAME en prod.py
+- [x] P22 ALLOWED_HOSTS requerido en prod.py
+- [x] P25 budget_limit con query real en GastoLista (hecho en P12)
