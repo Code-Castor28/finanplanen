@@ -72,3 +72,4 @@ Formato: `YYYY-MM-DD | Archivo | Línea(s) | Cambio | Motivo (ref. AUDITORIA.md)
 | 18.7 | `apps/core/views.py` | 15-16, 168-188 | Contexto `proximos_pagos` con total_a_pagar, días restantes, ordenado | Dashboard necesita lista de próximos pagos |
 | 18.8 | `apps/core/templates/core/dashboard.html` | 79-98 | Loop sobre `proximos_pagos` reemplaza placeholder vacío | Visualización de pagos próximos en dashboard |
 | 18.m | `apps/accounts/migrations/0003_cuenta_limite_credito.py` | — | Nueva migración: add field limite_credito to cuenta | Schema requerido por el nuevo campo |
+| 18.m2 | `static/js/main.js` | 44-153 | Reescritura idle timeout: sessionStorage persistente, `touchend`/`focusin`/`pageshow`/`webkitvisibilitychange`, tiempo restante en vez de reinicio completo | Idle timeout no funcionaba en móvil por recarga de página al cambiar de app + eventos móvil no cubiertos |

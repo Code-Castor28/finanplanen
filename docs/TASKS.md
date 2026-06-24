@@ -107,6 +107,7 @@
 - [x] 16.2 Modal countdown 60s en `templates/base.html`
 - [x] 16.3 Banner "sesión expirada" en `login.html` vía sessionStorage
 - [x] 16.4 Redirección a `/acceso/salir/` al llegar a 0
+- [x] 16.5 Fix móvil: sessionStorage persistente, eventos `touchend`/`focusin`/`pageshow`/`webkitvisibilitychange`, tiempo restante en vez de reinicio completo
 
 ## Fase 17 — Correcciones de Auditoría (Hallazgos y Soluciones)
 
