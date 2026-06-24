@@ -56,3 +56,19 @@ Formato: `YYYY-MM-DD | Archivo | Línea(s) | Cambio | Motivo (ref. AUDITORIA.md)
 | P20 | `config/settings/base.py` | LOGGING config con console handler + loggers de apps | Logs al void en producción |
 | P21+P22 | `config/settings/prod.py` | SECURE_HSTS_SECONDS + X_FRAME_OPTIONS + ALLOWED_HOSTS sin default | Seguridad HTTP insuficiente |
 | P25 | `apps/transactions/views.py` | Hecho en P12: budget_limit ahora es query real a Presupuesto | Valor hardcodeado 20000 |
+
+## 2026-06-23 — Fase 18: Próximos Pagos + Límite Crédito
+
+| # | Archivo | Líneas | Cambio | Motivo |
+|---|---------|--------|--------|--------|
+| 18.1 | `apps/accounts/models.py` | 35-38 | Nuevo campo `limite_credito = DecimalField(default=0)` | Necesario para calcular total_a_pagar en crédito |
+| 18.2a | `apps/accounts/forms.py` | 12-22 | Add `limite_credito` field + widget en `#credito-fields` | Input del límite en formulario |
+| 18.2b | `apps/accounts/forms.py` | 131-148 | `clean_limite_credito()` con validación | Límite > 0 para crédito, = 0 para débito/efectivo |
+| 18.3 | `apps/accounts/templates/accounts/_form_cuenta.html` | 58-75 | Input `limite_credito` dentro de `#credito-fields` + JS auto-complete balance | UX: al tipear límite, balance se auto-completa |
+| 18.4 | `apps/accounts/templates/accounts/Cuenta.html` | 51-53 | Mostrar "LÍMITE" en tarjeta crédito | Feedback visual del límite al usuario |
+| 18.5 | `apps/core/utils.py` | — | Crear archivo con `calcular_prox_pago()` | Función compartida entre dashboard y notificaciones |
+| 18.6a | `apps/notifications/tasks.py` | 1, 12-26 | Import `calcular_prox_pago` desde core/utils; eliminar función inline | DRY: misma lógica en un solo lugar |
+| 18.6b | `apps/notifications/management/commands/test_push.py` | 1, 12-25 | Import `calcular_prox_pago` desde core/utils; eliminar función inline | DRY: misma lógica en un solo lugar |
+| 18.7 | `apps/core/views.py` | 15-16, 168-188 | Contexto `proximos_pagos` con total_a_pagar, días restantes, ordenado | Dashboard necesita lista de próximos pagos |
+| 18.8 | `apps/core/templates/core/dashboard.html` | 79-98 | Loop sobre `proximos_pagos` reemplaza placeholder vacío | Visualización de pagos próximos en dashboard |
+| 18.m | `apps/accounts/migrations/0003_cuenta_limite_credito.py` | — | Nueva migración: add field limite_credito to cuenta | Schema requerido por el nuevo campo |

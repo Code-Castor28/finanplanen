@@ -137,3 +137,13 @@
 - [x] P21 HSTS + X_FRAME en prod.py
 - [x] P22 ALLOWED_HOSTS requerido en prod.py
 - [x] P25 budget_limit con query real en GastoLista (hecho en P12)
+
+## Fase 18 — Próximos Pagos + Límite Crédito
+- [x] 18.1 Agregar campo `limite_credito` a `Cuenta` (+ migration)
+- [x] 18.2 Formulario: input `limite_credito` en `#credito-fields` + validación
+- [x] 18.3 JS auto-complete: balance = limite_credito al tipear
+- [x] 18.4 Template Cuenta.html: mostrar límite en tarjetas crédito
+- [x] 18.5 Extraer `calcular_prox_pago()` a `apps/core/utils.py`
+- [x] 18.6 Refactor `notifications/tasks.py` y `test_push.py` (importar desde utils)
+- [x] 18.7 Dashboard: contexto `proximos_pagos` en `PanelPrincipal`
+- [x] 18.8 Dashboard template: loop de próximos pagos
