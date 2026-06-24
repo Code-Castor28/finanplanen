@@ -49,6 +49,7 @@
     <div class="card-footer">
       <div class="meta">
         {% if cta.tipo == 'credito' %}
+        <div><div class="label">LÍMITE</div><div class="value">RD$ {{ cta.limite_credito|dinero }}</div></div>
         <div><div class="label">CORTE</div><div class="value">{{ cta.dia_corte|default:"—" }}</div></div>
         <div><div class="label">PAGO</div><div class="value">{{ cta.dia_pago|default:"—" }}</div></div>
         {% else %}

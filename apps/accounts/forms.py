@@ -1,5 +1,5 @@
 import re
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from django import forms
 from django.urls import reverse_lazy
 from django.utils.text import slugify
@@ -17,11 +17,19 @@ class CuentaForm(forms.ModelForm):
         }),
     )
 
+    limite_credito = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'inputmode': 'decimal', 'autocomplete': 'off',
+            'style': 'border:none;background:transparent;flex:1;min-width:0;padding:10px 12px;font-family:inherit;font-size:14px;outline:none',
+        }),
+    )
+
     class Meta:
         model = Cuenta
         fields = [
             'nombre', 'tipo', 'color', 'icono',
-            'balance', 'emisor', 'ultimos_digitos',
+            'balance', 'limite_credito', 'emisor', 'ultimos_digitos',
             'dia_corte', 'dia_pago', 'vencimiento', 'activo',
         ]
         widgets = {
@@ -46,6 +54,7 @@ class CuentaForm(forms.ModelForm):
             self.fields['color'].queryset = self.fields['color'].queryset.filter(inquilino=self.inquilino)
         if not self.instance.pk:
             self.initial['balance'] = ''
+            self.initial['limite_credito'] = ''
         if tipo_filter:
             choices = [c for c in self.fields['tipo'].choices if c[0] == tipo_filter or (tipo_filter == 'tarjeta' and c[0] in ('credito', 'debito'))]
             self.fields['tipo'].choices = choices
@@ -57,7 +66,7 @@ class CuentaForm(forms.ModelForm):
             'hx-target': 'next .field-error',
             'hx-swap': 'outerHTML',
         }
-        for field_name in ['nombre', 'ultimos_digitos', 'vencimiento', 'dia_corte', 'dia_pago']:
+        for field_name in ['nombre', 'ultimos_digitos', 'vencimiento', 'dia_corte', 'dia_pago', 'limite_credito']:
             attrs = htmx_attrs.copy()
             attrs['hx-vals'] = f'{{"field":"{field_name}","instance_pk":"{pk}"}}'
             self.fields[field_name].widget.attrs.update(attrs)
@@ -69,7 +78,7 @@ class CuentaForm(forms.ModelForm):
         val = val.replace(',', '')
         try:
             return Decimal(val)
-        except:
+        except (ValueError, InvalidOperation):
             raise forms.ValidationError('Introduzca un número válido.')
 
     def clean_nombre(self):
@@ -118,6 +127,22 @@ class CuentaForm(forms.ModelForm):
             if int(val) > 31:
                 raise forms.ValidationError('El día no puede ser mayor a 31.')
         return val
+
+    def clean_limite_credito(self):
+        val = self.cleaned_data.get('limite_credito')
+        tipo = self.cleaned_data.get('tipo')
+        if not val:
+            val = '0'
+        val = val.replace(',', '')
+        try:
+            dec = Decimal(val)
+        except (ValueError, InvalidOperation):
+            raise forms.ValidationError('Introduzca un número válido.')
+        if tipo == 'credito' and dec <= 0:
+            raise forms.ValidationError('El límite de crédito debe ser mayor a 0.')
+        if tipo != 'credito' and dec != 0:
+            raise forms.ValidationError('El límite de crédito solo aplica a tarjetas de crédito.')
+        return dec
 
     def clean_dia_pago(self):
         val = self.cleaned_data.get('dia_pago')

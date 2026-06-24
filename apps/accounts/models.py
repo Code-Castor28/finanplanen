@@ -32,6 +32,10 @@ class Cuenta(models.Model):
         max_digits=12, decimal_places=2, default=0,
         verbose_name='balance'
     )
+    limite_credito = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0,
+        verbose_name='límite de crédito'
+    )
     emisor = models.CharField(
         max_length=100, blank=True, verbose_name='emisor'
     )

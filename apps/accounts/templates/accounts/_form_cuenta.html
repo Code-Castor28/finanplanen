@@ -57,6 +57,17 @@
     </div>
     <div id="credito-fields" class="field-row">
       <div class="field">
+        <label for="{{ form.limite_credito.id_for_label }}">
+          Límite de Crédito
+          <i class="fa-solid fa-circle-question" data-tippy-content="Monto máximo de crédito aprobado por el banco. Al ingresarlo, el balance se auto-completa con el mismo valor." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+        </label>
+        <div style="display:flex;align-items:center;border:1.5px solid var(--olv);border-radius:8px;overflow:hidden">
+          <span style="padding:10px 12px;background:var(--sc);color:var(--ov);font-weight:700;font-size:14px">RD$</span>
+          {{ form.limite_credito }}
+        </div>
+    <span class="field-error">{% for error in form.limite_credito.errors %}{{ error }}{% endfor %}</span>
+      </div>
+      <div class="field">
         <label for="{{ form.dia_corte.id_for_label }}">
           {{ form.dia_corte.label }}
           <i class="fa-solid fa-circle-question" data-tippy-content="Día del mes en que cierra el estado de cuenta. Entre el corte y el pago suele haber ~20 días." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
@@ -167,4 +178,42 @@
   var el = document.getElementById(id);
   if (el) el.addEventListener('input', function(){ this.value = this.value.replace(/\D/g, ''); });
 });
+
+(function(){
+  var tipo = document.getElementById('{{ form.tipo.id_for_label }}');
+  var limiteInput = document.getElementById('{{ form.limite_credito.id_for_label }}');
+  var balanceInput = document.getElementById('{{ form.balance.id_for_label }}');
+  if (!limiteInput || !balanceInput) return;
+  var balanceManual = false;
+  balanceInput.addEventListener('input', function(){ balanceManual = true; });
+  balanceInput.addEventListener('blur', function(){
+    var raw = this.value.replace(/,/g, '').trim();
+    if (raw !== '' && raw !== '0') balanceManual = true;
+  });
+  function autoFill(){
+    if (tipo && tipo.value !== 'credito') return;
+    if (balanceManual) return;
+    var raw = limiteInput.value.replace(/[^\d.]/g, '');
+    if (raw === '' || raw === '0') { balanceInput.value = ''; return; }
+    var n = parseFloat(raw) || 0;
+    balanceInput.value = n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  limiteInput.addEventListener('input', autoFill);
+  limiteInput.addEventListener('blur', function(){
+    var raw = this.value.replace(/,/g, '').trim();
+    if (raw === '' || raw === '0') return;
+    var n = parseFloat(raw) || 0;
+    this.value = n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    autoFill();
+  });
+  function fmtLimite(){
+    var v = limiteInput.value.replace(/[^\d.]/g, '');
+    var p = v.split('.');
+    if (p.length > 2) p = [p[0], p.slice(1).join('')];
+    if (p[0]) p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (p[1] !== undefined) { if (p[1].length > 2) p[1] = p[1].slice(0,2); }
+    limiteInput.value = p.join('.');
+  }
+  limiteInput.addEventListener('input', fmtLimite);
+})();
 </script>
