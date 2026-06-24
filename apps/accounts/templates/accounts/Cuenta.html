@@ -130,7 +130,7 @@
 
   <div class="right-col">
     <div class="patrimony">
-      <div class="p-label">PATRIMONIO TOTAL</div>
+      <div class="p-label">BALANCE GENERAL</div>
       <div class="p-amount" id="patrimonyAmount">RD$ {{ total|dinero }}</div>
       <div class="p-change"><i class="fas fa-arrow-trend-up"></i> +4.2% este mes</div>
     </div>
@@ -166,7 +166,7 @@
   var DATA = {
     tarjetas: [
       {% for cta in tarjetas %}
-      { id: "{{ cta.pk }}", tipo: "{{ cta.tipo }}", balance: {% localize off %}{{ cta.balance|default:"0" }}{% endlocalize %} },
+      { id: "{{ cta.pk }}", tipo: "{{ cta.tipo }}", balance: {% localize off %}{{ cta.balance|default:"0" }}{% endlocalize %}, limite: {% localize off %}{{ cta.limite_credito|default:"0" }}{% endlocalize %} },
       {% endfor %}
     ],
     wallets: [
@@ -182,13 +182,14 @@
   function renderDonut(){
     var cred = 0, deb = 0, cash = 0;
     DATA.tarjetas.forEach(function(c){
-      if(c.tipo === 'credito') cred += Math.abs(c.balance);
+      if(c.tipo === 'credito') cred += c.balance;
       else deb += Math.abs(c.balance);
     });
     DATA.wallets.forEach(function(w){ cash += Math.abs(w.balance); });
-    var total = cred + deb + cash;
+    var total = Math.abs(cred) + deb + cash;
+    var patrimonio = cred + deb + cash;
 
-    document.getElementById("patrimonyAmount").textContent = "RD$ " + total.toLocaleString("en-US",{minimumFractionDigits:2});
+    document.getElementById("patrimonyAmount").textContent = "RD$ " + patrimonio.toLocaleString("en-US",{minimumFractionDigits:2});
 
     var segs = [
       { label: "Crédito", value: cred, color: "#141d5c" },

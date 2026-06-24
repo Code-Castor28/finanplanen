@@ -20,14 +20,6 @@
       {{ form.cuenta }}
       {% for error in form.cuenta.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
     </div>
-    <div class="field">
-      <label for="{{ form.categoria.id_for_label }}">
-        {{ form.categoria.label }}
-        <i class="fa-solid fa-circle-question" data-tippy-content="Clasifica este ingreso para llevar el control de tus finanzas" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
-      </label>
-      {{ form.categoria }}
-      {% for error in form.categoria.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
-    </div>
   </div>
   <div class="form-group">
     <label>

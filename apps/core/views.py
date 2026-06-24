@@ -12,6 +12,9 @@ from apps.core.utils import calcular_prox_pago
 from apps.transactions.models import Ingreso, Gasto
 
 
+PAGO_TARJETA_SLUG = 'pago-tarjeta'
+
+
 class PanelPrincipal(LoginRequiredMixin, TemplateView):
     template_name = 'core/dashboard.html'
 
@@ -35,7 +38,7 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
         # --- Mes actual ---
         ing_mes = Ingreso.objects.filter(
             inquilino=inquilino, fecha__month=mes_actual, fecha__year=año_actual
-        ).aggregate(t=Sum('monto'))['t'] or 0
+        ).exclude(categoria__slug=PAGO_TARJETA_SLUG).aggregate(t=Sum('monto'))['t'] or 0
         gas_mes = Gasto.objects.filter(
             inquilino=inquilino, fecha__month=mes_actual, fecha__year=año_actual
         ).aggregate(t=Sum('monto'))['t'] or 0
@@ -46,7 +49,7 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
         # --- Mes anterior ---
         ing_ant = Ingreso.objects.filter(
             inquilino=inquilino, fecha__month=mes_anterior, fecha__year=año_anterior
-        ).aggregate(t=Sum('monto'))['t'] or 0
+        ).exclude(categoria__slug=PAGO_TARJETA_SLUG).aggregate(t=Sum('monto'))['t'] or 0
         gas_ant = Gasto.objects.filter(
             inquilino=inquilino, fecha__month=mes_anterior, fecha__year=año_anterior
         ).aggregate(t=Sum('monto'))['t'] or 0
@@ -66,7 +69,7 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
 
         ingresos_agg = list(Ingreso.objects.filter(
             inquilino=inquilino, fecha__gte=inicio_periodo, fecha__lte=hoy
-        ).annotate(mes=TruncMonth('fecha')).values('mes').annotate(
+        ).exclude(categoria__slug=PAGO_TARJETA_SLUG).annotate(mes=TruncMonth('fecha')).values('mes').annotate(
             total=Sum('monto')
         ))
         gastos_agg = list(Gasto.objects.filter(

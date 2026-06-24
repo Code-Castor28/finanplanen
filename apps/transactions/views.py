@@ -4,13 +4,62 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Count, Sum
 from django.http import HttpResponse
 from django.urls import reverse_lazy
+from django.utils.text import slugify
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .forms import IngresoForm, GastoForm
 from .models import Ingreso, Gasto
 from apps.accounts.models import Cuenta
 from apps.budgets.models import Presupuesto
 from apps.categories.models import Categoria
+from apps.theme.models import Color
 from apps.transfers.models import Transferencia
+
+
+PAGO_TARJETA_SLUG = 'pago-tarjeta'
+
+CAT_INGRESO_MAP = {
+    'debito': ('Ingreso Débito', '#1b5e20'),
+    'efectivo': ('Ingreso Efectivo', '#388e3c'),
+    'credito': ('Pago Tarjeta', '#1565c0'),
+}
+
+
+def _asignar_categoria_ingreso(form, usuario):
+    cuenta = form.cleaned_data['cuenta']
+    nombre_cat, hex_color = CAT_INGRESO_MAP[cuenta.tipo]
+    color_obj, _ = Color.objects.get_or_create(
+        inquilino=usuario.inquilino,
+        slug=slugify(nombre_cat),
+        defaults={'nombre': f'Color {nombre_cat}', 'hex': hex_color, 'usuario': usuario},
+    )
+    categoria, _ = Categoria.objects.get_or_create(
+        inquilino=usuario.inquilino,
+        slug=slugify(nombre_cat),
+        defaults={
+            'nombre': nombre_cat,
+            'usuario': usuario,
+            'color': color_obj,
+        }
+    )
+    form.instance.categoria = categoria
+
+
+def _seed_categorias_ingreso(inquilino, usuario):
+    for nombre_cat, hex_color in CAT_INGRESO_MAP.values():
+        color_obj, _ = Color.objects.get_or_create(
+            inquilino=inquilino,
+            slug=slugify(nombre_cat),
+            defaults={'nombre': f'Color {nombre_cat}', 'hex': hex_color, 'usuario': usuario},
+        )
+        Categoria.objects.get_or_create(
+            inquilino=inquilino,
+            slug=slugify(nombre_cat),
+            defaults={
+                'nombre': nombre_cat,
+                'usuario': usuario,
+                'color': color_obj,
+            }
+        )
 
 
 class InquilinoMixin(LoginRequiredMixin):
@@ -62,8 +111,9 @@ class IngresoLista(InquilinoMixin, ListView):
             inquilino = self.request.user.inquilino
             context['cuentas'] = Cuenta.objects.filter(inquilino=inquilino).order_by('nombre')
 
-            cats = Categoria.objects.filter(inquilino=inquilino).order_by('nombre')
-            ing_agg = Ingreso.objects.filter(inquilino=inquilino).values(
+            _seed_categorias_ingreso(inquilino, self.request.user)
+            cats = Categoria.objects.filter(inquilino=inquilino).exclude(slug=PAGO_TARJETA_SLUG).order_by('nombre')
+            ing_agg = Ingreso.objects.filter(inquilino=inquilino).exclude(categoria__slug=PAGO_TARJETA_SLUG).values(
                 'categoria_id'
             ).annotate(
                 total=Sum('monto'), count=Count('id')
@@ -78,7 +128,7 @@ class IngresoLista(InquilinoMixin, ListView):
                 cat.ingresos_count = stats['count']
             context['categorias'] = cats
 
-            qs_all = self.get_queryset()
+            qs_all = self.get_queryset().exclude(categoria__slug=PAGO_TARJETA_SLUG)
             total = qs_all.aggregate(s=Sum('monto'))['s'] or 0
             context['total_ingresos'] = total
 
@@ -87,12 +137,12 @@ class IngresoLista(InquilinoMixin, ListView):
                 inquilino=inquilino,
                 fecha__year=hoy.year,
                 fecha__month=hoy.month
-            )
+            ).exclude(categoria__slug=PAGO_TARJETA_SLUG)
             total_mes = mes_qs.aggregate(s=Sum('monto'))['s'] or 0
             context['total_mes'] = total_mes
 
-            cats_dist = Categoria.objects.filter(inquilino=inquilino).order_by('nombre')
-            ing_dist_agg = Ingreso.objects.filter(inquilino=inquilino).values(
+            cats_dist = Categoria.objects.filter(inquilino=inquilino).exclude(slug=PAGO_TARJETA_SLUG).order_by('nombre')
+            ing_dist_agg = Ingreso.objects.filter(inquilino=inquilino).exclude(categoria__slug=PAGO_TARJETA_SLUG).values(
                 'categoria_id'
             ).annotate(total=Sum('monto'))
             dist_totals = {r['categoria_id']: r['total'] or 0 for r in ing_dist_agg}
@@ -121,6 +171,7 @@ class IngresoCrear(InquilinoMixin, CreateView):
         return reverse_lazy('transactions:ingresos')
 
     def form_valid(self, form):
+        _asignar_categoria_ingreso(form, self.request.user)
         super().form_valid(form)
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
@@ -141,6 +192,7 @@ class IngresoEditar(InquilinoMixin, UpdateView):
         return reverse_lazy('transactions:ingresos')
 
     def form_valid(self, form):
+        _asignar_categoria_ingreso(form, self.request.user)
         super().form_valid(form)
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
@@ -450,7 +502,8 @@ class TransaccionLista(LoginRequiredMixin, ListView):
             ).aggregate(s=Sum('balance'))['s'] or 0
 
             total_ingresos = sum(
-                m['monto'] for m in movimientos if m['tipo'] == 'ingreso'
+                m['monto'] for m in movimientos
+                if m['tipo'] == 'ingreso' and m.get('categoria') and m['categoria'].slug != PAGO_TARJETA_SLUG
             )
             total_gastos = sum(
                 m['monto'] for m in movimientos if m['tipo'] == 'gasto'

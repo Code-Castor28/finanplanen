@@ -108,18 +108,6 @@
         <div class="field-row">
           <div class="field">
             <label>
-              Categoría
-              <i class="fa-solid fa-circle-question" data-tippy-content="Clasifica este ingreso para llevar el control" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
-            </label>
-            <select name="categoria" class="form-control">
-              <option value="">Seleccionar...</option>
-              {% for cat in categorias %}
-              <option value="{{ cat.pk }}">{{ cat.nombre }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="field">
-            <label>
               Fecha
               <i class="fa-solid fa-circle-question" data-tippy-content="Fecha en que se recibió el ingreso" style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
             </label>
