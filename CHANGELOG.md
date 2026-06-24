@@ -1,3 +1,22 @@
+## v2.1.0 (2026-06-23)
+
+### Feat
+
+- altos — P6-P11 validación, índices, dashboard, Redis
+- <div class="sidebar-footer">
+
+### Fix
+
+- medios — P12, P13, P17 N+1, validación, filtro default
+- críticos — C1-C5, P19, P23
+- mejora del lateral name
+
+### Refactor
+
+- logs y seguridad
+- **limite-credito**: anadir un campo limite de credito
+- **Próximos-Pagos**: update para cargar los proximos pagos al dashboard
+
 ## v2.0.0 (2026-06-22)
 
 ### Feat
