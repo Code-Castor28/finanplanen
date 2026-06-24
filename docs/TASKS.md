@@ -148,3 +148,4 @@
 - [x] 18.6 Refactor `notifications/tasks.py` y `test_push.py` (importar desde utils)
 - [x] 18.7 Dashboard: contexto `proximos_pagos` en `PanelPrincipal`
 - [x] 18.8 Dashboard template: loop de próximos pagos
+- [x] 18.9 Opción A vs B: se probó Opción B (balance=deuda) y se revirtió a Opción A (balance=disponible)

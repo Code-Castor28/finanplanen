@@ -73,3 +73,11 @@ Formato: `YYYY-MM-DD | Archivo | Línea(s) | Cambio | Motivo (ref. AUDITORIA.md)
 | 18.8 | `apps/core/templates/core/dashboard.html` | 79-98 | Loop sobre `proximos_pagos` reemplaza placeholder vacío | Visualización de pagos próximos en dashboard |
 | 18.m | `apps/accounts/migrations/0003_cuenta_limite_credito.py` | — | Nueva migración: add field limite_credito to cuenta | Schema requerido por el nuevo campo |
 | 18.m2 | `static/js/main.js` | 44-153 | Reescritura idle timeout: sessionStorage persistente, `touchend`/`focusin`/`pageshow`/`webkitvisibilitychange`, tiempo restante en vez de reinicio completo | Idle timeout no funcionaba en móvil por recarga de página al cambiar de app + eventos móvil no cubiertos |
+| 18.m3 | `apps/transactions/signals.py` | — | Revertido a Opción A: original sin inversión de signo (gasto -=, ingreso +=) | Se probó Opción B pero no gustó |
+| 18.m4 | `apps/transfers/signals.py` | — | Revertido a Opción A: original (origen -=, destino +=) | Se probó Opción B pero no gustó |
+| 18.m5 | `apps/accounts/forms.py` | — | Sin cambios (initial vacío correcto para Opción A) | Opción A no requiere auto-complete en forms.py |
+| 18.m6 | `apps/accounts/templates/accounts/_form_cuenta.html` | — | Restaurado tooltip "disponible" + JS auto-complete balance=limite_credito | Opción A: balance = disponible |
+| 18.m7 | `apps/accounts/templates/accounts/Cuenta.html` | 47 | Label "Deuda Actual" → "Saldo Disponible" | Revertido a Opción A |
+| 18.m8 | `apps/core/views.py` | 29-32, 181 | `total_balance = Sum(balance)` simple; `total_a_pagar = max(limite_credito - balance, 0)` | Revertido a Opción A |
+| 18.m9 | `apps/accounts/views.py` | 37 | `total = credito + debito + wallet` (suma simple) | Revertido a Opción A |
+| 18.m10 | `apps/accounts/templates/accounts/Cuenta.html` | 182-189 | Donut: `total = cred + deb + cash` (sin neto) | Revertido a Opción A |
