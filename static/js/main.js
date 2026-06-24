@@ -49,11 +49,20 @@
   var countdownEl = document.getElementById('idle-countdown');
   var continueBtn = document.getElementById('idle-continue');
 
-  function resetIdleTimer() {
+  function clearIdleTimers() {
     clearTimeout(idleTimer);
     clearInterval(countdownInterval);
     if (idleModal) idleModal.classList.remove('open');
-    idleTimer = setTimeout(showIdleWarning, IDLE_TIMEOUT);
+  }
+
+  function startIdleTimer(delay) {
+    clearIdleTimers();
+    idleTimer = setTimeout(showIdleWarning, delay || IDLE_TIMEOUT);
+  }
+
+  function resetIdleTimer() {
+    clearIdleTimers();
+    startIdleTimer();
   }
 
   function showIdleWarning() {
@@ -72,30 +81,74 @@
     }, 1000);
   }
 
+  function getDocHidden() {
+    return document.hidden || (document.webkitHidden !== undefined && document.webkitHidden);
+  }
+
+  function onPageShow() {
+    var hiddenAt = sessionStorage.getItem('idle_hidden_at');
+    if (hiddenAt) {
+      sessionStorage.removeItem('idle_hidden_at');
+      var elapsed = Date.now() - parseInt(hiddenAt, 10);
+      if (elapsed >= IDLE_TIMEOUT) {
+        sessionStorage.setItem('sesion_expirada', '1');
+        window.location.href = '/acceso/salir/';
+        return;
+      }
+      startIdleTimer(Math.max(IDLE_TIMEOUT - elapsed, 10000));
+    } else {
+      startIdleTimer();
+    }
+  }
+
   if (window.location.pathname.indexOf('/acceso/') === -1) {
-    var activityEvents = ['mousedown', 'mousemove', 'click', 'keydown', 'touchstart', 'scroll', 'wheel'];
+    var activityEvents = ['mousedown', 'mousemove', 'click', 'keydown', 'touchstart', 'touchend', 'focusin', 'scroll', 'wheel'];
     for (var i = 0; i < activityEvents.length; i++) {
       document.addEventListener(activityEvents[i], resetIdleTimer);
     }
-    resetIdleTimer();
+    startIdleTimer();
     if (continueBtn) {
       continueBtn.addEventListener('click', resetIdleTimer);
     }
 
-    var hiddenAt = null;
     document.addEventListener('visibilitychange', function() {
-      if (document.hidden) {
-        hiddenAt = Date.now();
-      } else if (hiddenAt !== null) {
-        var elapsed = Date.now() - hiddenAt;
-        hiddenAt = null;
-        if (elapsed >= IDLE_TIMEOUT) {
-          sessionStorage.setItem('sesion_expirada', '1');
-          window.location.href = '/acceso/salir/';
-        } else {
-          resetIdleTimer();
+      if (getDocHidden()) {
+        sessionStorage.setItem('idle_hidden_at', Date.now());
+      } else {
+        var hiddenAt = sessionStorage.getItem('idle_hidden_at');
+        if (hiddenAt) {
+          sessionStorage.removeItem('idle_hidden_at');
+          var elapsed = Date.now() - parseInt(hiddenAt, 10);
+          if (elapsed >= IDLE_TIMEOUT) {
+            sessionStorage.setItem('sesion_expirada', '1');
+            window.location.href = '/acceso/salir/';
+          } else {
+            startIdleTimer(Math.max(IDLE_TIMEOUT - elapsed, 10000));
+          }
         }
       }
     });
+
+    if (document.webkitHidden !== undefined) {
+      document.addEventListener('webkitvisibilitychange', function() {
+        if (getDocHidden()) {
+          sessionStorage.setItem('idle_hidden_at', Date.now());
+        } else {
+          var hiddenAt = sessionStorage.getItem('idle_hidden_at');
+          if (hiddenAt) {
+            sessionStorage.removeItem('idle_hidden_at');
+            var elapsed = Date.now() - parseInt(hiddenAt, 10);
+            if (elapsed >= IDLE_TIMEOUT) {
+              sessionStorage.setItem('sesion_expirada', '1');
+              window.location.href = '/acceso/salir/';
+            } else {
+              startIdleTimer(Math.max(IDLE_TIMEOUT - elapsed, 10000));
+            }
+          }
+        }
+      });
+    }
+
+    window.addEventListener('pageshow', onPageShow);
   }
 })();
