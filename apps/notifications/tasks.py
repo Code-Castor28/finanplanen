@@ -5,25 +5,10 @@ from celery import shared_task
 from pywebpush import webpush, WebPushException
 from django.conf import settings
 from apps.accounts.models import Cuenta
+from apps.core.utils import calcular_prox_pago
 from .models import SuscripcionPush
 
 logger = logging.getLogger(__name__)
-
-
-def _calcular_prox_pago(cuenta):
-    hoy = date.today()
-    try:
-        dia = int(cuenta.dia_pago)
-    except (ValueError, TypeError):
-        return None
-    dia = min(dia, 28)
-    prox = hoy.replace(day=dia)
-    if prox < hoy:
-        if prox.month == 12:
-            prox = prox.replace(year=prox.year + 1, month=1)
-        else:
-            prox = prox.replace(month=prox.month + 1)
-    return prox
 
 
 @shared_task(
@@ -45,7 +30,7 @@ def enviar_recordatorios_push(self):
 
     enviadas = 0
     for t in tarjetas:
-        prox = _calcular_prox_pago(t)
+        prox = calcular_prox_pago(t)
         if prox is None:
             continue
         diff = (prox - hoy).days

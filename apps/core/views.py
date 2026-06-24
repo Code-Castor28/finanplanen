@@ -8,6 +8,7 @@ from django.db.models import Sum
 from django.db.models.functions import TruncMonth
 from django.views.generic import TemplateView
 from apps.accounts.models import Cuenta
+from apps.core.utils import calcular_prox_pago
 from apps.transactions.models import Ingreso, Gasto
 
 
@@ -163,6 +164,33 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
             })
         movs.sort(key=lambda x: (x['fecha'], x['creado']), reverse=True)
         context['recientes'] = movs[:10]
+
+        # --- Próximos pagos tarjetas crédito ---
+        tarjetas_credito = Cuenta.objects.filter(
+            inquilino=inquilino, tipo='credito', activo=True
+        ).exclude(dia_pago='').select_related('color', 'icono')
+
+        proximos_pagos = []
+        for t in tarjetas_credito:
+            prox = calcular_prox_pago(t)
+            if prox is None:
+                continue
+            days_left = (prox - hoy).days
+            if days_left < 0:
+                continue
+            total_a_pagar = max(t.limite_credito - t.balance, 0)
+            proximos_pagos.append({
+                'nombre': t.nombre,
+                'emisor': t.emisor,
+                'color': t.color.hex if t.color_id else '#1a237e',
+                'icono': t.icono.clase_css if t.icono_id else 'fa-credit-card',
+                'total_a_pagar': total_a_pagar,
+                'dia_pago': t.dia_pago,
+                'fecha_pago': prox,
+                'days_left': days_left,
+            })
+        proximos_pagos.sort(key=lambda x: x['days_left'])
+        context['proximos_pagos'] = proximos_pagos
 
         return context
 
