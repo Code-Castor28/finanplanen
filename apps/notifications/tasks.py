@@ -37,12 +37,15 @@ def enviar_recordatorios_push(self):
         if diff not in dias_aviso:
             continue
 
+        total_a_pagar = max(t.limite_credito - t.balance, 0)
+        monto_str = f'RD$ {total_a_pagar:,.2f}'
+
         if diff > 0:
             titulo = '⚠️ Pago próximo'
-            cuerpo = f'Tu {t.nombre} ({t.emisor}) vence el {prox.strftime("%d/%m/%Y")}'
+            cuerpo = f'{t.nombre} ({t.emisor})\nVence: {prox.strftime("%d/%m/%Y")}\nMonto: {monto_str}'
         else:
             titulo = '📌 Pago HOY'
-            cuerpo = f'HOY vence tu {t.nombre} ({t.emisor})'
+            cuerpo = f'{t.nombre} ({t.emisor})\nVence: HOY\nMonto: {monto_str}'
 
         mensaje = {
             'title': titulo,

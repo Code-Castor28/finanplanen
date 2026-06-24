@@ -25,6 +25,17 @@
     {{ form.tipo }}
     <span class="field-error">{% for error in form.tipo.errors %}{{ error }}{% endfor %}</span>
   </div>
+  <div id="limite-credito-field" class="form-group" style="display:none">
+    <label for="{{ form.limite_credito.id_for_label }}">
+      Límite de Crédito
+      <i class="fa-solid fa-circle-question" data-tippy-content="Monto máximo de crédito aprobado por el banco. Al ingresarlo, el balance se auto-completa con el mismo valor." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
+    </label>
+    <div style="display:flex;align-items:center;border:1.5px solid var(--olv);border-radius:8px;overflow:hidden">
+      <span style="padding:10px 12px;background:var(--sc);color:var(--ov);font-weight:700;font-size:14px">RD$</span>
+      {{ form.limite_credito }}
+    </div>
+    <span class="field-error">{% for error in form.limite_credito.errors %}{{ error }}{% endfor %}</span>
+  </div>
   <div class="form-group">
     <label>
       Balance
@@ -56,17 +67,6 @@
       </div>
     </div>
     <div id="credito-fields" class="field-row">
-      <div class="field">
-        <label for="{{ form.limite_credito.id_for_label }}">
-          Límite de Crédito
-          <i class="fa-solid fa-circle-question" data-tippy-content="Monto máximo de crédito aprobado por el banco. Al ingresarlo, el balance se auto-completa con el mismo valor." style="color:var(--ov,#999);margin-left:4px;cursor:help;font-size:0.9em"></i>
-        </label>
-        <div style="display:flex;align-items:center;border:1.5px solid var(--olv);border-radius:8px;overflow:hidden">
-          <span style="padding:10px 12px;background:var(--sc);color:var(--ov);font-weight:700;font-size:14px">RD$</span>
-          {{ form.limite_credito }}
-        </div>
-    <span class="field-error">{% for error in form.limite_credito.errors %}{{ error }}{% endfor %}</span>
-      </div>
       <div class="field">
         <label for="{{ form.dia_corte.id_for_label }}">
           {{ form.dia_corte.label }}
@@ -133,11 +133,13 @@
   var tarjeta = document.getElementById('tarjeta-fields');
   var credito = document.getElementById('credito-fields');
   var venc = document.getElementById('vencimiento-field');
+  var lcf = document.getElementById('limite-credito-field');
   function toggle(){
     var v = tipo.value;
     tarjeta.style.display = v === 'efectivo' ? 'none' : 'block';
     credito.style.display = v === 'credito' ? 'flex' : 'none';
     venc.style.display = v === 'debito' ? 'block' : 'none';
+    if (lcf) lcf.style.display = v === 'credito' ? 'block' : 'none';
   }
   if(tipo){ tipo.addEventListener('change', toggle); toggle(); }
 })();
