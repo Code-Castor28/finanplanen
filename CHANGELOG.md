@@ -1,3 +1,9 @@
+## v2.1.1 (2026-06-23)
+
+### Refactor
+
+- **MOVILES**: MEJORA DEL TIME NICTIVIDAD EN MOVILES
+
 ## v2.1.0 (2026-06-23)
 
 ### Feat
