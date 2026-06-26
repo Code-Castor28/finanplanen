@@ -1,5 +1,7 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 from django.conf import settings
@@ -26,6 +28,12 @@ class RegistroView(CreateView):
         ctx['titulo'] = 'Crear Cuenta'
         return ctx
 
+    def form_valid(self, form):
+        super().form_valid(form)
+        messages.success(
+            self.request, 'Cuenta creada correctamente. Ahora inicia sesión.')
+        return redirect(self.get_success_url())
+
 
 class PerfilView(LoginRequiredMixin, UpdateView):
     template_name = 'users/perfil.html'
@@ -39,3 +47,8 @@ class PerfilView(LoginRequiredMixin, UpdateView):
         ctx = super().get_context_data(**kwargs)
         ctx['vapid_public_key'] = settings.VAPID_PUBLIC_KEY
         return ctx
+
+    def form_valid(self, form):
+        super().form_valid(form)
+        messages.success(self.request, 'Perfil actualizado correctamente.')
+        return redirect(self.get_success_url())

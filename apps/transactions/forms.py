@@ -1,5 +1,7 @@
 from django import forms
+from .constants import CATEGORIAS_INGRESO_SLUGS, CATEGORIAS_AJUSTE_SLUGS
 from .models import Ingreso, Gasto
+from apps.categories.models import Categoria
 
 
 class IngresoForm(forms.ModelForm):
@@ -19,6 +21,16 @@ class IngresoForm(forms.ModelForm):
 
 
 class GastoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        inquilino = kwargs.pop('inquilino', None)
+        super().__init__(*args, **kwargs)
+        qs = Categoria.objects.all()
+        if inquilino:
+            qs = qs.filter(inquilino=inquilino)
+        self.fields['categoria'].queryset = qs.exclude(
+            slug__in=CATEGORIAS_INGRESO_SLUGS + CATEGORIAS_AJUSTE_SLUGS
+        )
+
     class Meta:
         model = Gasto
         fields = ['cuenta', 'categoria', 'monto', 'fecha', 'nota', 'comprobante']

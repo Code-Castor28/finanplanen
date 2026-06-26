@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Count, Sum
@@ -6,6 +7,7 @@ from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.utils.text import slugify
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from .constants import CATEGORIAS_INGRESO_SLUGS, CATEGORIAS_AJUSTE_SLUGS, CAT_INGRESO_MAP
 from .forms import IngresoForm, GastoForm
 from .models import Ingreso, Gasto
 from apps.accounts.models import Cuenta
@@ -13,16 +15,6 @@ from apps.budgets.models import Presupuesto
 from apps.categories.models import Categoria
 from apps.theme.models import Color
 from apps.transfers.models import Transferencia
-
-
-PAGO_TARJETA_SLUG = 'pago-tarjeta'
-
-CAT_INGRESO_MAP = {
-    'debito': ('Ingreso Débito', '#1b5e20'),
-    'efectivo': ('Ingreso Efectivo', '#388e3c'),
-    'credito': ('Pago Tarjeta', '#1565c0'),
-}
-
 
 def _asignar_categoria_ingreso(form, usuario):
     cuenta = form.cleaned_data['cuenta']
@@ -112,8 +104,8 @@ class IngresoLista(InquilinoMixin, ListView):
             context['cuentas'] = Cuenta.objects.filter(inquilino=inquilino).order_by('nombre')
 
             _seed_categorias_ingreso(inquilino, self.request.user)
-            cats = Categoria.objects.filter(inquilino=inquilino).exclude(slug=PAGO_TARJETA_SLUG).order_by('nombre')
-            ing_agg = Ingreso.objects.filter(inquilino=inquilino).exclude(categoria__slug=PAGO_TARJETA_SLUG).values(
+            cats = Categoria.objects.filter(inquilino=inquilino, slug__in=CATEGORIAS_INGRESO_SLUGS).order_by('nombre')
+            ing_agg = Ingreso.objects.filter(inquilino=inquilino).values(
                 'categoria_id'
             ).annotate(
                 total=Sum('monto'), count=Count('id')
@@ -128,7 +120,7 @@ class IngresoLista(InquilinoMixin, ListView):
                 cat.ingresos_count = stats['count']
             context['categorias'] = cats
 
-            qs_all = self.get_queryset().exclude(categoria__slug=PAGO_TARJETA_SLUG)
+            qs_all = self.get_queryset()
             total = qs_all.aggregate(s=Sum('monto'))['s'] or 0
             context['total_ingresos'] = total
 
@@ -137,12 +129,12 @@ class IngresoLista(InquilinoMixin, ListView):
                 inquilino=inquilino,
                 fecha__year=hoy.year,
                 fecha__month=hoy.month
-            ).exclude(categoria__slug=PAGO_TARJETA_SLUG)
+            )
             total_mes = mes_qs.aggregate(s=Sum('monto'))['s'] or 0
             context['total_mes'] = total_mes
 
-            cats_dist = Categoria.objects.filter(inquilino=inquilino).exclude(slug=PAGO_TARJETA_SLUG).order_by('nombre')
-            ing_dist_agg = Ingreso.objects.filter(inquilino=inquilino).exclude(categoria__slug=PAGO_TARJETA_SLUG).values(
+            cats_dist = Categoria.objects.filter(inquilino=inquilino, slug__in=CATEGORIAS_INGRESO_SLUGS).order_by('nombre')
+            ing_dist_agg = Ingreso.objects.filter(inquilino=inquilino, categoria__slug__in=CATEGORIAS_INGRESO_SLUGS).values(
                 'categoria_id'
             ).annotate(total=Sum('monto'))
             dist_totals = {r['categoria_id']: r['total'] or 0 for r in ing_dist_agg}
@@ -173,6 +165,7 @@ class IngresoCrear(InquilinoMixin, CreateView):
     def form_valid(self, form):
         _asignar_categoria_ingreso(form, self.request.user)
         super().form_valid(form)
+        messages.success(self.request, 'Ingreso registrado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -194,6 +187,7 @@ class IngresoEditar(InquilinoMixin, UpdateView):
     def form_valid(self, form):
         _asignar_categoria_ingreso(form, self.request.user)
         super().form_valid(form)
+        messages.success(self.request, 'Ingreso actualizado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -214,6 +208,7 @@ class IngresoEliminar(InquilinoMixin, DeleteView):
     def form_valid(self, form):
         self.object = self.get_object()
         self.object.delete()
+        messages.success(self.request, 'Ingreso eliminado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -262,7 +257,7 @@ class GastoLista(InquilinoMixin, ListView):
             inquilino = self.request.user.inquilino
             context['cuentas'] = Cuenta.objects.filter(inquilino=inquilino).order_by('nombre')
 
-            cats = Categoria.objects.filter(inquilino=inquilino).order_by('nombre')
+            cats = Categoria.objects.filter(inquilino=inquilino).exclude(slug__in=CATEGORIAS_INGRESO_SLUGS + CATEGORIAS_AJUSTE_SLUGS).order_by('nombre')
             gas_agg = Gasto.objects.filter(inquilino=inquilino).values(
                 'categoria_id'
             ).annotate(
@@ -296,7 +291,7 @@ class GastoLista(InquilinoMixin, ListView):
             ).aggregate(s=Sum('monto_limite'))
             context['budget_limit'] = budget_agg['s'] or 0
 
-            cats_dist = Categoria.objects.filter(inquilino=inquilino).order_by('nombre')
+            cats_dist = Categoria.objects.filter(inquilino=inquilino).exclude(slug__in=CATEGORIAS_INGRESO_SLUGS + CATEGORIAS_AJUSTE_SLUGS).order_by('nombre')
             gas_dist_agg = Gasto.objects.filter(inquilino=inquilino).values(
                 'categoria_id'
             ).annotate(total=Sum('monto'))
@@ -325,8 +320,14 @@ class GastoCrear(InquilinoMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('transactions:gastos')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['inquilino'] = self.request.user.inquilino
+        return kwargs
+
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Gasto registrado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -345,8 +346,14 @@ class GastoEditar(InquilinoMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('transactions:gastos')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['inquilino'] = self.request.user.inquilino
+        return kwargs
+
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Gasto actualizado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -367,6 +374,7 @@ class GastoEliminar(InquilinoMixin, DeleteView):
     def form_valid(self, form):
         self.object = self.get_object()
         self.object.delete()
+        messages.success(self.request, 'Gasto eliminado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -503,7 +511,7 @@ class TransaccionLista(LoginRequiredMixin, ListView):
 
             total_ingresos = sum(
                 m['monto'] for m in movimientos
-                if m['tipo'] == 'ingreso' and m.get('categoria') and m['categoria'].slug != PAGO_TARJETA_SLUG
+                if m['tipo'] == 'ingreso' and m.get('categoria') and m['categoria'].slug != CATEGORIAS_INGRESO_SLUGS[2]
             )
             total_gastos = sum(
                 m['monto'] for m in movimientos if m['tipo'] == 'gasto'

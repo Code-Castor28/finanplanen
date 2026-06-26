@@ -1,4 +1,5 @@
 from datetime import date
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from django.http import HttpResponse
@@ -74,6 +75,7 @@ class TransferenciaCrear(InquilinoMixin, CreateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Transferencia creada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -105,6 +107,7 @@ class TransferenciaEditar(InquilinoMixin, UpdateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Transferencia actualizada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -125,6 +128,7 @@ class TransferenciaEliminar(InquilinoMixin, DeleteView):
     def form_valid(self, form):
         self.object = self.get_object()
         self.object.delete()
+        messages.success(self.request, 'Transferencia eliminada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response

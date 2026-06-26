@@ -1,3 +1,4 @@
+from celery.schedules import crontab
 from pathlib import Path
 import datetime
 import environ
@@ -11,9 +12,10 @@ environ.Env.read_env(BASE_DIR / '.env')
 SECRET_KEY = env('SECRET_KEY')
 
 # Mantenimiento
-MAINTENANCE_MODE          = env.bool('MAINTENANCE_MODE', default=False)
-MAINTENANCE_END_TIME      = env('MAINTENANCE_END_TIME', default=None)
-MAINTENANCE_SUPPORT_EMAIL = env('MAINTENANCE_SUPPORT_EMAIL', default='soporte@finanplanen.com')
+MAINTENANCE_MODE = env.bool('MAINTENANCE_MODE', default=False)
+MAINTENANCE_END_TIME = env('MAINTENANCE_END_TIME', default=None)
+MAINTENANCE_SUPPORT_EMAIL = env(
+    'MAINTENANCE_SUPPORT_EMAIL', default='soporte@finanplanen.com')
 
 _end_time_str = env('MAINTENANCE_END_TIME', default=None)
 if _end_time_str:
@@ -122,14 +124,15 @@ VAPID_PRIVATE_KEY = env('VAPID_PRIVATE_KEY', default='')
 VAPID_ADMIN_EMAIL = env('VAPID_ADMIN_EMAIL', default='admin@example.com')
 
 # Celery
-CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='redis://localhost:6379/1')
+CELERY_BROKER_URL = env('CELERY_BROKER_URL',
+                        default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND',
+                            default='redis://localhost:6379/1')
 CELERY_RESULT_EXPIRES = 1800
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'America/Santo_Domingo'
-from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'ejecutar-recurrencias': {
         'task': 'apps.transfers.tasks.ejecutar_recurrencias',
