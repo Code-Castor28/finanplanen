@@ -1,3 +1,13 @@
+## v2.1.2 (2026-06-25)
+
+### Refactor
+
+- mejoras en dashboard, mensajes nuevos kpi
+- importacion de mensaje y integracion
+- agrear mensaje
+- fotmateador de numeros
+- **aoutocategoria**: se regitro categoria auto para los tipo de cuentas
+
 ## v2.1.1 (2026-06-23)
 
 ### Refactor
