@@ -31,9 +31,11 @@
     if (icon) {
       icon.className = type === 'error' ? 'fas fa-exclamation-circle'
         : type === 'info' ? 'fas fa-info-circle'
+        : type === 'warning' ? 'fas fa-exclamation-triangle'
         : 'fas fa-check-circle';
     }
     toastEl.className = 'toast';
+    if (type) toastEl.classList.add(type);
     void toastEl.offsetWidth;
     toastEl.classList.add('show');
     clearTimeout(toastTimer);
