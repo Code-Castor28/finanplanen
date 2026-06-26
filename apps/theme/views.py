@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
@@ -37,6 +38,7 @@ class ColorCrear(InquilinoMixin, CreateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Color creado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -57,6 +59,7 @@ class ColorEditar(InquilinoMixin, UpdateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Color actualizado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -77,6 +80,7 @@ class ColorEliminar(InquilinoMixin, DeleteView):
     def form_valid(self, form):
         self.object = self.get_object()
         self.object.delete()
+        messages.success(self.request, 'Color eliminado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -107,6 +111,7 @@ class IconoCrear(InquilinoMixin, CreateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Icono creado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -127,6 +132,7 @@ class IconoEditar(InquilinoMixin, UpdateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Icono actualizado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -147,6 +153,7 @@ class IconoEliminar(InquilinoMixin, DeleteView):
     def form_valid(self, form):
         self.object = self.get_object()
         self.object.delete()
+        messages.success(self.request, 'Icono eliminado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response

@@ -1,5 +1,6 @@
 import json
 from datetime import date
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import ProtectedError
@@ -90,6 +91,7 @@ class MetaAhorroCrear(InquilinoMixin, CreateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Meta de ahorro creada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -110,6 +112,7 @@ class MetaAhorroEditar(InquilinoMixin, UpdateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Meta de ahorro actualizada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -132,11 +135,11 @@ class MetaAhorroEliminar(InquilinoMixin, DeleteView):
         try:
             self.object.delete()
         except ProtectedError:
-            return HttpResponse(
-                'No se puede eliminar: esta meta tiene depósitos asociados. '
-                'Elimina primero sus depósitos.',
-                status=409,
-            )
+            messages.error(self.request, 'No se puede eliminar: esta meta tiene depósitos asociados. Elimina primero sus depósitos.')
+            response = HttpResponse()
+            response['HX-Redirect'] = self.get_success_url()
+            return response
+        messages.success(self.request, 'Meta de ahorro eliminada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -162,6 +165,7 @@ class DepositoAhorroCrear(InquilinoMixin, CreateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Depósito registrado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -182,6 +186,7 @@ class DepositoAhorroEliminar(InquilinoMixin, DeleteView):
     def form_valid(self, form):
         self.object = self.get_object()
         self.object.delete()
+        messages.success(self.request, 'Depósito eliminado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response

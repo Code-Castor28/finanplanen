@@ -1,3 +1,4 @@
+import calendar
 import json
 import random
 from datetime import date
@@ -9,10 +10,8 @@ from django.db.models.functions import TruncMonth
 from django.views.generic import TemplateView
 from apps.accounts.models import Cuenta
 from apps.core.utils import calcular_prox_pago
+from apps.transactions.constants import CATEGORIAS_INGRESO_SLUGS
 from apps.transactions.models import Ingreso, Gasto
-
-
-PAGO_TARJETA_SLUG = 'pago-tarjeta'
 
 
 class PanelPrincipal(LoginRequiredMixin, TemplateView):
@@ -38,7 +37,7 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
         # --- Mes actual ---
         ing_mes = Ingreso.objects.filter(
             inquilino=inquilino, fecha__month=mes_actual, fecha__year=año_actual
-        ).exclude(categoria__slug=PAGO_TARJETA_SLUG).aggregate(t=Sum('monto'))['t'] or 0
+        ).exclude(categoria__slug=CATEGORIAS_INGRESO_SLUGS[2]).aggregate(t=Sum('monto'))['t'] or 0
         gas_mes = Gasto.objects.filter(
             inquilino=inquilino, fecha__month=mes_actual, fecha__year=año_actual
         ).aggregate(t=Sum('monto'))['t'] or 0
@@ -49,7 +48,7 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
         # --- Mes anterior ---
         ing_ant = Ingreso.objects.filter(
             inquilino=inquilino, fecha__month=mes_anterior, fecha__year=año_anterior
-        ).exclude(categoria__slug=PAGO_TARJETA_SLUG).aggregate(t=Sum('monto'))['t'] or 0
+        ).exclude(categoria__slug=CATEGORIAS_INGRESO_SLUGS[2]).aggregate(t=Sum('monto'))['t'] or 0
         gas_ant = Gasto.objects.filter(
             inquilino=inquilino, fecha__month=mes_anterior, fecha__year=año_anterior
         ).aggregate(t=Sum('monto'))['t'] or 0
@@ -69,7 +68,7 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
 
         ingresos_agg = list(Ingreso.objects.filter(
             inquilino=inquilino, fecha__gte=inicio_periodo, fecha__lte=hoy
-        ).exclude(categoria__slug=PAGO_TARJETA_SLUG).annotate(mes=TruncMonth('fecha')).values('mes').annotate(
+        ).exclude(categoria__slug=CATEGORIAS_INGRESO_SLUGS[2]).annotate(mes=TruncMonth('fecha')).values('mes').annotate(
             total=Sum('monto')
         ))
         gastos_agg = list(Gasto.objects.filter(
@@ -134,6 +133,39 @@ class PanelPrincipal(LoginRequiredMixin, TemplateView):
             cat_data = [{'label': 'Sin gastos', 'value': 100, 'color': '#e0e0e0'}]
 
         context['cat_json'] = json.dumps(cat_data)
+
+        # --- Métricas de decisión ---
+        ing_total = float(ing_mes) if ing_mes else 0
+        gas_total = float(gas_mes) if gas_mes else 0
+        dia_actual = hoy.day
+        gasto_diario = round(gas_total / dia_actual, 2) if dia_actual and gas_total else 0
+        dias_mes = calendar.monthrange(hoy.year, hoy.month)[1]
+        proyeccion_gasto = round(gasto_diario * dias_mes, 2)
+
+        # 1 — Días de cobertura
+        total_balance_float = float(total_balance)
+        dias_cobertura = round(total_balance_float / gasto_diario) if gasto_diario else 0
+        context['dias_cobertura'] = dias_cobertura
+        context['cobertura_meses'] = int(dias_cobertura // 30)
+        context['cobertura_dias'] = int(dias_cobertura % 30)
+
+        # 2 — Salud del Presupuesto
+        from apps.budgets.models import Presupuesto
+        budget_agg = Presupuesto.objects.filter(
+            inquilino=inquilino, mes=mes_actual, año=año_actual
+        ).aggregate(gastado=Sum('monto_gastado'), limite=Sum('monto_limite'))
+        bg = float(budget_agg['gastado']) if budget_agg['gastado'] else 0
+        bl = float(budget_agg['limite']) if budget_agg['limite'] else 0
+        context['salud_presupuesto'] = round(bg / bl * 100, 1) if bl else 0
+
+        # 3 — Gasto por transacción
+        cant_gastos = Gasto.objects.filter(
+            inquilino=inquilino, fecha__month=mes_actual, fecha__year=año_actual
+        ).count()
+        context['gasto_x_transaccion'] = round(gas_total / cant_gastos, 2) if cant_gastos else 0
+
+        # 4 — Colchón al cierre
+        context['colchon_cierre'] = round(ing_total - proyeccion_gasto, 2)
 
         # --- Transacciones recientes (con select_related) ---
         movs = []

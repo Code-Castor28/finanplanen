@@ -1,8 +1,20 @@
 from django import forms
 from .models import Presupuesto
+from apps.categories.models import Categoria
+from apps.transactions.constants import CATEGORIAS_AJUSTE_SLUGS
 
 
 class PresupuestoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        inquilino = kwargs.pop('inquilino', None)
+        super().__init__(*args, **kwargs)
+        qs = Categoria.objects.all()
+        if inquilino:
+            qs = qs.filter(inquilino=inquilino)
+        self.fields['categoria'].queryset = qs.exclude(
+            slug__in=['ingreso-debito', 'ingreso-efectivo', 'pago-tarjeta'] + CATEGORIAS_AJUSTE_SLUGS
+        )
+
     class Meta:
         model = Presupuesto
         fields = ['categoria', 'monto_limite', 'mes', 'año']

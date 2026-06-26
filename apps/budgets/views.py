@@ -1,5 +1,6 @@
 import json
 from datetime import date
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Sum
@@ -65,7 +66,7 @@ class PresupuestoLista(InquilinoMixin, ListView):
 
         context['categorias'] = Categoria.objects.filter(
             inquilino=inquilino, activo=True
-        )
+        ).exclude(slug__in=['ingreso-debito', 'ingreso-efectivo', 'pago-tarjeta'])
 
         presupuestos_json = []
         for p in context['presupuestos']:
@@ -90,8 +91,14 @@ class PresupuestoCrear(InquilinoMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('budgets:lista')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['inquilino'] = self.request.user.inquilino
+        return kwargs
+
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Presupuesto creado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -110,8 +117,14 @@ class PresupuestoEditar(InquilinoMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('budgets:lista')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['inquilino'] = self.request.user.inquilino
+        return kwargs
+
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Presupuesto actualizado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -132,6 +145,7 @@ class PresupuestoEliminar(InquilinoMixin, DeleteView):
     def form_valid(self, form):
         self.object = self.get_object()
         self.object.delete()
+        messages.success(self.request, 'Presupuesto eliminado correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response

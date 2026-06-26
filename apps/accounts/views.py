@@ -1,12 +1,19 @@
+from datetime import date
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import ProtectedError, Sum
 from django.http import HttpResponse
 from django.urls import reverse_lazy
+from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .forms import CuentaForm
 from .models import Cuenta
+from apps.categories.models import Categoria
+from apps.theme.models import Color
+from apps.transactions.constants import CAT_INGRESO_MAP, CAT_AJUSTE_MAP
+from apps.transactions.models import Ingreso, Gasto
 
 
 class InquilinoMixin(LoginRequiredMixin):
@@ -64,7 +71,37 @@ class CuentaCrear(InquilinoMixin, CreateView):
         return reverse_lazy('accounts:lista')
 
     def form_valid(self, form):
+        tipo = form.cleaned_data.get('tipo')
+        balance_deseado = form.cleaned_data.get('balance', 0)
         super().form_valid(form)
+        cuenta = form.instance
+        if balance_deseado > 0 and tipo in ('debito', 'efectivo'):
+            nombre_cat, hex_color = CAT_INGRESO_MAP[tipo]
+            color_obj, _ = Color.objects.get_or_create(
+                inquilino=cuenta.inquilino,
+                slug=slugify(nombre_cat),
+                defaults={'nombre': f'Color {nombre_cat}', 'hex': hex_color, 'usuario': cuenta.usuario},
+            )
+            categoria, _ = Categoria.objects.get_or_create(
+                inquilino=cuenta.inquilino,
+                slug=slugify(nombre_cat),
+                defaults={
+                    'nombre': nombre_cat,
+                    'usuario': cuenta.usuario,
+                    'color': color_obj,
+                }
+            )
+            Ingreso.objects.create(
+                inquilino=cuenta.inquilino,
+                usuario=cuenta.usuario,
+                cuenta=cuenta,
+                categoria=categoria,
+                monto=balance_deseado,
+                fecha=date.today(),
+                nota=f'Balance inicial — {cuenta.nombre}',
+            )
+            Cuenta.objects.filter(pk=cuenta.pk).update(balance=balance_deseado)
+        messages.success(self.request, 'Cuenta creada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -89,7 +126,47 @@ class CuentaEditar(InquilinoMixin, UpdateView):
         return reverse_lazy('accounts:lista')
 
     def form_valid(self, form):
+        old_balance = self.get_object().balance
+        tipo = form.cleaned_data.get('tipo', self.get_object().tipo)
+        new_balance = form.cleaned_data.get('balance', 0)
+        diff = new_balance - old_balance
         super().form_valid(form)
+        cuenta = form.instance
+        if diff != 0 and tipo in ('debito', 'efectivo'):
+            if diff > 0:
+                key = 'positivo'
+                model_cls = Ingreso
+                monto = diff
+            else:
+                key = 'negativo'
+                model_cls = Gasto
+                monto = abs(diff)
+            nombre_cat, slug, hex_color = CAT_AJUSTE_MAP[key]
+            color_obj, _ = Color.objects.get_or_create(
+                inquilino=cuenta.inquilino,
+                slug=slug,
+                defaults={'nombre': f'Color {nombre_cat}', 'hex': hex_color, 'usuario': cuenta.usuario},
+            )
+            categoria, _ = Categoria.objects.get_or_create(
+                inquilino=cuenta.inquilino,
+                slug=slug,
+                defaults={
+                    'nombre': nombre_cat,
+                    'usuario': cuenta.usuario,
+                    'color': color_obj,
+                }
+            )
+            model_cls.objects.create(
+                inquilino=cuenta.inquilino,
+                usuario=cuenta.usuario,
+                cuenta=cuenta,
+                categoria=categoria,
+                monto=monto,
+                fecha=date.today(),
+                nota=f'Ajuste balance — {cuenta.nombre}',
+            )
+            Cuenta.objects.filter(pk=cuenta.pk).update(balance=new_balance)
+        messages.success(self.request, 'Cuenta actualizada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -112,11 +189,15 @@ class CuentaEliminar(InquilinoMixin, DeleteView):
         try:
             self.object.delete()
         except ProtectedError:
-            return HttpResponse(
+            messages.error(
+                self.request,
                 'No se puede eliminar: esta cuenta tiene transacciones asociadas. '
                 'Elimina primero sus ingresos, gastos y transferencias.',
-                status=409,
             )
+            response = HttpResponse()
+            response['HX-Redirect'] = self.get_success_url()
+            return response
+        messages.success(self.request, 'Cuenta eliminada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response

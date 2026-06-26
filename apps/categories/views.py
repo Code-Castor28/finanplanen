@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
@@ -42,6 +43,7 @@ class CategoriaCrear(InquilinoMixin, CreateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Categoría creada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -62,6 +64,7 @@ class CategoriaEditar(InquilinoMixin, UpdateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Categoría actualizada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -82,6 +85,7 @@ class CategoriaEliminar(InquilinoMixin, DeleteView):
     def form_valid(self, form):
         self.object = self.get_object()
         self.object.delete()
+        messages.success(self.request, 'Categoría eliminada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -108,6 +112,7 @@ class EtiquetaCrear(InquilinoMixin, CreateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Etiqueta creada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -128,6 +133,7 @@ class EtiquetaEditar(InquilinoMixin, UpdateView):
 
     def form_valid(self, form):
         super().form_valid(form)
+        messages.success(self.request, 'Etiqueta actualizada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
@@ -148,6 +154,7 @@ class EtiquetaEliminar(InquilinoMixin, DeleteView):
     def form_valid(self, form):
         self.object = self.get_object()
         self.object.delete()
+        messages.success(self.request, 'Etiqueta eliminada correctamente.')
         response = HttpResponse()
         response['HX-Redirect'] = self.get_success_url()
         return response
