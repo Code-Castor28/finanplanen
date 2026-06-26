@@ -77,6 +77,17 @@
 - [x] 12.3 Últimas 10 transacciones + tabla ahorro mensual con superávit/déficit
 - [x] 12.4 Template `dashboard.html` (397 líneas, extiende base.html)
 
+## Fase 19 — Notificaciones toast + Login feedback
+- [ ] 19.1 App `users`: login non_field_errors + registro success message
+- [ ] 19.2 App `accounts`: messages en CuentaCrear, Editar, Eliminar
+- [ ] 19.3 App `transactions`: messages en Ingreso/Gasto Crear, Editar, Eliminar
+- [ ] 19.4 App `transfers`: messages en Transferencia Crear, Editar, Eliminar
+- [ ] 19.5 App `budgets`: messages en Presupuesto Crear, Editar, Eliminar
+- [ ] 19.6 App `savings`: messages en MetaAhorro + Deposito Crear, Editar, Eliminar
+- [ ] 19.7 App `categories`: messages en Categoria/Etiqueta Crear, Editar, Eliminar
+- [ ] 19.8 App `theme`: messages en Color/Icono Crear, Editar, Eliminar
+- [ ] 19.9 `templates/base.html`: render Django messages como toast
+
 ## Fase 13 — Signals
 - [x] 13.1 Signal `Presupuesto.monto_gastado` (al guardar/borrar Gasto) — `apps/budgets/signals.py`
 - [x] 13.2 Signal `MetaAhorro.monto_actual` (al guardar/borrar DepositoAhorro) — `apps/savings/signals.py`

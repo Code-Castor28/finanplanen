@@ -81,3 +81,13 @@ Formato: `YYYY-MM-DD | Archivo | Línea(s) | Cambio | Motivo (ref. AUDITORIA.md)
 | 18.m8 | `apps/core/views.py` | 29-32, 181 | `total_balance = Sum(balance)` simple; `total_a_pagar = max(limite_credito - balance, 0)` | Revertido a Opción A |
 | 18.m9 | `apps/accounts/views.py` | 37 | `total = credito + debito + wallet` (suma simple) | Revertido a Opción A |
 | 18.m10 | `apps/accounts/templates/accounts/Cuenta.html` | 182-189 | Donut: `total = cred + deb + cash` (sin neto) | Revertido a Opción A |
+| 19.1a | `apps/users/views.py` | 1-8, 29-33, 44-48 | Import `messages` + `redirect`; `form_valid` en RegistroView y PerfilView | Sin feedback en registro/perfil |
+| 19.1b | `apps/users/templates/users/login.html` | 115-123 | Agregado bloque `form.non_field_errors` antes del form | Login no mostraba errores de autenticación |
+| 19.2 | `apps/accounts/views.py` | — | `messages.success/error` en CuentaCrear, Editar, Eliminar | Sin feedback en CRUD cuentas |
+| 19.3a | `apps/transactions/views.py` | — | `messages.success` en Ingreso/Gasto Crear, Editar, Eliminar | Sin feedback en CRUD transacciones |
+| 19.3b | `apps/transfers/views.py` | — | `messages.success` en Transferencia Crear, Editar, Eliminar | Sin feedback en CRUD transferencias |
+| 19.4 | `apps/budgets/views.py` | — | `messages.success` en Presupuesto Crear, Editar, Eliminar | Sin feedback en CRUD presupuestos |
+| 19.5a | `apps/savings/views.py` | — | `messages.success` en MetaAhorro + Deposito Crear, Editar, Eliminar | Sin feedback en CRUD ahorros |
+| 19.5b | `apps/categories/views.py` | — | `messages.success` en Categoria/Etiqueta Crear, Editar, Eliminar | Sin feedback en CRUD categorías |
+| 19.6 | `apps/theme/views.py` | — | `messages.success` en Color/Icono Crear, Editar, Eliminar | Sin feedback en CRUD tema |
+| 19.base | `templates/base.html` | — | Agregado bloque `{% if messages %}` que llama `showToast()` | Toast nunca se disparaba desde el backend |
