@@ -91,3 +91,17 @@ Formato: `YYYY-MM-DD | Archivo | Línea(s) | Cambio | Motivo (ref. AUDITORIA.md)
 | 19.5b | `apps/categories/views.py` | — | `messages.success` en Categoria/Etiqueta Crear, Editar, Eliminar | Sin feedback en CRUD categorías |
 | 19.6 | `apps/theme/views.py` | — | `messages.success` en Color/Icono Crear, Editar, Eliminar | Sin feedback en CRUD tema |
 | 19.base | `templates/base.html` | — | Agregado bloque `{% if messages %}` que llama `showToast()` | Toast nunca se disparaba desde el backend |
+
+## 2026-06-28 — Fase 20: Avatar dropdown + limpieza de sidebar
+
+| # | Archivo | Líneas | Cambio | Motivo |
+|---|---------|--------|--------|--------|
+| 20.1 | `templates/base.html` | 100-116 | Avatar en topbar derecho convertido a dropdown con Perfil, Colores, Iconos, Notificaciones | Centralizar configuraciones de usuario en el avatar |
+| 20.2 | `templates/base.html` | 70-79 | Eliminada sección "Configuración" del sidebar (Colores, Iconos, Notificaciones) | Esas opciones ahora están en el dropdown del avatar |
+| 20.3 | `templates/base.html` | 82-85 | Eliminado enlace "Perfil" del sidebar-bottom | Ahora está en el dropdown del avatar |
+| 20.4 | `static/css/style.css` | 58-70 | Nuevos estilos: `.avatar-dropdown`, `.avatar-dropdown-menu`, hover/active states | Soportar el nuevo dropdown del avatar |
+| 20.5 | `static/css/style.css` | 384-385 | `.overlay.show ~ .mob-nav{display:none}` dentro de @media(max-width:768px) | Ocultar navegación inferior al abrir sidebar en móvil |
+| 20.6 | `static/js/main.js` | 157-172 | Lógica de toggle/cierre del dropdown del avatar | Abrir/cerrar menú al hacer clic, clic fuera o Escape |
+| 20.7 | `static/css/style.css` | 57-65 | Unificar reglas `.topbar-avatar` duplicadas; agregar `-webkit-appearance:none`, `appearance:none`, `-webkit-tap-highlight-color:transparent` | El `<button>` nativo en móviles tiene estilos por defecto que rompen el círculo de 36x36 |
+| 20.8 | `static/js/main.js` | 8-20 | Agregar control directo de `.mob-nav` mediante JS en los handlers del sidebar | El combinador CSS `~` no era confiable en móviles; JS es más robusto |
+| 20.9 | `static/css/style.css` | 392 | Eliminar `.overlay.show ~ .mob-nav{display:none}` | Reemplazado por JS en 20.8 |

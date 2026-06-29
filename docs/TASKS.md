@@ -160,3 +160,12 @@
 - [x] 18.7 Dashboard: contexto `proximos_pagos` en `PanelPrincipal`
 - [x] 18.8 Dashboard template: loop de próximos pagos
 - [x] 18.9 Opción A vs B: se probó Opción B (balance=deuda) y se revirtió a Opción A (balance=disponible)
+
+## Fase 20 — Avatar dropdown + limpieza de sidebar
+- [x] 20.1 `base.html`: convertir avatar del topbar en dropdown con Perfil, Colores, Iconos, Notificaciones
+- [x] 20.2 `base.html`: eliminar sección Configuración y Perfil del sidebar
+- [x] 20.3 `style.css`: estilos del dropdown del avatar
+- [x] 20.4 `style.css`: ocultar `.mob-nav` cuando el sidebar está abierto en móvil (reemplazado por JS en 20.7)
+- [x] 20.7 `main.js`: controlar visibilidad de `.mob-nav` directamente al abrir/cerrar sidebar (más robusto que CSS `~`)
+- [x] 20.5 `main.js`: lógica de toggle y cierre del dropdown
+- [x] 20.6 `style.css`: corregir reglas `.topbar-avatar` duplicadas y agregar resets para botón en móvil
