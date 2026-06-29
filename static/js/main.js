@@ -5,17 +5,20 @@
   var sidebar = document.getElementById('sidebar');
   var overlay = document.getElementById('sidebarOverlay');
   var hamburger = document.getElementById('hamburgerBtn');
+  var mobNav = document.querySelector('.mob-nav');
 
   if (hamburger) {
     hamburger.addEventListener('click', function(){
       sidebar.classList.add('open');
       overlay.classList.add('show');
+      if (mobNav) mobNav.style.display = 'none';
     });
   }
   if (overlay) {
     overlay.addEventListener('click', function(){
       sidebar.classList.remove('open');
       overlay.classList.remove('show');
+      if (mobNav) mobNav.style.display = '';
     });
   }
 
@@ -152,5 +155,26 @@
     }
 
     window.addEventListener('pageshow', onPageShow);
+  }
+
+  /* Avatar dropdown toggle */
+  var avatarBtn = document.getElementById('avatarBtn');
+  var avatarDropdown = document.getElementById('avatarDropdown');
+
+  if (avatarBtn && avatarDropdown) {
+    avatarBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      avatarDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!avatarBtn.contains(e.target) && !avatarDropdown.contains(e.target)) {
+        avatarDropdown.classList.remove('show');
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') avatarDropdown.classList.remove('show');
+    });
   }
 })();

@@ -67,22 +67,9 @@
         <i class="fas fa-tags"></i><span>Categor&iacute;as</span>
       </a>
 
-      <div class="sidebar-section">Configuraci&oacute;n</div>
-      <a href="{% url 'theme:colores_lista' %}" class="nav-item{% if section == 'theme_colores' %} active{% endif %}">
-        <i class="fas fa-palette"></i><span>Colores</span>
-      </a>
-      <a href="{% url 'theme:iconos_lista' %}" class="nav-item{% if section == 'theme_iconos' %} active{% endif %}">
-        <i class="fas fa-icons"></i><span>Iconos</span>
-      </a>
-      <a href="{% url 'users:perfil' %}" class="nav-item{% if section == 'profile' %} active{% endif %}">
-        <i class="fas fa-bell"></i><span>Notificaciones</span>
-      </a>
     </nav>
 
     <div class="sidebar-bottom">
-      <a href="{% url 'users:perfil' %}" class="nav-item{% if section == 'profile' %} active{% endif %}">
-        <i class="fas fa-user"></i><span>Perfil</span>
-      </a>
       <a href="{% url 'users:salir' %}" class="nav-item">
         <i class="fas fa-right-from-bracket"></i><span>Cerrar Sesi&oacute;n</span>
       </a>
@@ -98,7 +85,17 @@
       <button class="hamburger" id="hamburgerBtn" aria-label="Men&uacute;"><i class="fas fa-bars"></i></button>
       <span class="topbar-title">{% block page_title %}FinanPlanen{% endblock %}</span>
       <div class="topbar-right">
-        <div class="topbar-avatar">{{ user.nombre|first|upper|default:user.nombre_usuario|first|upper }}</div>
+        <div class="avatar-dropdown">
+          <button class="topbar-avatar" id="avatarBtn" aria-label="Men&uacute; de usuario">
+            {{ user.nombre|first|upper|default:user.nombre_usuario|first|upper }}
+          </button>
+          <div class="avatar-dropdown-menu" id="avatarDropdown">
+            <a href="{% url 'users:perfil' %}"><i class="fas fa-user"></i> Perfil</a>
+            <a href="{% url 'theme:colores_lista' %}"><i class="fas fa-palette"></i> Colores</a>
+            <a href="{% url 'theme:iconos_lista' %}"><i class="fas fa-icons"></i> Iconos</a>
+            <a href="{% url 'users:perfil' %}"><i class="fas fa-bell"></i> Notificaciones</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="content">
