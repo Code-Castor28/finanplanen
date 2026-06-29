@@ -61,8 +61,9 @@ class Cuenta(models.Model):
         unique_together = ['inquilino', 'slug']
 
     def __str__(self):
-        banco = self.emisor if self.emisor else 'N/A'
-        return f'{self.nombre} | {banco} | {self.get_tipo_display()} | RD$ {self.balance:,.2f}'
+        banco = self.emisor if self.emisor else '-'
+        ultimos_digitos = self.ultimos_digitos if self.ultimos_digitos else '-'
+        return f'{self.nombre} ({ultimos_digitos}) | {banco} | {self.get_tipo_display()} | RD$ {self.balance:,.2f}'
 
     def save(self, *args, **kwargs):
         if not self.slug:
