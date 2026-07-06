@@ -106,3 +106,12 @@ Formato: `YYYY-MM-DD | Archivo | Línea(s) | Cambio | Motivo (ref. AUDITORIA.md)
 | 20.8 | `static/js/main.js` | 8-20 | Agregar control directo de `.mob-nav` mediante JS en los handlers del sidebar | El combinador CSS `~` no era confiable en móviles; JS es más robusto |
 | 20.9 | `static/css/style.css` | 392 | Eliminar `.overlay.show ~ .mob-nav{display:none}` | Reemplazado por JS en 20.8 |
 | 20.10 | `static/js/main.js` | 8-23 | Confirmado: `mobNav.style.display='none'` oculta el mob-nav al abrir sidebar. Bug de superposición resuelto. | La regla CSS nunca se implementó (descartada en 20.9). El JS existente funciona correctamente. |
+
+## 2026-07-06 — Fix mob-nav sobre sidebar en móvil (Fase 21)
+
+| # | Archivo | Líneas | Cambio | Motivo |
+|---|---------|--------|--------|--------|
+| 21.1 | `static/css/style.css` | 27 | Overlay `z-index: 99 → 110` | El overlay estaba por debajo del `mob-nav` (z-index 100), haciendo que la bottom bar quedara visible y sobre el overlay cuando el sidebar estaba abierto |
+| 21.2 | `static/css/style.css` | 68 | `body.sidebar-open .mob-nav{display:none!important}` | Capa de respaldo CSS: aunque JS falle o haya algún override, el mob-nav se oculta garantizadamente |
+| 21.3 | `static/js/main.js` | 13, 20 | `document.body.classList.add/remove('sidebar-open')` al abrir/cerrar sidebar | Activa la regla CSS de 21.2 y refuerza la lógica existente de `display:none` |
+

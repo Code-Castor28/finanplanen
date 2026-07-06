@@ -11,6 +11,7 @@
     hamburger.addEventListener('click', function(){
       sidebar.classList.add('open');
       overlay.classList.add('show');
+      document.body.classList.add('sidebar-open');
       if (mobNav) mobNav.style.display = 'none';
     });
   }
@@ -18,6 +19,7 @@
     overlay.addEventListener('click', function(){
       sidebar.classList.remove('open');
       overlay.classList.remove('show');
+      document.body.classList.remove('sidebar-open');
       if (mobNav) mobNav.style.display = '';
     });
   }

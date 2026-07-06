@@ -24,7 +24,7 @@ img{max-width:100%;display:block}
 .content{padding:28px 36px 100px;flex:1}
 
 /* ===== OVERLAY ===== */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;display:none}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:110;display:none}
 .overlay.show{display:block}
 
 /* ===== SIDEBAR ===== */
@@ -64,7 +64,8 @@ img{max-width:100%;display:block}
 .avatar-dropdown-menu a i{width:18px;text-align:center;color:var(--ol,#767683)}
 
 /* ===== MOBILE NAV ===== */
-.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sl,#fff);border-top:1px solid var(--olv,#c6c5d4);z-index:100;padding:6px 0 env(safe-area-inset-bottom,10px)}
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sl,#fff);border-top:1px solid var(--olv,#c6c5d4);z-index:105;padding:6px 0 env(safe-area-inset-bottom,10px)}
+body.sidebar-open .mob-nav{display:none!important}
 .mob-nav-inner{display:flex;justify-content:space-around}
 .mob-nav a{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:var(--ol,#767683);font-size:11px;font-weight:600;padding:10px 4px;min-width:54px;transition:color .15s;-webkit-tap-highlight-color:transparent}
 .mob-nav a i{font-size:20px}

@@ -170,3 +170,8 @@
 - [x] 20.5 `main.js`: lógica de toggle y cierre del dropdown
 - [x] 20.6 `style.css`: corregir reglas `.topbar-avatar` duplicadas y agregar resets para botón en móvil
 - [x] 20.10 Confirmar que el JS en `main.js:8-23` oculta correctamente `.mob-nav` al abrir sidebar. No requiere regla CSS — el bug de superposición está resuelto.
+
+## Fase 21 — Fix mob-nav superponiéndose sobre sidebar en móvil
+- [x] 21.1 `style.css`: elevar overlay z-index de 99 → 110 (mayor que mob-nav) para que tape la bottom bar al abrir sidebar
+- [x] 21.2 `style.css`: agregar `body.sidebar-open .mob-nav{display:none!important}` como capa CSS de respaldo
+- [x] 21.3 `main.js`: agregar/remover clase `sidebar-open` en `document.body` al abrir/cerrar sidebar
