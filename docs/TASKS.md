@@ -169,3 +169,4 @@
 - [x] 20.7 `main.js`: controlar visibilidad de `.mob-nav` directamente al abrir/cerrar sidebar (más robusto que CSS `~`)
 - [x] 20.5 `main.js`: lógica de toggle y cierre del dropdown
 - [x] 20.6 `style.css`: corregir reglas `.topbar-avatar` duplicadas y agregar resets para botón en móvil
+- [x] 20.10 Confirmar que el JS en `main.js:8-23` oculta correctamente `.mob-nav` al abrir sidebar. No requiere regla CSS — el bug de superposición está resuelto.

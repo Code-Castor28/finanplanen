@@ -105,3 +105,4 @@ Formato: `YYYY-MM-DD | Archivo | Línea(s) | Cambio | Motivo (ref. AUDITORIA.md)
 | 20.7 | `static/css/style.css` | 57-65 | Unificar reglas `.topbar-avatar` duplicadas; agregar `-webkit-appearance:none`, `appearance:none`, `-webkit-tap-highlight-color:transparent` | El `<button>` nativo en móviles tiene estilos por defecto que rompen el círculo de 36x36 |
 | 20.8 | `static/js/main.js` | 8-20 | Agregar control directo de `.mob-nav` mediante JS en los handlers del sidebar | El combinador CSS `~` no era confiable en móviles; JS es más robusto |
 | 20.9 | `static/css/style.css` | 392 | Eliminar `.overlay.show ~ .mob-nav{display:none}` | Reemplazado por JS en 20.8 |
+| 20.10 | `static/js/main.js` | 8-23 | Confirmado: `mobNav.style.display='none'` oculta el mob-nav al abrir sidebar. Bug de superposición resuelto. | La regla CSS nunca se implementó (descartada en 20.9). El JS existente funciona correctamente. |
