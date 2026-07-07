@@ -24,11 +24,11 @@ img{max-width:100%;display:block}
 .content{padding:28px 36px 100px;flex:1}
 
 /* ===== OVERLAY ===== */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:110;display:none}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150;display:none}
 .overlay.show{display:block}
 
 /* ===== SIDEBAR ===== */
-.sidebar{width:260px;min-height:100vh;background:linear-gradient(180deg,#1a237e,#0d1042);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s}
+.sidebar{width:260px;min-height:100vh;background:linear-gradient(180deg,#1a237e,#0d1042);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform .3s}
 .sidebar-logo{padding:28px 24px 24px;border-bottom:1px solid rgba(255,255,255,.08)}
 .sidebar-logo .lr{display:flex;align-items:center;gap:12px}
 .sidebar-logo .li{width:40px;height:40px;background:rgba(255,255,255,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#bdc2ff;font-size:18px}
